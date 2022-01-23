@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "90925970917",
+    "project_id": "planningkun",
+    "storage_bucket": "planningkun.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:90925970917:android:9b7723cd7790f483116b0c",
+        "android_client_info": {
+          "package_name": "com.apps.planningkun"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "90925970917-mqno788famgq7mme9vlkusno82iioib4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiSLlyicZ2bHh0Py31b0nW49GWJqd_XY8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "90925970917-mqno788famgq7mme9vlkusno82iioib4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
