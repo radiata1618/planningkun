@@ -30,6 +30,10 @@ dependencies:
   # Add the dependency for the FlutterFire plugin for Google Analytics
   firebase_analytics: ^9.0.5
 
+
+  # Add the dependency for the FlutterFire plugin for Google Analytics
+  syncfusion_flutter_calendar: ^19.4.43
+
   # Add the dependencies for any other Firebase products you want to use in your app
   # For example, to use Firebase Authentication and Cloud Firestore
   firebase_auth: ^3.3.5
