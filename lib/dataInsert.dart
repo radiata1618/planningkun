@@ -8,19 +8,18 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import 'firebase_config.dart';
 import 'tabs_page.dart';
+import 'userInsert.dart';
 
 
-class Chat extends StatefulWidget {
+class DataInsert extends StatefulWidget {
   @override
   final argumentEmail;
-  final argumentOppositeEmail;
 
-  Chat({this.argumentEmail
-  ,this.argumentOppositeEmail});
-  _Chat createState() => _Chat();
+  DataInsert({this.argumentEmail});
+  _DataInsert createState() => _DataInsert();
 }
 
-class _Chat extends State<Chat> {
+class _DataInsert extends State<DataInsert> {
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
   FirebaseAnalyticsObserver(analytics: analytics);
@@ -43,28 +42,13 @@ class _Chat extends State<Chat> {
           padding: EdgeInsets.all(32),
           child: Column(
             children: <Widget>[
-              TextFormField(
-                // テキスト入力のラベルを設定
-                decoration: InputDecoration(labelText: "メッセージ"),
-                onChanged: (String value) {
-                  setState(() {
-                    content = value;
-                  });
-                },
-              ),
               ElevatedButton(
                 onPressed: () async {
-                  try {
-                    _insertMessage();
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) => Chat(
-                    //       argumentEmail: email,
-                    //       //argumentBusinessYear: year,
-                    //     ),
-                    //   ),
-                    // );
-                  } catch (e) {}
+                      await Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) {
+                          return UserInsert();
+                        }),
+                      );
                 },
                 child: const Text('ユーザ情報登録'),
               ),

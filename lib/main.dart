@@ -11,8 +11,9 @@ import 'package:flutter/material.dart';
 
 import 'firebase_config.dart';
 import 'tabs_page.dart';
-import 'calendarWeek.dart';
+import 'talkList.dart';
 import 'login.dart';
+import 'dataInsert.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,7 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
     FirebaseFirestore.instance.collection('message').add({'content': _message});
   }
 
-
     void _deleteMessage() async {
       final messages = await FirebaseFirestore.instance.collection("message").get();
       for (var message in messages.docs) {
@@ -131,14 +131,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => CalendarWeek(
+                    builder: (context) => TalkList(
                         //argumentMode: 2,
                         //argumentBusinessYear: year,
                     ),
                   ),
                 );
               },
-              child: const Text('カレンダー画面')//,
+              child: const Text('トークリスト画面')//,
           ),
           MaterialButton(
               onPressed: () {
@@ -152,6 +152,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: const Text('ログイン画面')//,
+          ),
+          MaterialButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DataInsert(
+                      //argumentMode: 2,
+                      //argumentBusinessYear: year,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('テストデータ登録')//,
           ),
           ListView.builder(
             padding: EdgeInsets.all(36.0),
