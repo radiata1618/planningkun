@@ -11,7 +11,8 @@ import 'package:flutter/material.dart';
 
 import 'firebase_config.dart';
 import 'tabs_page.dart';
-import 'CalendarWeek.dart';
+import 'calendarWeek.dart';
+import 'login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -138,6 +139,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: const Text('カレンダー画面')//,
+          ),
+          MaterialButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => login(
+                      //argumentMode: 2,
+                      //argumentBusinessYear: year,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('ログイン画面')//,
           ),
           ListView.builder(
             padding: EdgeInsets.all(36.0),
