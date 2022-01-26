@@ -28,16 +28,16 @@ class _Chat extends State<Chat> {
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
       'ownUserEmail': email,
-      'SenderEmail': email,
-      'ReceiverEmail': oppositeUserEmail,
+      'senderEmail': email,
+      'receiverEmail': oppositeUserEmail,
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
       'ownUserEmail': oppositeUserEmail,
-      'SenderEmail': email,
-      'ReceiverEmail': oppositeUserEmail,
+      'senderEmail': email,
+      'receiverEmail': oppositeUserEmail,
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
   }
@@ -56,25 +56,25 @@ class _Chat extends State<Chat> {
         ),
         iconTheme: IconThemeData(color: Colors.black87),
       ),
-      body: buildMessageList(widget.argumentEmail)
+      //body: buildMessageList(widget.argumentEmail)
 
-      // SafeArea(
-      //     child: Column(children: <Widget>[
-      //   Expanded(
-      //     child: Padding(
-      //       padding:
-      //           const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-      //       child: Column(
-      //         children: <Widget>[
-      //           buildMessageList(widget.argumentEmail),
-      //           leftBalloon(),
-      //           leftBalloon(),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      //   textInputWidget(),
-      // ])),
+      body:SafeArea(
+          child: Column(children: <Widget>[
+        Expanded(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+            child: Column(
+              children: <Widget>[
+                buildMessageList(widget.argumentEmail),
+                ////leftBalloon(),
+                ////leftBalloon(),
+              ],
+            ),
+          ),
+        ),
+        textInputWidget(),
+      ])),
 
 
     );
@@ -112,7 +112,7 @@ class _Chat extends State<Chat> {
     );
   }
 
-  Padding leftBalloon() {
+  Padding leftBalloon(String content) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 28.0),
       child: Align(
@@ -138,7 +138,7 @@ class _Chat extends State<Chat> {
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child:
-                      Text('メッセージ', style: TextStyle(color: Colors.black54))))),
+                      Text(content, style: TextStyle(color: Colors.black54))))),
     );
   }
 
@@ -199,7 +199,7 @@ class _Chat extends State<Chat> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('messages')
-          //.where('ownUserEmail', isEqualTo: email)
+          .where('ownUserEmail', isEqualTo: email)
           .orderBy('sendTime', descending: true)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -212,9 +212,16 @@ class _Chat extends State<Chat> {
           return const Text('Something went wrong');
         }
         return ListView(
+          shrinkWrap: true,//エラー対策
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             final data = document.data()! as Map<String, dynamic>;
-            return rightBalloon(data['content']);
+            if(data['senderEmail']==data['ownUserEmail']){
+              return rightBalloon(data['content']);
+
+            }else{
+
+              return leftBalloon(data['content']);
+            }
           }).toList(),
         );
       },
