@@ -108,27 +108,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: <Widget>[
-          Text(
-            "",
-            style: const TextStyle(color: Color.fromARGB(255, 0, 155, 0)),
-          ),
-          TextFormField(
-            onChanged: (value) {
-              _message = value;
-            },),
-          MaterialButton(
-            onPressed: _insertMessage,
-            child: const Text('メッセージ登録'),
-          ),
-          MaterialButton(
-            onPressed: _deleteMessage,
-            child: const Text('メッセージ削除'),
-          ),
-          MaterialButton(
-            onPressed: _selectMessage,
-            child: const Text('メッセージ表示')//,
-          ),
-
           TextFormField(
             decoration: InputDecoration(labelText: "ログインメール"),
             onChanged: (value) {

@@ -23,12 +23,23 @@ class _Chat extends State<Chat> {
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
-  Future<void> _insertMessage() async {
-    // addによるドキュメントIDを指定しない追加
-    // この場合は、ドキュメントIDはハッシュ値が払い出されます
-    FirebaseFirestore.instance.collection('messages').add(
-      {'email': widget.argumentEmail, 'content': content},
-    );
+  Future<void> _insertMessage(
+      String email, String oppositeUserEmail, String messageContent) async {
+    FirebaseFirestore.instance.collection('messages').add({
+      'content': messageContent,
+      'ownUserEmail': email,
+      'SenderEmail': email,
+      'ReceiverEmail': oppositeUserEmail,
+      'sendTime': Timestamp.fromDate(DateTime.now()),
+    });
+
+    FirebaseFirestore.instance.collection('messages').add({
+      'content': messageContent,
+      'ownUserEmail': oppositeUserEmail,
+      'SenderEmail': email,
+      'ReceiverEmail': oppositeUserEmail,
+      'sendTime': Timestamp.fromDate(DateTime.now()),
+    });
   }
 
   String content = "";
@@ -45,28 +56,31 @@ class _Chat extends State<Chat> {
         ),
         iconTheme: IconThemeData(color: Colors.black87),
       ),
-      body: SafeArea(
-          child: Column(children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-            child: Column(
-              children: <Widget>[
-                rightBalloon(),
-                leftBalloon(),
-                rightBalloon(),
-                leftBalloon(),
-              ],
-            ),
-          ),
-        ),
-        textInputWidget(),
-      ])),
+      body: buildMessageList(widget.argumentEmail)
+
+      // SafeArea(
+      //     child: Column(children: <Widget>[
+      //   Expanded(
+      //     child: Padding(
+      //       padding:
+      //           const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+      //       child: Column(
+      //         children: <Widget>[
+      //           buildMessageList(widget.argumentEmail),
+      //           leftBalloon(),
+      //           leftBalloon(),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      //   textInputWidget(),
+      // ])),
+
+
     );
   }
 
-  Padding rightBalloon(){
+  Padding rightBalloon(String content) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 28.0),
       child: Align(
@@ -91,17 +105,14 @@ class _Chat extends State<Chat> {
                       ])),
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text('メッセージ',
+                  child: Text(content,
                       style: TextStyle(
                         color: Colors.white,
                       ))))),
     );
   }
 
-
-
-
-  Padding leftBalloon(){
+  Padding leftBalloon() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 28.0),
       child: Align(
@@ -126,10 +137,8 @@ class _Chat extends State<Chat> {
                       ])),
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text('メッセージ',
-                      style: TextStyle(
-                        color: Colors.black54
-                      ))))),
+                  child:
+                      Text('メッセージ', style: TextStyle(color: Colors.black54))))),
     );
   }
 
@@ -156,9 +165,24 @@ class _Chat extends State<Chat> {
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(40)),
           child: TextField(
-              autofocus: true,
-              decoration: InputDecoration(border: InputBorder.none)),
+            autofocus: true,
+            decoration: InputDecoration(border: InputBorder.none),
+            onChanged: (String value) {
+              setState(() {
+                content = value;
+              });
+            },
+          ),
         )),
+        IconButton(
+          icon: Icon(Icons.arrow_forward_ios_rounded),
+          iconSize: 28,
+          color: Colors.black54,
+          onPressed: () {
+            _insertMessage(
+                widget.argumentEmail, widget.argumentOppositeEmail, content);
+          },
+        ),
         IconButton(
           icon: Icon(Icons.mic),
           iconSize: 28,
@@ -168,4 +192,34 @@ class _Chat extends State<Chat> {
       ]),
     );
   }
+
+
+
+  Widget buildMessageList(String email) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('messages')
+          //.where('ownUserEmail', isEqualTo: email)
+          .orderBy('sendTime', descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: const CircularProgressIndicator(),
+          );
+        }
+        if (snapshot.hasError) {
+          return const Text('Something went wrong');
+        }
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            final data = document.data()! as Map<String, dynamic>;
+            return rightBalloon(data['content']);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+
 }
