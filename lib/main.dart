@@ -14,6 +14,7 @@ import 'tabs_page.dart';
 import 'talkList.dart';
 import 'login.dart';
 import 'dataInsert.dart';
+import 'root.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -130,8 +131,21 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => login(
+                    builder: (context) => Root(
+                        argumentEmail:email
                       //argumentMode: 2,
+                      //argumentBusinessYear: year,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('ルート画面')//,
+          ),
+          MaterialButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => login(
                       //argumentBusinessYear: year,
                     ),
                   ),
