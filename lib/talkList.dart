@@ -9,6 +9,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'firebase_config.dart';
 import 'tabs_page.dart';
 import 'friendList.dart';
+import 'chat.dart';
 
 class TalkList extends StatelessWidget {
   final argumentEmail;
@@ -38,6 +39,23 @@ class TalkList extends StatelessWidget {
     );
   }
 
+
+  Future<void> _MoveToTalks(String oppositeUserEmail,BuildContext context) async {
+    // addによるドキュメントIDを指定しない追加
+    // この場合は、ドキュメントIDはハッシュ値が払い出されます
+    Navigator.push(
+      context,MaterialPageRoute(
+      builder: (context) => Chat(
+          argumentOppositeEmail: oppositeUserEmail,
+          argumentEmail: argumentEmail
+      ),
+    ),
+    );
+
+
+
+  }
+
   Widget buildTalkList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -62,6 +80,9 @@ class TalkList extends StatelessWidget {
                 trailing: Text(data['lastTime'].toDate().toString()),
                 title: Text(data['oppositeUserEmail']),
                 subtitle: Text(data['LastMessageContent']),
+                onTap: () {
+                  _MoveToTalks(data['oppositeUserEmail'],context);
+                },
                   ),
             );
           }).toList(),

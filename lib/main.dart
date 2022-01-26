@@ -63,6 +63,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
+  String email = '';
 
 
   List<String> _contents=[];
@@ -127,12 +128,18 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: _selectMessage,
             child: const Text('メッセージ表示')//,
           ),
+
+          TextFormField(
+            decoration: InputDecoration(labelText: "ログインメール"),
+            onChanged: (value) {
+              email = value;
+            },),
           MaterialButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => TalkList(
-                        //argumentMode: 2,
+                        argumentEmail:email
                         //argumentBusinessYear: year,
                     ),
                   ),

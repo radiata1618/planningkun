@@ -13,8 +13,9 @@ import 'Chat.dart';
 
 class FriendList extends StatelessWidget {
   final argumentEmail;
+  final argumentOppositeEmail;
 
-  FriendList({this.argumentEmail});
+  FriendList({this.argumentEmail,this.argumentOppositeEmail});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class FriendList extends StatelessWidget {
         .where('userEmail', isEqualTo: argumentEmail)
         .get();
 
-    if(snapshot.size>0){
+    if(snapshot.size==0){
       FirebaseFirestore.instance.collection('talks').add({
         'LastMessageContent': "あああ",
         'LastMessageDocId': "",
@@ -49,7 +50,7 @@ class FriendList extends StatelessWidget {
       context,MaterialPageRoute(
         builder: (context) => Chat(
           argumentOppositeEmail: email,
-          argumentEmail: argumentEmail,
+            argumentEmail: argumentEmail
         ),
       ),
     );
