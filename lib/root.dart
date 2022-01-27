@@ -7,11 +7,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'rootWidget.dart';
 
 class Root extends StatefulWidget {
-  @override
   final argumentEmail;
 
   Root({this.argumentEmail});
 
+  @override
   _Root createState() => _Root();
 }
 
@@ -34,6 +34,6 @@ class _Root extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    return RootWidget();
+    return RootWidget(argumentEmail:widget.argumentEmail);
   }
 }

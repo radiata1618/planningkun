@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'routes/home_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/timeline_route.dart';
-import 'routes/wallet_route.dart';
+import 'routes/map_route.dart';
 import 'routes/news_route.dart';
 // =============================================
 
 class RootWidget extends StatefulWidget {
-  RootWidget({Key? key}) : super(key: key);
+  final argumentEmail;
+
+  RootWidget({this.argumentEmail});
 
   @override
   _RootWidgetState createState() => _RootWidgetState();
@@ -29,11 +31,11 @@ class _RootWidgetState extends State<RootWidget> {
   ];
 
   static const _footerItemNames = [
-    'ホーム',
+    'おすすめ',
     'トーク',
-    'タイムライン',
-    'ニュース',
-    'ウォレット',
+    'カレンダ',
+    'Me',
+    'マップ',
   ];
 
   // === 追加部分 ===
@@ -42,13 +44,16 @@ class _RootWidgetState extends State<RootWidget> {
     Talk(),
     TimeLine(),
     News(),
-    Wallet(),
+    Map(),
   ];
+
   // ==============
 
   @override
   void initState() {
     super.initState();
+
+    //String email = widget.argumentEmail;
     _bottomNavigationBarItems.add(_UpdateActiveState(0));
     for (var i = 1; i < _footerItemNames.length; i++) {
       _bottomNavigationBarItems.add(_UpdateDeactiveState(i));
@@ -67,8 +72,7 @@ class _RootWidgetState extends State<RootWidget> {
           style: TextStyle(
             color: Colors.black87,
           ),
-        )
-    );
+        ));
   }
 
   BottomNavigationBarItem _UpdateDeactiveState(int index) {
@@ -82,8 +86,7 @@ class _RootWidgetState extends State<RootWidget> {
           style: TextStyle(
             color: Colors.black26,
           ),
-        )
-    );
+        ));
   }
 
   void _onItemTapped(int index) {
@@ -98,7 +101,10 @@ class _RootWidgetState extends State<RootWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _routes.elementAt(_selectedIndex),
+      body:
+      routeElement(_selectedIndex,widget.argumentEmail),
+      //Home(),
+      //_routes.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
         items: _bottomNavigationBarItems,
@@ -106,5 +112,22 @@ class _RootWidgetState extends State<RootWidget> {
         onTap: _onItemTapped,
       ),
     );
+  }
+
+  Widget routeElement(int selectedIndex,String email) {
+    switch (selectedIndex) {
+      case 0:
+        return Home();
+        break;
+      case 1:
+        return Talk(argumentEmail: email,);
+        break;
+      case 2:
+        return TimeLine();
+      case 3:
+        return News();
+      default:
+        return Map();
+    }
   }
 }

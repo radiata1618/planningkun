@@ -23,7 +23,7 @@ class FriendList extends StatelessWidget {
       appBar: AppBar(
         title: Text(""),
       ),
-      body: buildFriendList(),
+      body: buildFriendList(argumentEmail),
     );
   }
 
@@ -39,8 +39,8 @@ class FriendList extends StatelessWidget {
 
     if(snapshot.size==0){
       FirebaseFirestore.instance.collection('talks').add({
-        'LastMessageContent': "あああ",
-        'LastMessageDocId': "",
+        'lastMessageContent': "あああ",
+        'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
         'oppositeUserEmail': email,
         'userEmail': argumentEmail
@@ -60,11 +60,12 @@ class FriendList extends StatelessWidget {
   }
 
 
-  Widget buildFriendList() {
+  Widget buildFriendList(String email) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('users')
-          .orderBy('name', descending: true)
+          .where('email', isNotEqualTo: email)
+          //.orderBy('name', descending: true)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {

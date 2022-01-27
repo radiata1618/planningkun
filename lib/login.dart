@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'chat.dart';
 import 'register.dart';
-import 'talkList.dart';
 
 
 class login extends StatefulWidget {
@@ -97,7 +96,7 @@ class _loginState extends State<login> {
                       // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
-                          return TalkList(
+                          return Register(
                             argumentEmail: email,);
                         }),
                       );

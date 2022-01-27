@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 
 import 'firebase_config.dart';
 import 'tabs_page.dart';
-import 'talkList.dart';
 import 'login.dart';
 import 'dataInsert.dart';
 import 'root.dart';
@@ -72,33 +71,20 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState(){
   }
 
+  Future<void> _insertUser(String email) async {
 
-  Future<void> _insertMessage() async {
-    // addによるドキュメントIDを指定しない追加
-    // この場合は、ドキュメントIDはハッシュ値が払い出されます
-    FirebaseFirestore.instance.collection('message').add({'content': _message});
-  }
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
 
-    void _deleteMessage() async {
-      final messages = await FirebaseFirestore.instance.collection("message").get();
-      for (var message in messages.docs) {
-        print(message.reference.id);
-        FirebaseFirestore.instance.collection("message").doc(message.reference.id).delete();
-      }
-    }
-  void _selectMessage() async {
-
-
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('message').get();
-    for(var i = 0; i < snapshot.docs.length; i++){
-      _contents.add(snapshot.docs[i].get('content'));
-      print(_contents[i]);
+    if(snapshot.size==0){
+      FirebaseFirestore.instance.collection('users').add(
+        {'email':email , 'name': "テスト用", 'age':21 },
+      );
     }
 
-    setState((){});
-
   }
-
 
 
   @override
@@ -116,28 +102,34 @@ class _MyHomePageState extends State<MyHomePage> {
             },),
           MaterialButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => TalkList(
-                        argumentEmail:email
-                        //argumentBusinessYear: year,
+                if(email==""){
+                  showDialog(
+                      context: context,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: Text('サンプルダイアログ'),
+                        content: Text('メールアドレスを入力してください'),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("OK"),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                }else{
+
+                  _insertUser(email);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Root(
+                          argumentEmail:email
+                      ),
                     ),
-                  ),
-                );
-              },
-              child: const Text('トークリスト画面')//,
-          ),
-          MaterialButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Root(
-                        argumentEmail:email
-                      //argumentMode: 2,
-                      //argumentBusinessYear: year,
-                    ),
-                  ),
-                );
+                  );
+                }
               },
               child: const Text('ルート画面')//,
           ),

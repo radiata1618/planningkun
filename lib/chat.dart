@@ -25,19 +25,35 @@ class _Chat extends State<Chat> {
 
   Future<void> _insertMessage(
       String email, String oppositeUserEmail, String messageContent) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('talks')
+        .where('oppositeUserEmail', isEqualTo: email)
+        .where('userEmail', isEqualTo: oppositeUserEmail)
+        .get();
+
+    if (snapshot.size == 0) {
+      FirebaseFirestore.instance.collection('talks').add({
+        'lastMessageContent': "あああ",
+        'lastMessageDocId': "",
+        'lastTime': Timestamp.fromDate(DateTime.now()),
+        'oppositeUserEmail': email,
+        'userEmail': oppositeUserEmail
+      });
+    }
+
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'ownUserEmail': email,
-      'senderEmail': email,
-      'receiverEmail': oppositeUserEmail,
+      'userEmail': email,
+      'oppositeUserEmail': oppositeUserEmail,
+      'receiveSend': "send",
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'ownUserEmail': oppositeUserEmail,
-      'senderEmail': email,
-      'receiverEmail': oppositeUserEmail,
+      'userEmail': oppositeUserEmail,
+      'oppositeUserEmail': email,
+      'receiveSend': "receive",
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
   }
@@ -58,7 +74,7 @@ class _Chat extends State<Chat> {
       ),
       //body: buildMessageList(widget.argumentEmail)
 
-      body:SafeArea(
+      body: SafeArea(
           child: Column(children: <Widget>[
         Expanded(
           child: Padding(
@@ -66,17 +82,14 @@ class _Chat extends State<Chat> {
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
             child: Column(
               children: <Widget>[
-                buildMessageList(widget.argumentEmail),
-                ////leftBalloon(),
-                ////leftBalloon(),
+                buildMessageList(
+                    widget.argumentEmail, widget.argumentOppositeEmail),
               ],
             ),
           ),
         ),
         textInputWidget(),
       ])),
-
-
     );
   }
 
@@ -193,14 +206,13 @@ class _Chat extends State<Chat> {
     );
   }
 
-
-
-  Widget buildMessageList(String email) {
+  Widget buildMessageList(String email, String oppositeEmail) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('messages')
-          .where('ownUserEmail', isEqualTo: email)
-          .orderBy('sendTime', descending: true)
+          .where('userEmail', isEqualTo: email)
+          .where('oppositeUserEmail', isEqualTo: oppositeEmail)
+          .orderBy('sendTime', descending: false)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
@@ -212,14 +224,12 @@ class _Chat extends State<Chat> {
           return const Text('Something went wrong');
         }
         return ListView(
-          shrinkWrap: true,//エラー対策
+          shrinkWrap: true, //エラー対策
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             final data = document.data()! as Map<String, dynamic>;
-            if(data['senderEmail']==data['ownUserEmail']){
+            if (data['receiveSend'] == "send") {
               return rightBalloon(data['content']);
-
-            }else{
-
+            } else {
               return leftBalloon(data['content']);
             }
           }).toList(),
@@ -227,6 +237,4 @@ class _Chat extends State<Chat> {
       },
     );
   }
-
-
 }
