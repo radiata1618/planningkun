@@ -13,7 +13,7 @@ import 'firebase_config.dart';
 import 'tabs_page.dart';
 import 'login.dart';
 import 'dataInsert.dart';
-import 'root.dart';
+import 'rootWidget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,6 +64,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
   String email = '';
+  String userDocId = '';
 
 
   List<String> _contents=[];
@@ -82,8 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
       FirebaseFirestore.instance.collection('users').add(
         {'email':email , 'name': "テスト用", 'age':21 },
       );
+
+      snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
     }
 
+    userDocId=snapshot.docs[0].id;
   }
 
 
@@ -124,8 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   _insertUser(email);
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => Root(
+                      builder: (context) => RootWidget(
                           argumentEmail:email
+                          ,argumentUserDocId:userDocId
                       ),
                     ),
                   );

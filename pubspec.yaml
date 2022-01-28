@@ -27,6 +27,10 @@ dependencies:
   # Add the dependency for the Firebase Core Flutter SDK
   firebase_core: ^1.11.0
 
+  firebase_storage: ^10.2.6
+  image_picker: ^0.8.4+5
+  video_player: ^2.2.16
+  path_provider: ^2.0.8
   # Add the dependency for the FlutterFire plugin for Google Analytics
   firebase_analytics: ^9.0.5
 

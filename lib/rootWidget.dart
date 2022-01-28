@@ -6,13 +6,15 @@ import 'routes/home_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/timeline_route.dart';
 import 'routes/map_route.dart';
-import 'routes/news_route.dart';
+import 'routes/setting_route.dart';
 // =============================================
 
 class RootWidget extends StatefulWidget {
   final argumentEmail;
+  final argumentUserDocId;
 
-  RootWidget({this.argumentEmail});
+
+  RootWidget({this.argumentEmail,this.argumentUserDocId});
 
   @override
   _RootWidgetState createState() => _RootWidgetState();
@@ -43,7 +45,7 @@ class _RootWidgetState extends State<RootWidget> {
     Home(),
     Talk(),
     TimeLine(),
-    News(),
+    Setting(),
     Map(),
   ];
 
@@ -102,7 +104,7 @@ class _RootWidgetState extends State<RootWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-      routeElement(_selectedIndex,widget.argumentEmail),
+      routeElement(_selectedIndex,widget.argumentEmail,widget.argumentUserDocId),
       //Home(),
       //_routes.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
@@ -114,7 +116,7 @@ class _RootWidgetState extends State<RootWidget> {
     );
   }
 
-  Widget routeElement(int selectedIndex,String email) {
+  Widget routeElement(int selectedIndex,String email,String userDocId) {
     switch (selectedIndex) {
       case 0:
         return Home();
@@ -125,7 +127,9 @@ class _RootWidgetState extends State<RootWidget> {
       case 2:
         return TimeLine();
       case 3:
-        return News();
+        return Setting(
+        argumentEmail:email,
+        argumentUserDocId:userDocId);
       default:
         return Map();
     }

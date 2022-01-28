@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.apps.planningkun">
    <application
+       android:name="io.flutter.app.FlutterApplication"
         android:label="planningkun"
         android:icon="@mipmap/ic_launcher">
+
+
+<!--       <meta-data android:name="com.google.android.geo.API_KEY"-->
+<!--           android:value="${MAPS_API_KEY}" />-->
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
