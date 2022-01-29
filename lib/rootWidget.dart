@@ -122,7 +122,8 @@ class _RootWidgetState extends State<RootWidget> {
         return Home();
         break;
       case 1:
-        return Talk(argumentEmail: email,);
+        return Talk(argumentEmail: email,
+            argumentUserDocId:userDocId);
         break;
       case 2:
         return TimeLine();

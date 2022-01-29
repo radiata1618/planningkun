@@ -40,44 +40,26 @@ class _Register extends State<Register> {
           padding: EdgeInsets.all(32),
           child: Column(
             children: <Widget>[
-              TextFormField(
-                // テキスト入力のラベルを設定
-                decoration: InputDecoration(labelText: "名前"),
-                onChanged: (String value) {
-                  setState(() {
-                    name = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: "年齢"),
-                obscureText: true,
-                onChanged: (String value) {
-                  setState(() {
-                    age = int.parse(value);
-                  });
-                },
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    onPressed:
-                    _insertUser;
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Chat(
-                            argumentEmail: email,
-                            //argumentBusinessYear: year,
-                            ),
-                      ),
-                    );
-                  } catch (e) {}
-                },
-                child: const Text('ユーザ情報登録'),
-              ),
+              // TextFormField(
+              //   // テキスト入力のラベルを設定
+              //   decoration: InputDecoration(labelText: "名前"),
+              //   onChanged: (String value) {
+              //     setState(() {
+              //       name = value;
+              //     });
+              //   },
+              // ),
+              // const SizedBox(height: 8),
+              // TextFormField(
+              //   keyboardType: TextInputType.number,
+              //   decoration: InputDecoration(labelText: "年齢"),
+              //   obscureText: true,
+              //   onChanged: (String value) {
+              //     setState(() {
+              //       age = int.parse(value);
+              //     });
+              //   },
+              // ),
             ],
           ),
         ),

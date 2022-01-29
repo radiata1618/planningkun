@@ -9,10 +9,10 @@ import 'firebase_config.dart';
 import 'tabs_page.dart';
 
 class Chat extends StatefulWidget {
-  final argumentEmail;
-  final argumentOppositeEmail;
+  final argumentUserDocId;
+  final argumentOppositeUserDocId;
 
-  Chat({this.argumentEmail, this.argumentOppositeEmail});
+  Chat({this.argumentUserDocId,this.argumentOppositeUserDocId});
 
   @override
   _Chat createState() => _Chat();
@@ -24,11 +24,13 @@ class _Chat extends State<Chat> {
       FirebaseAnalyticsObserver(analytics: analytics);
 
   Future<void> _insertMessage(
-      String email, String oppositeUserEmail, String messageContent) async {
+
+      //相手ユーザの画面にトークデータがなかったら新規作成する
+      String userDocId, String oppositeUserDocId, String messageContent) async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('talks')
-        .where('oppositeUserEmail', isEqualTo: email)
-        .where('userEmail', isEqualTo: oppositeUserEmail)
+        .where('oppositeUserDocId', isEqualTo: userDocId)
+        .where('userDocId', isEqualTo: oppositeUserDocId)
         .get();
 
     if (snapshot.size == 0) {
@@ -36,23 +38,23 @@ class _Chat extends State<Chat> {
         'lastMessageContent': "あああ",
         'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
-        'oppositeUserEmail': email,
-        'userEmail': oppositeUserEmail
+        'oppositeUserDocId': userDocId,
+        'userDocId': oppositeUserDocId
       });
     }
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userEmail': email,
-      'oppositeUserEmail': oppositeUserEmail,
+      'userDocId': userDocId,
+      'oppositeUserDocId': oppositeUserDocId,
       'receiveSend': "send",
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userEmail': oppositeUserEmail,
-      'oppositeUserEmail': email,
+      'userDocId': oppositeUserDocId,
+      'oppositeUserDocId': userDocId,
       'receiveSend': "receive",
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
@@ -67,12 +69,11 @@ class _Chat extends State<Chat> {
         backgroundColor: Theme.of(context).canvasColor,
         elevation: .6,
         title: Text(
-          widget.argumentOppositeEmail,
+          widget.argumentOppositeUserDocId,
           style: TextStyle(color: Colors.black87),
         ),
         iconTheme: IconThemeData(color: Colors.black87),
       ),
-      //body: buildMessageList(widget.argumentEmail)
 
       body: SafeArea(
           child: Column(children: <Widget>[
@@ -83,7 +84,7 @@ class _Chat extends State<Chat> {
             child: Column(
               children: <Widget>[
                 buildMessageList(
-                    widget.argumentEmail, widget.argumentOppositeEmail),
+                    widget.argumentUserDocId, widget.argumentOppositeUserDocId),
               ],
             ),
           ),
@@ -193,7 +194,7 @@ class _Chat extends State<Chat> {
           color: Colors.black54,
           onPressed: () {
             _insertMessage(
-                widget.argumentEmail, widget.argumentOppositeEmail, content);
+                widget.argumentUserDocId, widget.argumentOppositeUserDocId, content);
           },
         ),
         IconButton(
@@ -206,12 +207,12 @@ class _Chat extends State<Chat> {
     );
   }
 
-  Widget buildMessageList(String email, String oppositeEmail) {
+  Widget buildMessageList(String userDocId, String oppositeUserDocId) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('messages')
-          .where('userEmail', isEqualTo: email)
-          .where('oppositeUserEmail', isEqualTo: oppositeEmail)
+          .where('userDocId', isEqualTo: userDocId)
+          .where('oppositeUserDocId', isEqualTo: oppositeUserDocId)
           .orderBy('sendTime', descending: false)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {

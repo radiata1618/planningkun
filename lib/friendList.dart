@@ -9,13 +9,13 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'firebase_config.dart';
 import 'tabs_page.dart';
 import 'friendList.dart';
-import 'Chat.dart';
+import 'chat.dart';
 
 class FriendList extends StatelessWidget {
   final argumentEmail;
-  final argumentOppositeEmail;
+  final argumentUserDocId;
 
-  FriendList({this.argumentEmail,this.argumentOppositeEmail});
+  FriendList({this.argumentEmail,this.argumentUserDocId});
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +28,13 @@ class FriendList extends StatelessWidget {
   }
 
 
-  Future<void> _insertOrMoveTalks(String email,BuildContext context) async {
+  Future<void> _insertOrMoveTalks(String oppositeUserDocId,BuildContext context) async {
     // addによるドキュメントIDを指定しない追加
     // この場合は、ドキュメントIDはハッシュ値が払い出されます
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('talks')
-        .where('oppositeUserEmail', isEqualTo: email)
-        .where('userEmail', isEqualTo: argumentEmail)
+        .where('oppositeUserDocId', isEqualTo: oppositeUserDocId)
+        .where('userDocId', isEqualTo: argumentUserDocId)
         .get();
 
     if(snapshot.size==0){
@@ -42,15 +42,15 @@ class FriendList extends StatelessWidget {
         'lastMessageContent': "あああ",
         'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
-        'oppositeUserEmail': email,
-        'userEmail': argumentEmail
+        'oppositeUserDocId': oppositeUserDocId,
+        'userDocId': argumentUserDocId
       });
     }
     Navigator.push(
       context,MaterialPageRoute(
         builder: (context) => Chat(
-          argumentOppositeEmail: email,
-            argumentEmail: argumentEmail
+          argumentUserDocId: argumentUserDocId,
+          argumentOppositeUserDocId: oppositeUserDocId
         ),
       ),
     );
@@ -86,7 +86,7 @@ class FriendList extends StatelessWidget {
                 title: Text(data['email']),
                 subtitle: Text(data['name']),
                 onTap: () {
-                  _insertOrMoveTalks(data['email'],context);
+                  _insertOrMoveTalks(document.id,context);
                 },
               ),
             );

@@ -11,8 +11,9 @@ import '../FriendList.dart';
 
 class Talk extends StatefulWidget {
   final argumentEmail;
+  final argumentUserDocId;
 
-  Talk({this.argumentEmail});
+  Talk({this.argumentEmail,this.argumentUserDocId});
 
   @override
   _Talk createState() => _Talk();
@@ -25,14 +26,15 @@ class _Talk extends State<Talk> {
       appBar: AppBar(
         title: Text(""),
       ),
-      body: buildTalkList(widget.argumentEmail),
+      body: buildTalkList(widget.argumentUserDocId),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => FriendList(
-                  argumentEmail: widget.argumentEmail),
+                  argumentEmail: widget.argumentEmail,
+                  argumentUserDocId: widget.argumentUserDocId),
             ),
           );
         },
@@ -41,43 +43,26 @@ class _Talk extends State<Talk> {
     );
   }
 
-  Future<void> _MoveToChat(String email,
+  Future<void> _MoveToChat(String userDocId,
       String oppositeUserEmail, BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Chat(
-            argumentOppositeEmail: oppositeUserEmail,
-            argumentEmail: email),
+            argumentUserDocId: widget.argumentUserDocId,
+            argumentOppositeUserDocId: userDocId),
       ),
     );
   }
 
 
-  // Future<void> CheckQuery(
-  //     String email) async {
-  //   QuerySnapshot snapshot = await FirebaseFirestore.instance
-  //       .collection('talks')
-  //       .where('userEmail', isEqualTo: email)
-  //       .orderBy('lastTime', descending: true)
-  //       .get();
-  //
-  //   if (snapshot.size == 0) {
-  //     email=email;
-  //   }
-  //
-  // }
+  Widget buildTalkList(String userDocId) {
 
-
-
-  Widget buildTalkList(String email) {
-
-    //CheckQuery(email);
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('talks')
-          .where('userEmail', isEqualTo: email)
+          .where('userDocId', isEqualTo: userDocId)
           .orderBy('lastTime', descending: true)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -96,10 +81,10 @@ class _Talk extends State<Talk> {
               child: ListTile(
                 leading: CircleAvatar(),
                 trailing: Text(data['lastTime'].toDate().toString()),
-                title: Text(data['oppositeUserEmail']),
+                title: Text(data['oppositeUserDocId']),
                 subtitle: Text(data['lastMessageContent']),
                 onTap: () {
-                  _MoveToChat(email,data['oppositeUserEmail'], context);
+                  _MoveToChat(userDocId,data['oppositeUserDocId'], context);
                 },
               ),
             );
