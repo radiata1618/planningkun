@@ -89,7 +89,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if(snapshot.size==0){
       FirebaseFirestore.instance.collection('users').add(
-        {'email':email , 'name': "テスト用", 'age':21 },
+      {'email':email ,
+      'name': "テスト用",
+      'age':21 ,
+      'level':1,
+      'ocupation':'consultant',
+      'nativeLang':"JPN",
+      'country':"JPN",
+      'homeCountry':"JPN",
+      'town':"TOKYO",
+      'gender':'1',
+      'placeWannaGo':'antarctic',
+      'greeting':'おはようございます！',
+      'description':'わたしは～～～'
+      },
       );
 
       snapshot = await FirebaseFirestore.instance
@@ -156,6 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 final User user = result.user!;
                 setState(() {
                   infoText = "登録OK：${user.email}";
+
+                  _insertUserAndMove(email);
                 });
               } catch (e) {
                 // 登録に失敗した場合
@@ -164,7 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               }
 
-              _insertUserAndMove(email);
 
             },
             child: Text("ユーザー登録"),

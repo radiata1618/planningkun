@@ -43,20 +43,21 @@ class _Setting extends State<Setting> {
   Image? _img;
   Text ? _text;
 
-  Future<void> _download() async {
+  Future<void> _download(String userDocId) async {
 
 
     // ファイルのダウンロード
     // テキスト
-    FirebaseStorage storage = FirebaseStorage.instance;
+    FirebaseStorage storage =await FirebaseStorage.instance;
     Reference textRef = storage.ref().child("DL").child("hello.txt");
     //Reference ref = storage.ref("DL/hello.txt"); // refで一度に書いてもOK
 
 
     var data = await textRef.getData();
 
+
     // 画像
-    Reference imageRef = storage.ref().child("DL").child("icon.png");
+    Reference imageRef =await storage.ref().child("DL").child("icon.png");
     String imageUrl = await imageRef.getDownloadURL();
 
     // 画面に反映
@@ -67,7 +68,7 @@ class _Setting extends State<Setting> {
 
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File("${appDocDir.path}/download-logo.png");
+    File downloadToFile =  File("${appDocDir.path}/"+userDocId+".png");
     try {
       await imageRef.writeToFile(downloadToFile);
     } catch (e) {
@@ -84,6 +85,8 @@ class _Setting extends State<Setting> {
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
       await storage.ref("UL/"+ userDocId +".png").putFile(file);
+
+      // await _download(userDocId);
     } catch (e) {
       print(e);
     }
@@ -91,6 +94,7 @@ class _Setting extends State<Setting> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Setting"), // <- (※2)
@@ -100,28 +104,34 @@ class _Setting extends State<Setting> {
               Column(children: <Widget>[
                 Container(height: 120,
                     child: Row(
-                      children:<Widget>[
-                        // if (_text != null) _text,
-                        // if (_img != null) _img,
-                    //     Container(
-                    //   width: 100,
-                    //   height: 100,
-                    //   decoration: BoxDecoration(
-                    //     shape: BoxShape.circle,
-                    //     image: DecorationImage(
-                    //       fit: BoxFit.fill,
-                    //       image: NetworkImage(doc.data.data()[Strings.PROFILE_IMAGE_PATH]),
-                    //     ),
-                    //   ),
-                    // ),
+                      children:<Widget>[Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            if (_text != null) _text!,
+                            if (_img != null) _img!,
+                          ],
+                        ),
+                      ),
                         MaterialButton(
                             onPressed: () {
                               _upload(widget.argumentUserDocId);
                             },
                             child: const Text('写真アップロード')//,
                         ),
+                        MaterialButton(
+                            onPressed: () {
+                              _download(widget.argumentUserDocId);
+                            },
+                            child: const Text('写真ダウンロード')//,
+                          //TODO ダウンロード機能が不完全
+                          //TODO 画像はローカルのアプリ固有フォルダにも保存して、ローカルにあるならローカルのものを使う
+                        ),
                       ]
-                    ))])),
+                    )),
+
+
+              ])),
     );
   }
 }
