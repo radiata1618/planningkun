@@ -64,6 +64,7 @@ class FriendList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('users')
+      //TODO ドキュメントIDをもとに自ユーザを省くように変更する
           .where('email', isNotEqualTo: email)
           //.orderBy('name', descending: true)
           .snapshots(),

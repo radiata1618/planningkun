@@ -75,7 +75,7 @@ class _Setting extends State<Setting> {
     }
   }
 
-  void _upload() async {
+  void _upload(String userDocId) async {
     // imagePickerで画像を選択する
     // upload
     PickedFile? pickerFile =    await ImagePicker().getImage(source: ImageSource.gallery);
@@ -83,7 +83,7 @@ class _Setting extends State<Setting> {
 
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
-      await storage.ref("UL/upload-pic.png").putFile(file);
+      await storage.ref("UL/"+ userDocId +".png").putFile(file);
     } catch (e) {
       print(e);
     }
@@ -115,7 +115,9 @@ class _Setting extends State<Setting> {
                     //   ),
                     // ),
                         MaterialButton(
-                            onPressed: _upload,
+                            onPressed: () {
+                              _upload(widget.argumentUserDocId);
+                            },
                             child: const Text('写真アップロード')//,
                         ),
                       ]
