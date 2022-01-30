@@ -9,18 +9,27 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'firebase_config.dart';
 import 'tabs_page.dart';
 import 'login.dart';
-import 'dataInsert.dart';
 import 'rootWidget.dart';
 import 'Register.dart';
+import 'database.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
+  await Hive.initFlutter();
+
+  ///アプリ立ち上げ時にローカルストレージからBoxをOpenする
+  await Hive.openBox('user');
+
+  //Hive.registerAdapter(RecordModelAdapter());
+
   runApp(const MyApp());
 }
 
@@ -93,11 +102,12 @@ class _MyHomePageState extends State<MyHomePage> {
       'name': "テスト用",
       'age':21 ,
       'level':1,
-      'ocupation':'consultant',
+      'occupation':'consultant',
       'nativeLang':"JPN",
       'country':"JPN",
+      'town':"Tokyo",
       'homeCountry':"JPN",
-      'town':"TOKYO",
+      'homeTown':"Nagano",
       'gender':'1',
       'placeWannaGo':'antarctic',
       'greeting':'おはようございます！',
@@ -109,7 +119,29 @@ class _MyHomePageState extends State<MyHomePage> {
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
+
     }
+
+      //Hiveに登録
+      //TODO　データが取れないときの処理の中に移動する
+    // var box = await Hive.openBox('record');
+    //   var userForInsert = await UserData(email,
+    //     'テスト用',
+    //     21,
+    //     1,
+    //     'consultant',
+    //     'JPN',
+    //     'JPN',
+    //     'Tokyo',
+    //     'JPN',
+    //     'Nagano',
+    //     1,
+    //     'antarctic',
+    //     'おはようございます！',
+    //     'わたしは～～～'
+    //   );
+    //
+    //   await box.put("user",userForInsert);
 
     userDocId=snapshot.docs[0].id;
 

@@ -34,6 +34,8 @@ dependencies:
   # Add the dependency for the FlutterFire plugin for Google Analytics
   firebase_analytics: ^9.0.5
 
+  hive: ^2.0.5
+  hive_flutter: ^1.1.0
 
   # Add the dependency for the FlutterFire plugin for Google Analytics
   syncfusion_flutter_calendar: ^19.4.43
@@ -52,6 +54,8 @@ dependencies:
   google_maps_flutter: ^2.1.1
 
 dev_dependencies:
+  hive_generator: ^1.1.2
+  build_runner: ^2.1.7
 #  flutter_test:一旦削除
 #    sdk: flutter一旦削除
 

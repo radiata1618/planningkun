@@ -58,6 +58,8 @@ class _Chat extends State<Chat> {
       'receiveSend': "receive",
       'sendTime': Timestamp.fromDate(DateTime.now()),
     });
+
+    //TODO トークデータを更新
   }
 
   String content = "";
@@ -70,6 +72,7 @@ class _Chat extends State<Chat> {
         elevation: .6,
         title: Text(
           widget.argumentOppositeUserDocId,
+          //TODO IDを名前に変更
           style: TextStyle(color: Colors.black87),
         ),
         iconTheme: IconThemeData(color: Colors.black87),

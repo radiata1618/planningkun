@@ -44,13 +44,13 @@ class _Talk extends State<Talk> {
   }
 
   Future<void> _MoveToChat(String userDocId,
-      String oppositeUserEmail, BuildContext context) async {
+      String oppositeUserDocId, BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Chat(
-            argumentUserDocId: widget.argumentUserDocId,
-            argumentOppositeUserDocId: userDocId),
+            argumentUserDocId: userDocId,
+            argumentOppositeUserDocId: oppositeUserDocId),
       ),
     );
   }
@@ -82,6 +82,7 @@ class _Talk extends State<Talk> {
                 leading: CircleAvatar(),
                 trailing: Text(data['lastTime'].toDate().toString()),
                 title: Text(data['oppositeUserDocId']),
+                //TODO IDを名前に変更
                 subtitle: Text(data['lastMessageContent']),
                 onTap: () {
                   _MoveToChat(userDocId,data['oppositeUserDocId'], context);
