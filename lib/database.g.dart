@@ -19,52 +19,55 @@ class UserDataAdapter extends TypeAdapter<UserData> {
     return UserData(
       fields[0] as String,
       fields[1] as String,
-      fields[2] as int,
+      fields[2] as String,
       fields[3] as int,
-      fields[4] as String,
+      fields[4] as int,
       fields[5] as String,
       fields[6] as String,
       fields[7] as String,
       fields[8] as String,
       fields[9] as String,
-      fields[10] as int,
-      fields[11] as String,
+      fields[10] as String,
+      fields[11] as int,
       fields[12] as String,
       fields[13] as String,
+      fields[14] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserData obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
-      ..write(obj.email)
+      ..write(obj.userDocId)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.email)
       ..writeByte(2)
-      ..write(obj.age)
+      ..write(obj.name)
       ..writeByte(3)
-      ..write(obj.level)
+      ..write(obj.age)
       ..writeByte(4)
-      ..write(obj.occupation)
+      ..write(obj.level)
       ..writeByte(5)
-      ..write(obj.nativeLang)
+      ..write(obj.occupation)
       ..writeByte(6)
-      ..write(obj.country)
+      ..write(obj.nativeLang)
       ..writeByte(7)
-      ..write(obj.town)
+      ..write(obj.country)
       ..writeByte(8)
-      ..write(obj.homeCountry)
+      ..write(obj.town)
       ..writeByte(9)
-      ..write(obj.homeTown)
+      ..write(obj.homeCountry)
       ..writeByte(10)
-      ..write(obj.gender)
+      ..write(obj.homeTown)
       ..writeByte(11)
-      ..write(obj.placeWannaGo)
+      ..write(obj.gender)
       ..writeByte(12)
-      ..write(obj.greeting)
+      ..write(obj.placeWannaGo)
       ..writeByte(13)
+      ..write(obj.greeting)
+      ..writeByte(14)
       ..write(obj.description);
   }
 

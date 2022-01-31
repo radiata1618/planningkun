@@ -15,6 +15,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../firebase_config.dart';
 import '../tabs_page.dart';
@@ -43,6 +45,16 @@ class _Setting extends State<Setting> {
   // }
   Image? _img;
   Text? _text;
+
+
+  var box;
+  var masterBox;
+
+  String? nameData;
+  int? ageData;
+  int? levelData;
+  String? levelDisplayedData;
+  String? placeWannaGoData;
 
   Future<void> _download(String userDocId) async {
     // ファイルのダウンロード
@@ -156,12 +168,47 @@ class _Setting extends State<Setting> {
 
   }
 
+  Future<void> getHiveData() async {
+
+    //Hive(ローカル)のデータ取得
+
+    box = await Hive.openBox('record');
+    masterBox = await Hive.openBox('master');
+    //データ取得
+
+    String? nameTmp=await box.get("name");
+    int? ageTmp=await box.get("age");
+    int? levelTmp=await box.get("level");
+    String? levelDisplayedTmp=await masterBox.get("level_"+levelTmp.toString());
+    String? placeWannaGoTmp=await box.get("placeWannaGo");
+    await box.close();
+    await masterBox.close();
+
+    setState(() {
+      nameData=nameTmp;
+      ageData=ageTmp;
+      levelData=levelTmp;
+      levelDisplayedData=levelDisplayedTmp;
+      placeWannaGoData=placeWannaGoTmp;
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    var getData = getHiveData();
+
+
     return Scaffold(
         appBar: AppBar(
-          title: Text("Setting"), // <- (※2)
-        ),
+          title: Text("Setting",
+        style: TextStyle(
+        fontWeight: FontWeight.normal,
+        fontSize: 18,
+        color: Colors.white,
+          ), // <- (※2)
+        ),),
         body: SingleChildScrollView(
           child: SafeArea(
               child: Column(children: <Widget>[
@@ -192,17 +239,30 @@ class _Setting extends State<Setting> {
                       //TODO 画像はローカルのアプリ固有フォルダにも保存して、ローカルにあるならローカルのものを使う⇨DB上のデータなども全般的な話
                       ),
                 ])),
-            linePadding("name", "haruki"),
-            linePadding("age", "21"),
-            linePadding("level", "beginner"),
-            linePadding("occupation", "consultant"),
-            linePadding("mother tongue", "Japanese"),
-            linePadding("country", "Japan"),
-            linePadding("town", "Tokyo"),
-            linePadding("home country", "Japan"),
-            linePadding("home town", "Nagano"),
-            linePadding("gender", "male"),
-            linePadding("place I wanna go", "antarctic"),
+                linePadding("name","name", nameData==null ? "" : nameData!,nameData,null,"String"),
+                linePadding("age","age", ageData==null ? "" : ageData!.toString(),null,ageData,"int"),
+                linePadding("level","level",  levelDisplayedData==null ? "" : levelDisplayedData!,null,levelData,"selectInt"),
+                linePadding("place I wanna go","placeWannaGo",  placeWannaGoData==null ? "" : placeWannaGoData!,placeWannaGoData,null,"String"),
+
+
+            //
+            //     linePadding("", "antarctic"),
+            //
+            //
+            //     linePadding("age", ageData == null ? "" : ageData!),
+            //     linePadding("name", nameData==null ? "" : nameData!),
+            //     linePadding("name", nameData==null ? "" : nameData!),
+            //     linePadding("name", nameData==null ? "" : nameData!),
+            // linePadding("age", ageData),
+            // linePadding("level", "beginner"),
+            // linePadding("occupation", "consultant"),
+            // linePadding("mother tongue", "Japanese"),
+            // linePadding("country", "Japan"),
+            // linePadding("town", "Tokyo"),
+            // linePadding("home country", "Japan"),
+            // linePadding("home town", "Nagano"),
+            // linePadding("gender", "male"),
+            // linePadding("place I wanna go", "antarctic"),
             //TODO 挨拶と自己紹介を追加
             //実際のDBの値を取得するように変更
             //'greeting':'おはようございます！',
@@ -211,27 +271,48 @@ class _Setting extends State<Setting> {
         ));
   }
 
-  Padding linePadding(String item, String value) {
+  Padding linePadding(String displayedItem,String databaseItem,String displayedValue, String? stringValue, int? intValue,valueType) {
+    //valueType:String or int or selectInt(セグメント)
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.only(left:10,right:10,bottom:4),
         child: Container(
-          height: 52,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            GrayText(item),
+          height: 40,
+          child:Column(children:[
             Container(
-              width: 200,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [BlackText(value),
+              width: double.infinity,
+              child: Text(
+                displayedItem,
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 12,
+                  color: Colors.deepOrange,
+                ),
+              ),
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(displayedValue,
+                style: TextStyle(
+                fontWeight: FontWeight.normal,
+                  fontSize: 16,
+                  color: Colors.black54,
+                ),),
 
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      iconSize: 18,
-                      color: Colors.black54,
-                      onPressed: () {},
-                    ),]),
-            )
+            Padding(padding:const EdgeInsets.only(left:4),
+              child:GestureDetector(
+                          onTap: () {},
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.black54,
+                            size:18
+                          )
+                      ),)]),
+              )
+            ]),
           ]),
           decoration: BoxDecoration(
             border: const Border(

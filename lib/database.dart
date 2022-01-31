@@ -8,35 +8,38 @@ part 'database.g.dart';
 @HiveType(typeId: 0)
 class UserData extends HiveObject {
   @HiveField(0)
-  String email;
+  String userDocId;
   @HiveField(1)
-  String name;
+  String email;
   @HiveField(2)
-  int age;
+  String name;
   @HiveField(3)
-  int level;
+  int age;
   @HiveField(4)
-  String occupation;
+  int level;
   @HiveField(5)
-  String nativeLang;
+  String occupation;
   @HiveField(6)
-  String country;
+  String nativeLang;
   @HiveField(7)
-  String town;
+  String country;
   @HiveField(8)
-  String homeCountry;
+  String town;
   @HiveField(9)
-  String homeTown;
+  String homeCountry;
   @HiveField(10)
-  int gender;
+  String homeTown;
   @HiveField(11)
-  String placeWannaGo;
+  int gender;
   @HiveField(12)
-  String greeting;
+  String placeWannaGo;
   @HiveField(13)
+  String greeting;
+  @HiveField(14)
   String description;
 
   UserData(
+      this.userDocId,
       this.email,
       this.name,
       this.age,

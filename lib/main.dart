@@ -16,7 +16,7 @@ import 'firebase_config.dart';
 import 'tabs_page.dart';
 import 'login.dart';
 import 'rootWidget.dart';
-import 'Register.dart';
+import 'common.dart';
 import 'database.dart';
 
 
@@ -24,9 +24,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
   await Hive.initFlutter();
+  Hive.registerAdapter(UserDataAdapter());
 
-  ///アプリ立ち上げ時にローカルストレージからBoxをOpenする
-  await Hive.openBox('user');
 
   //Hive.registerAdapter(RecordModelAdapter());
 
@@ -43,9 +42,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Analytics Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
       ),
       navigatorObservers: <NavigatorObserver>[observer],
       home: MyHomePage(
@@ -108,42 +107,78 @@ class _MyHomePageState extends State<MyHomePage> {
       'town':"Tokyo",
       'homeCountry':"JPN",
       'homeTown':"Nagano",
-      'gender':'1',
+      'gender':1,
       'placeWannaGo':'antarctic',
       'greeting':'おはようございます！',
       'description':'わたしは～～～'
       },
       );
 
+
       snapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
 
+      userDocId=snapshot.docs[0].id;
+
+      //Hiveボックスをオープン
+      var box = await Hive.openBox('record');
+
+      // //ユーザデータ型で登録するときの処理　開始
+      // //DocIdを追加
+      // var userForInsert = UserData(userDocId,
+      //     email,
+      //     'テスト用',
+      //     21,
+      //     1,
+      //     'consultant',
+      //     'JPN',
+      //     'JPN',
+      //     'Tokyo',
+      //     'JPN',
+      //     'Nagano',
+      //     1,
+      //     'antarctic',
+      //     'おはようございます！',
+      //     'わたしは～～～'
+      // );
+      //
+      // await box.put("user",userForInsert);
+
+      //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
+      await box.put("userDocId",userDocId);
+      await box.put("email",email);
+      await box.put("name","テスト用");
+      await box.put("age",21);
+      await box.put("level",1);
+      await box.put("occupation","consultant");
+      await box.put("nativeLang","JPN");
+      await box.put("country","JPN");
+      await box.put("town","Tokyo");
+      await box.put("homeCountry","JPN");
+      await box.put("homeTown","Nagano");
+      await box.put("gender",1);
+      await box.put("placeWannaGo","antarctic");
+      await box.put("greeting","おはようございます");
+      await box.put("description","わたしは～～～");
+
+      //ユーザデータ型で登録するときの処理　終了
+
+
+      await box.close();
+
+
+
+    }else{
+
+      userDocId=snapshot.docs[0].id;
     }
 
-      //Hiveに登録
-      //TODO　データが取れないときの処理の中に移動する
-    // var box = await Hive.openBox('record');
-    //   var userForInsert = await UserData(email,
-    //     'テスト用',
-    //     21,
-    //     1,
-    //     'consultant',
-    //     'JPN',
-    //     'JPN',
-    //     'Tokyo',
-    //     'JPN',
-    //     'Nagano',
-    //     1,
-    //     'antarctic',
-    //     'おはようございます！',
-    //     'わたしは～～～'
-    //   );
-    //
-    //   await box.put("user",userForInsert);
 
-    userDocId=snapshot.docs[0].id;
+
+
+
 
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄
@@ -160,11 +195,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
+      body: SafeArea(
+        child:Column(
         children: <Widget>[
+          Container(
+            child:Text("ログイン")
+          ),
           TextFormField(
             // テキスト入力のラベルを設定
             decoration: InputDecoration(labelText: "メールアドレス"),
@@ -241,87 +277,24 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Text(infoText),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            // マスタデータ登録ボタン
+            child: OutlinedButton(
+              child: Text('マスタデータ登録（テスト用）'),
+              onPressed: () async{
 
-          // MaterialButton(
-          //     onPressed: () {
-          //       Navigator.of(context).push(
-          //         MaterialPageRoute(
-          //           builder: (context) => login(
-          //             //argumentBusinessYear: year,
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //     child: const Text('ログイン画面')//,
-          // ),
-          // MaterialButton(
-          //     onPressed: () {
-          //       Navigator.of(context).push(
-          //         MaterialPageRoute(
-          //           builder: (context) => DataInsert(
-          //             //argumentMode: 2,
-          //             //argumentBusinessYear: year,
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //     child: const Text('テストデータ登録')//,
-          // ),
-          // TextFormField(
-          //   decoration: InputDecoration(labelText: "ログインメール"),
-          //   onChanged: (value) {
-          //     email = value;
-          //   },),
-          // MaterialButton(
-          //     onPressed: () {
-          //       if(email==""){
-          //         showDialog(
-          //             context: context,
-          //           builder: (_) {
-          //             return AlertDialog(
-          //               title: Text('サンプルダイアログ'),
-          //               content: Text('メールアドレスを入力してください'),
-          //               actions: <Widget>[
-          //                 FlatButton(
-          //                   child: Text("OK"),
-          //                   onPressed: () => Navigator.pop(context),
-          //                 ),
-          //               ],
-          //             );
-          //           },
-          //         );
-          //
-          //       }else{
-          //
-          //         _insertUser(email);
-          //         Navigator.of(context).push(
-          //           MaterialPageRoute(
-          //             builder: (context) => RootWidget(
-          //                 argumentEmail:email
-          //                 ,argumentUserDocId:userDocId
-          //             ),
-          //           ),
-          //         );
-          //       }
-          //     },
-          //     child: const Text('ルート画面')//,
-          // ),
-          // ListView.builder(
-          //   padding: EdgeInsets.all(36.0),
-          //   shrinkWrap: true,
-          //   itemCount: _contents.length,
-          //   itemBuilder: (BuildContext context, int index) {
-          //     return Container(
-          //       color: Colors.green,
-          //       child: Text(
-          //         _contents[index],
-          //         textAlign: TextAlign.center,
-          //         style: TextStyle(fontSize: 25.0),
-          //       ),
-          //     );
-          //   },
-          // ),
+                var box = await Hive.openBox('master');
+                box.put("level_1","beginner");
+                box.put("level_2","intermediate");
+                box.put("level_3","advanced");
+                box.put("level_4","native");
+              },
+            ),
+          ),
         ],
+      ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
