@@ -22,11 +22,12 @@ import '../firebase_config.dart';
 import '../tabs_page.dart';
 import '../common.dart';
 
-class Setting extends StatefulWidget {
-  final argumentEmail;
-  final argumentUserDocId;
 
-  Setting({this.argumentEmail, this.argumentUserDocId});
+class Setting extends StatefulWidget {
+  UserInfoData argumentUserData;
+  Map<String, String> argumentMasterData;
+
+  Setting({required this.argumentUserData, required this.argumentMasterData});
 
   @override
   _Setting createState() => _Setting();
@@ -226,13 +227,13 @@ class _Setting extends State<Setting> {
                   ),
                   MaterialButton(
                       onPressed: () {
-                        _upload(widget.argumentUserDocId);
+                        _upload(widget.argumentUserData.getUserDocId()!);
                       },
                       child: const Text('写真アップロード') //,
                       ),
                   MaterialButton(
                       onPressed: () {
-                        _download(widget.argumentUserDocId);
+                        _download(widget.argumentUserData.getUserDocId()!);
                       },
                       child: const Text('写真ダウンロード') //,
                       //TODO ダウンロード機能が不完全

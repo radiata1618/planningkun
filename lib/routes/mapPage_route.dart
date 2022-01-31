@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Map extends StatelessWidget { // <- (※1)
+class MapPage extends StatelessWidget { // <- (※1)
   @override
   Widget build(BuildContext context) {
     return Scaffold(

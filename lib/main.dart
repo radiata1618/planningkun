@@ -18,6 +18,7 @@ import 'login.dart';
 import 'rootWidget.dart';
 import 'common.dart';
 import 'database.dart';
+import 'common.dart';
 
 
 Future<void> main() async {
@@ -80,6 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String password = "";
   // 登録・ログインに関する情報を表示
   String infoText = "";
+  UserInfoData userData =UserInfoData();
+  Map<String,String> masterData={};
 
 
   List<String> _contents=[];
@@ -125,40 +128,20 @@ class _MyHomePageState extends State<MyHomePage> {
       //Hiveボックスをオープン
       var box = await Hive.openBox('record');
 
-      // //ユーザデータ型で登録するときの処理　開始
-      // //DocIdを追加
-      // var userForInsert = UserData(userDocId,
-      //     email,
-      //     'テスト用',
-      //     21,
-      //     1,
-      //     'consultant',
-      //     'JPN',
-      //     'JPN',
-      //     'Tokyo',
-      //     'JPN',
-      //     'Nagano',
-      //     1,
-      //     'antarctic',
-      //     'おはようございます！',
-      //     'わたしは～～～'
-      // );
-      //
-      // await box.put("user",userForInsert);
-
       //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
+      //TODO　Firebaseのデータを読み出してきて、Hiveに書き込むように変更
       await box.put("userDocId",userDocId);
       await box.put("email",email);
       await box.put("name","テスト用");
       await box.put("age",21);
-      await box.put("level",1);
+      await box.put("level","1");
       await box.put("occupation","consultant");
       await box.put("nativeLang","JPN");
       await box.put("country","JPN");
       await box.put("town","Tokyo");
       await box.put("homeCountry","JPN");
       await box.put("homeTown","Nagano");
-      await box.put("gender",1);
+      await box.put("gender","1");
       await box.put("placeWannaGo","antarctic");
       await box.put("greeting","おはようございます");
       await box.put("description","わたしは～～～");
@@ -176,19 +159,57 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
 
+    //ログイン・ユーザ登録後の共通処理
+    //TODO　Firebaseのデータを読み出してきて、メモリに書き込むように変更
+    userData.setUserDocId(userDocId);
+    userData.setEmail(email);
+    userData.setName("テスト用");
+    userData.setAge(21);
+    userData.setLevel("1");
+    userData.setOccupation("consultant");
+    userData.setNativeLang("JPN");
+    userData.setCountry("JPN");
+    userData.setTown("Tokyo");
+    userData.setHomeCountry("JPN");
+    userData.setHomeTown("Nagano");
+    userData.setGender("1");
+    userData.setPlaceWannaGo("antarctic");
+    userData.setGreeting("おはようございます");
+    userData.setDescription("わたしは～～～");
+
+
+    //マスタデータをFirebaseからHiveへ
+
+    await FirebaseFirestore.instance.collection('masters').get().then((QuerySnapshot snapshot)async {
+
+      var boxMaster = await Hive.openBox('master');
+      await boxMaster.clear();
+      masterData.clear();
+
+       snapshot.docs.forEach((doc) async{
+
+        //Hiveとメモリにデータをセットする処理を追加
+        await boxMaster.put(doc.get('item')+"_"+doc.get('selectedValue'),doc.get('displayedValue'));
+        masterData[doc.get('item')+"_"+doc.get('selectedValue')]=doc.get('displayedValue');
+      });
+
+      await boxMaster.close();
+
+
+      // ログインに成功した場合
+      // チャット画面に遷移＋ログイン画面を破棄
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) {
+          return RootWidget(
+            argumentUserData: userData,
+            argumentMasterData: masterData);
+        }),
+      );
+    });
 
 
 
 
-    // ログインに成功した場合
-    // チャット画面に遷移＋ログイン画面を破棄
-    await Navigator.of(context).pushReplacement(
-    MaterialPageRoute(builder: (context) {
-    return RootWidget(
-    argumentEmail: email,
-    argumentUserDocId: userDocId,);
-    }),
-    );
   }
 
 
@@ -278,21 +299,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Text(infoText),
           const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            // マスタデータ登録ボタン
-            child: OutlinedButton(
-              child: Text('マスタデータ登録（テスト用）'),
-              onPressed: () async{
-
-                var box = await Hive.openBox('master');
-                box.put("level_1","beginner");
-                box.put("level_2","intermediate");
-                box.put("level_3","advanced");
-                box.put("level_4","native");
-              },
-            ),
-          ),
         ],
       ),
       ),

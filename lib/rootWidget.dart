@@ -5,16 +5,18 @@ import 'package:flutter/material.dart';
 import 'routes/home_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/timeline_route.dart';
-import 'routes/map_route.dart';
+import 'routes/mapPage_route.dart';
 import 'routes/setting_route.dart';
+import 'common.dart';
+import 'dart:core';
 // =============================================
 
 class RootWidget extends StatefulWidget {
-  final argumentEmail;
-  final argumentUserDocId;
+  UserInfoData argumentUserData;
+  Map<String, String> argumentMasterData;
 
 
-  RootWidget({this.argumentEmail,this.argumentUserDocId});
+  RootWidget({required this.argumentUserData,required this.argumentMasterData});
 
   @override
   _RootWidgetState createState() => _RootWidgetState();
@@ -40,22 +42,11 @@ class _RootWidgetState extends State<RootWidget> {
     'マップ',
   ];
 
-  // === 追加部分 ===
-  var _routes = [
-    Home(),
-    Talk(),
-    TimeLine(),
-    Setting(),
-    Map(),
-  ];
-
-  // ==============
 
   @override
   void initState() {
     super.initState();
 
-    //String email = widget.argumentEmail;
     _bottomNavigationBarItems.add(_UpdateActiveState(0));
     for (var i = 1; i < _footerItemNames.length; i++) {
       _bottomNavigationBarItems.add(_UpdateDeactiveState(i));
@@ -104,9 +95,7 @@ class _RootWidgetState extends State<RootWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-      routeElement(_selectedIndex,widget.argumentEmail,widget.argumentUserDocId),
-      //Home(),
-      //_routes.elementAt(_selectedIndex),
+      routeElement(_selectedIndex,widget.argumentUserData.getEmail()!,widget.argumentUserData.getUserDocId()!),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
         items: _bottomNavigationBarItems,
@@ -122,17 +111,16 @@ class _RootWidgetState extends State<RootWidget> {
         return Home();
         break;
       case 1:
-        return Talk(argumentEmail: email,
-            argumentUserDocId:userDocId);
+        return Talk(argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData);
         break;
       case 2:
         return TimeLine();
       case 3:
-        return Setting(
-        argumentEmail:email,
-        argumentUserDocId:userDocId);
+        return Setting(argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData);
       default:
-        return Map();
+        return MapPage();
     }
   }
 }

@@ -8,12 +8,15 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
 import '../FriendList.dart';
+import '../common.dart';
+
 
 class Talk extends StatefulWidget {
-  final argumentEmail;
-  final argumentUserDocId;
+  UserInfoData argumentUserData;
+  Map<String, String> argumentMasterData;
 
-  Talk({this.argumentEmail,this.argumentUserDocId});
+
+  Talk({required this.argumentUserData,required this.argumentMasterData});
 
   @override
   _Talk createState() => _Talk();
@@ -26,15 +29,15 @@ class _Talk extends State<Talk> {
       appBar: AppBar(
         title: Text(""),
       ),
-      body: buildTalkList(widget.argumentUserDocId),
+      body: buildTalkList(widget.argumentUserData.getUserDocId()!),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => FriendList(
-                  argumentEmail: widget.argumentEmail,
-                  argumentUserDocId: widget.argumentUserDocId),
+                  argumentUserData: widget.argumentUserData,
+                  argumentMasterData:widget.argumentMasterData),
             ),
           );
         },
