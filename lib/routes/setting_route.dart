@@ -105,22 +105,6 @@ class _Setting extends State<Setting> {
 
     //FirebaseのデータをHiveに取得
 
-
-    // box.put("name",firebaseUserData.get('name'));
-    // box.put("email",firebaseUserData.get('email'));
-    // box.put("age",firebaseUserData.get('age'));
-    // box.put("level",firebaseUserData.get('level'));
-    // box.put("occupation",firebaseUserData.get('occupation'));
-    // box.put("nativeLang",firebaseUserData.get('nativeLang'));
-    // box.put("country",firebaseUserData.get('country'));
-    // box.put("town",firebaseUserData.get('town'));
-    // box.put("homeCountry",firebaseUserData.get('homeCountry'));
-    // box.put("homeTown",firebaseUserData.get('homeTown'));
-    // box.put("gender",firebaseUserData.get('gender'));
-    // box.put("placeWannaGo",firebaseUserData.get('placeWannaGo'));
-    // box.put("greeting",firebaseUserData.get('greeting'));
-    // box.put("description",firebaseUserData.get('description'));
-
     await arrangeUserDataUnit("name");
     await arrangeUserDataUnit("email");
     await arrangeUserDataUnit("age");
@@ -231,7 +215,6 @@ class _Setting extends State<Setting> {
           height: 52,
           child:Column(children:[
             Container(
-              height: 18,
               width: double.infinity,
               child: Text(
                 displayedItem,

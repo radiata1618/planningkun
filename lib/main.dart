@@ -83,6 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String infoText = "";
   Map<String,String> userData={};
   Map<String,String> masterData={};
+  var box;
+  QuerySnapshot? snapshot;
 
 
   List<String> _contents=[];
@@ -92,13 +94,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _insertUserAndMove(String email) async {
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+    snapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
         .get();
 
 
-    if(snapshot.size==0){
+    if(snapshot!.size==0){
       FirebaseFirestore.instance.collection('users').add(
       {'email':email ,
       'name': "テスト用",
@@ -123,63 +125,39 @@ class _MyHomePageState extends State<MyHomePage> {
           .where('email', isEqualTo: email)
           .get();
 
-      userDocId=snapshot.docs[0].id;
-
-      //Hiveボックスをオープン
-      var box = await Hive.openBox('record');
-
-      //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
-      //TODO　Firebaseのデータを読み出してきて、Hiveに書き込むように変更
-      await box.put("userDocId",userDocId);
-      await box.put("email",email);
-      await box.put("name","テスト用");
-      await box.put("age","21");
-      await box.put("level","1");
-      await box.put("occupation","consultant");
-      await box.put("nativeLang","JPN");
-      await box.put("country","JPN");
-      await box.put("town","Tokyo");
-      await box.put("homeCountry","JPN");
-      await box.put("homeTown","Nagano");
-      await box.put("gender","1");
-      await box.put("placeWannaGo","antarctic");
-      await box.put("greeting","おはようございます");
-      await box.put("description","わたしは～～～");
-
-      //ユーザデータ型で登録するときの処理　終了
-
-
-      await box.close();
 
 
 
-    }else{
-
-      userDocId=snapshot.docs[0].id;
     }
 
 
-    //ログイン・ユーザ登録後の共通処理
-    //TODO　Firebaseのデータを読み出してきて、メモリに書き込むように変更
+    userDocId=snapshot!.docs[0].id;
 
+
+
+    //Hiveボックスをオープン
+    box = await Hive.openBox('record');
+
+    //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
+    await box.put("userDocId",userDocId);
     userData["userDocId"]=userDocId;
-    userData["email"]=email;
-    userData["name"]="テスト用";
-    userData["age"]="21";
-    userData["level"]="1";
-    userData["occupation"]="consultant";
-    userData["nativeLang"]="JPN";
-    userData["country"]="JPN";
-    userData["town"]="Tokyo";
-    userData["homeCountry"]="JPN";
-    userData["homeTown"]="Nagano";
-    userData["gender"]="1";
-    userData["placeWannaGo"]="antarctic";
-    userData["greeting"]="おはようございます";
-    userData["description"]="わたしは～～～";
+    await arrangeUserDataUnit("name");
+    await arrangeUserDataUnit("email");
+    await arrangeUserDataUnit("age");
+    await arrangeUserDataUnit("level");
+    await arrangeUserDataUnit("occupation");
+    await arrangeUserDataUnit("nativeLang");
+    await arrangeUserDataUnit("country");
+    await arrangeUserDataUnit("town");
+    await arrangeUserDataUnit("homeCountry");
+    await arrangeUserDataUnit("homeTown");
+    await arrangeUserDataUnit("gender");
+    await arrangeUserDataUnit("placeWannaGo");
+    await arrangeUserDataUnit("greeting");
+    await arrangeUserDataUnit("description");
 
 
-
+    await box.close();
 
     //マスタデータをFirebaseからHiveへ
 
@@ -214,7 +192,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   }
-
+  Future<void> arrangeUserDataUnit(String item) async {
+    userData[item]=snapshot!.docs[0].get(item);
+    await box.put(item,snapshot!.docs[0].get(item));
+  }
 
   @override
   Widget build(BuildContext context) {
