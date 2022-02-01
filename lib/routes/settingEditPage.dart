@@ -12,22 +12,18 @@ import '../firebase_config.dart';
 import '../common.dart';
 
 class SettingEditPage extends StatefulWidget {
-  UserInfoData argumentUserData;
+  Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
   String displayedItem;
   String databaseItem;
-  String? stringValue;
-  int? intValue;
-  String valueType;
+  String value;
 
   SettingEditPage({
     required this.argumentUserData,
     required this.argumentMasterData,
     required this.displayedItem,
     required this.databaseItem,
-    this.stringValue,
-    this.intValue,
-    required this.valueType
+    required this.value,
   });
 
   @override
@@ -48,7 +44,8 @@ class _SettingTextEdit extends State<SettingEditPage> {
         elevation: .0,
         title: Text(
           widget.displayedItem,
-          style: TextStyle(color: Colors.black87),
+          style: TextStyle(color: Colors.black87,
+          fontWeight: FontWeight.bold),
         ),
         iconTheme: IconThemeData(color: Colors.black87),
       ),
@@ -58,11 +55,12 @@ class _SettingTextEdit extends State<SettingEditPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
 
-        Padding(padding:const EdgeInsets.symmetric(horizontal:10),
+            Padding(padding:const EdgeInsets.symmetric(horizontal:10),
             child:EditItemContainer(),),
             const SizedBox(height: 8),
-
-            Padding(padding:const EdgeInsets.symmetric(horizontal:10),
+            (widget.databaseItem=="level"||widget.databaseItem=="gender")
+            ?const SizedBox(height: 8)
+            :Padding(padding:const EdgeInsets.symmetric(horizontal:10),
               child:Container(
                 color:Colors.orangeAccent,
                 width: double.infinity,
@@ -70,17 +68,17 @@ class _SettingTextEdit extends State<SettingEditPage> {
                 child:ElevatedButton(
                   style:ButtonStyle(
                   ),
-                onPressed: () {
-                  _updateUserInfo();
-                },
-                child: Text("OK",
-                  style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),),
-              ),),
-            )
+                  onPressed: () {
+                    _updateUserInfo();
+                  },
+                  child: Text("OK",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),),
+                ),),
+            ),
 
           ],
         ),
@@ -91,65 +89,210 @@ class _SettingTextEdit extends State<SettingEditPage> {
   Future<void> _updateUserInfo() async {
 
 
-    await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData.getUserDocId())
-        .update({widget.databaseItem: widget.valueType=="int"? widget.intValue:widget.stringValue});
+    await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
+        .update({widget.databaseItem: widget.value});
 
     var box = await Hive.openBox('record');
 
     //FirebaseのデータをHiveに取得
-    await box.put(widget.databaseItem, widget.valueType=="int"? widget.intValue:widget.stringValue);
+    await box.put(widget.databaseItem, widget.value);
+
+    await box.close();
 
     Navigator.pop(context);
   }
 
   Container EditItemContainer(){
 
-    if(widget.valueType=="int"){
+    if(widget.databaseItem=="gender"){
+      return Container(
+        child:Column(
+          children:[
+            Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+              child:Container(
+                color:Colors.orangeAccent,
+                width: double.infinity,
+                height:50,
+                child:ElevatedButton(
+                  style:ButtonStyle(
+                  ),
+                  onPressed: () {
+                    widget.value="1";
+                    _updateUserInfo();
+                  },
+                  child: Text("Male",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),),
+                ),),
+            ),
+            Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+              child:Container(
+                color:Colors.orangeAccent,
+                width: double.infinity,
+                height:50,
+                child:ElevatedButton(
+                  style:ButtonStyle(
+                  ),
+                  onPressed: () {
+                    widget.value="2";
+                    _updateUserInfo();
+                  },
+                  child: Text("Female",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),),
+                ),),
+            ),
+            Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+              child:Container(
+                color:Colors.orangeAccent,
+                width: double.infinity,
+                height:50,
+                child:ElevatedButton(
+                  style:ButtonStyle(
+                  ),
+                  onPressed: () {
+                    widget.value="3";
+                    _updateUserInfo();
+                  },
+                  child: Text("Other",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),),
+                ),),
+            )
 
+          ]
+        ));
+
+    }else if(widget.databaseItem=="level"){
+
+      return Container(
+          child:Column(
+              children:[
+                Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+                  child:Container(
+                    color:Colors.orangeAccent,
+                    width: double.infinity,
+                    height:50,
+                    child:ElevatedButton(
+                      style:ButtonStyle(
+                      ),
+                      onPressed: () {
+                        widget.value="1";
+                        _updateUserInfo();
+                      },
+                      child: Text("beginner",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),),
+                    ),),
+                ),
+                Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+                  child:Container(
+                    color:Colors.orangeAccent,
+                    width: double.infinity,
+                    height:50,
+                    child:ElevatedButton(
+                      style:ButtonStyle(
+                      ),
+                      onPressed: () {
+                        widget.value="2";
+                        _updateUserInfo();
+                      },
+                      child: Text("intermediate",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),),
+                    ),),
+                ),
+                Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+                  child:Container(
+                    color:Colors.orangeAccent,
+                    width: double.infinity,
+                    height:50,
+                    child:ElevatedButton(
+                      style:ButtonStyle(
+                      ),
+                      onPressed: () {
+                        widget.value="3";
+                        _updateUserInfo();
+                      },
+                      child: Text("advanced",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),),
+                    ),),
+                ),
+                Padding(padding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+                  child:Container(
+                    color:Colors.orangeAccent,
+                    width: double.infinity,
+                    height:50,
+                    child:ElevatedButton(
+                      style:ButtonStyle(
+                      ),
+                      onPressed: () {
+                        widget.value="4";
+                        _updateUserInfo();
+                      },
+                      child: Text("native",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),),
+                    ),),
+                ),
+
+              ]
+          ));
+
+    }else if(widget.databaseItem=="age"){
       return Container(
         child:TextFormField(
           // テキスト入力のラベルを設定
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           decoration: InputDecoration(labelText: widget.displayedItem),
-          controller: TextEditingController(text: widget.intValue!.toString()),
-          onChanged: (String value) {
+          initialValue:widget.value,
+          onChanged: (String inputValue) {
             setState(() {
-              widget.intValue = int.parse(value);
+              widget.value = inputValue;
             });
           },
         ),
       );
-
-    }else if(widget.valueType=="String"){
-
-
+    }else{
       return Container(
         child:TextFormField(
           // テキスト入力のラベルを設定
           decoration: InputDecoration(labelText: widget.displayedItem),
-          initialValue: widget.stringValue,
-          onChanged: (String value) {
+          initialValue:widget.value,
+          onChanged: (String inputValue) {
             setState(() {
-              widget.stringValue = value;
+              widget.value = inputValue;
             });
           },
         ),
       );
 
-    }else{
-      return Container(
-        child:TextFormField(//仮おき
-          // テキスト入力のラベルを設定
-          decoration: InputDecoration(labelText: widget.displayedItem),
-          onChanged: (String value) {
-            setState(() {
-              widget.stringValue = value;
-            });
-          },
-        ),
-      );
     }
+
+
 
   }
 

@@ -12,7 +12,7 @@ import 'dart:core';
 // =============================================
 
 class RootWidget extends StatefulWidget {
-  UserInfoData argumentUserData;
+  Map<String,String>  argumentUserData;
   Map<String, String> argumentMasterData;
 
 
@@ -95,7 +95,7 @@ class _RootWidgetState extends State<RootWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-      routeElement(_selectedIndex,widget.argumentUserData.getEmail()!,widget.argumentUserData.getUserDocId()!),
+      routeElement(_selectedIndex,widget.argumentUserData["email"]!,widget.argumentUserData["userDocId"]!),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
         items: _bottomNavigationBarItems,

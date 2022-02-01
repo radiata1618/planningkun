@@ -12,7 +12,7 @@ import '../common.dart';
 
 
 class Talk extends StatefulWidget {
-  UserInfoData argumentUserData;
+  Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
 
 
@@ -29,7 +29,7 @@ class _Talk extends State<Talk> {
       appBar: AppBar(
         title: Text(""),
       ),
-      body: buildTalkList(widget.argumentUserData.getUserDocId()!),
+      body: buildTalkList(widget.argumentUserData["userDocId"]!),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

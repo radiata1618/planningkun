@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String password = "";
   // 登録・ログインに関する情報を表示
   String infoText = "";
-  UserInfoData userData =UserInfoData();
+  Map<String,String> userData={};
   Map<String,String> masterData={};
 
 
@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
       FirebaseFirestore.instance.collection('users').add(
       {'email':email ,
       'name': "テスト用",
-      'age':21 ,
+      'age':"21" ,
       'level':"1",
       'occupation':'consultant',
       'nativeLang':"JPN",
@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
       'town':"Tokyo",
       'homeCountry':"JPN",
       'homeTown':"Nagano",
-      'gender':1,
+      'gender':"1",
       'placeWannaGo':'antarctic',
       'greeting':'おはようございます！',
       'description':'わたしは～～～'
@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await box.put("userDocId",userDocId);
       await box.put("email",email);
       await box.put("name","テスト用");
-      await box.put("age",21);
+      await box.put("age","21");
       await box.put("level","1");
       await box.put("occupation","consultant");
       await box.put("nativeLang","JPN");
@@ -161,21 +161,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //ログイン・ユーザ登録後の共通処理
     //TODO　Firebaseのデータを読み出してきて、メモリに書き込むように変更
-    userData.setUserDocId(userDocId);
-    userData.setEmail(email);
-    userData.setName("テスト用");
-    userData.setAge(21);
-    userData.setLevel("1");
-    userData.setOccupation("consultant");
-    userData.setNativeLang("JPN");
-    userData.setCountry("JPN");
-    userData.setTown("Tokyo");
-    userData.setHomeCountry("JPN");
-    userData.setHomeTown("Nagano");
-    userData.setGender("1");
-    userData.setPlaceWannaGo("antarctic");
-    userData.setGreeting("おはようございます");
-    userData.setDescription("わたしは～～～");
+
+    userData["userDocId"]=userDocId;
+    userData["email"]=email;
+    userData["name"]="テスト用";
+    userData["age"]="21";
+    userData["level"]="1";
+    userData["occupation"]="consultant";
+    userData["nativeLang"]="JPN";
+    userData["country"]="JPN";
+    userData["town"]="Tokyo";
+    userData["homeCountry"]="JPN";
+    userData["homeTown"]="Nagano";
+    userData["gender"]="1";
+    userData["placeWannaGo"]="antarctic";
+    userData["greeting"]="おはようございます";
+    userData["description"]="わたしは～～～";
+
+
 
 
     //マスタデータをFirebaseからHiveへ

@@ -24,7 +24,7 @@ import '../common.dart';
 
 
 class Setting extends StatefulWidget {
-  UserInfoData argumentUserData;
+  Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
 
   Setting({required this.argumentUserData, required this.argumentMasterData});
@@ -49,7 +49,7 @@ class _Setting extends State<Setting> {
 
 
   var box;
-  var masterBox;
+  var firebaseUserData;
 
 
   Future<void> _download(String userDocId) async {
@@ -100,40 +100,54 @@ class _Setting extends State<Setting> {
 
   Future<void> getFirebaseData() async {
 
-    var firebaseUserData =await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData.getUserDocId()).get();
-    var box = await Hive.openBox('record');
+    firebaseUserData =await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"]).get();
+    box = await Hive.openBox('record');
 
     //FirebaseのデータをHiveに取得
-    box.put("userDocId",widget.argumentUserData.getUserDocId());
-    box.put("name",firebaseUserData.get('name'));
-    box.put("email",firebaseUserData.get('email'));
-    box.put("age",firebaseUserData.get('age'));
-    box.put("level",firebaseUserData.get('level'));
-    box.put("occupation",firebaseUserData.get('occupation'));
-    box.put("nativeLang",firebaseUserData.get('nativeLang'));
-    box.put("country",firebaseUserData.get('country'));
-    box.put("town",firebaseUserData.get('town'));
-    box.put("homeCountry",firebaseUserData.get('homeCountry'));
-    box.put("homeTown",firebaseUserData.get('homeTown'));
-    box.put("gender",firebaseUserData.get('gender'));
-    box.put("placeWannaGo",firebaseUserData.get('placeWannaGo'));
-    box.put("greeting",firebaseUserData.get('greeting'));
-    box.put("description",firebaseUserData.get('description'));
 
 
-    String nameTmp=await box.get("name");
-    int ageTmp=await box.get("age");
-    String levelTmp=await box.get("level");
-    String placeWannaGoTmp=await box.get("placeWannaGo");
+    // box.put("name",firebaseUserData.get('name'));
+    // box.put("email",firebaseUserData.get('email'));
+    // box.put("age",firebaseUserData.get('age'));
+    // box.put("level",firebaseUserData.get('level'));
+    // box.put("occupation",firebaseUserData.get('occupation'));
+    // box.put("nativeLang",firebaseUserData.get('nativeLang'));
+    // box.put("country",firebaseUserData.get('country'));
+    // box.put("town",firebaseUserData.get('town'));
+    // box.put("homeCountry",firebaseUserData.get('homeCountry'));
+    // box.put("homeTown",firebaseUserData.get('homeTown'));
+    // box.put("gender",firebaseUserData.get('gender'));
+    // box.put("placeWannaGo",firebaseUserData.get('placeWannaGo'));
+    // box.put("greeting",firebaseUserData.get('greeting'));
+    // box.put("description",firebaseUserData.get('description'));
+
+    await arrangeUserDataUnit("name");
+    await arrangeUserDataUnit("email");
+    await arrangeUserDataUnit("age");
+    await arrangeUserDataUnit("level");
+    await arrangeUserDataUnit("occupation");
+    await arrangeUserDataUnit("nativeLang");
+    await arrangeUserDataUnit("country");
+    await arrangeUserDataUnit("town");
+    await arrangeUserDataUnit("homeCountry");
+    await arrangeUserDataUnit("homeTown");
+    await arrangeUserDataUnit("gender");
+    await arrangeUserDataUnit("placeWannaGo");
+    await arrangeUserDataUnit("greeting");
+    await arrangeUserDataUnit("description");
+
+    //await box.close();Closeするとエラーになるのでオープンしたまま
 
     setState(() {
-      widget.argumentUserData.setName(nameTmp);
-      widget.argumentUserData.setAge(ageTmp);
-      widget.argumentUserData.setLevel(levelTmp);
-      widget.argumentUserData.setPlaceWannaGo(placeWannaGoTmp);
 
     });
   }
+
+  Future<void> arrangeUserDataUnit(String item) async {
+    box.put(item,firebaseUserData.get(item));
+    widget.argumentUserData[item]=await firebaseUserData.get(item);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -143,11 +157,13 @@ class _Setting extends State<Setting> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Setting",
+          backgroundColor: Colors.white10,
+          elevation: 0.0,
+          title: Text("Settings",
         style: TextStyle(
-        fontWeight: FontWeight.normal,
-        fontSize: 18,
-        color: Colors.white,
+        fontWeight: FontWeight.w500,
+        fontSize: 21,
+        color: Colors.black87,
           ), // <- (※2)
         ),),
         body: SingleChildScrollView(
@@ -167,45 +183,55 @@ class _Setting extends State<Setting> {
                   ),
                   MaterialButton(
                       onPressed: () {
-                        _upload(widget.argumentUserData.getUserDocId()!);
+                        _upload(widget.argumentUserData["userDocId"]!);
                       },
                       child: const Text('写真アップロード') //,
                       ),
                   MaterialButton(
                       onPressed: () {
-                        _download(widget.argumentUserData.getUserDocId()!);
+                        _download(widget.argumentUserData["userDocId"]!);
                       },
                       child: const Text('写真ダウンロード') //,
                       //TODO ダウンロード機能が不完全
                       //TODO 画像はローカルのアプリ固有フォルダにも保存して、ローカルにあるならローカルのものを使う⇨DB上のデータなども全般的な話
                       ),
                 ])),
-                linePadding("Name","name", widget.argumentUserData.getName(),null,"String"),
-                linePadding("Age","age", null,widget.argumentUserData.getAge(),"int"),
-                linePadding("Level","level", widget.argumentUserData.getLevel(), null,"selectString"),
-                linePadding("Place I wanna go","placeWannaGo",  widget.argumentUserData.getPlaceWannaGo(),null,"String"),
+                linePadding("Name","name", widget.argumentUserData["name"]!),
+                linePadding("E-mail","email", widget.argumentUserData["email"]!),
+                linePadding("Age","age", widget.argumentUserData["age"]!),
+                linePadding("English Level","level", widget.argumentUserData["level"]!),
+                linePadding("Occupation","occupation", widget.argumentUserData["occupation"]!),
+                linePadding("mother Tongue","nativeLang", widget.argumentUserData["nativeLang"]!),
+                linePadding("Country","country", widget.argumentUserData["country"]!),
+                linePadding("Town","town", widget.argumentUserData["town"]!),
+                linePadding("Home Country","homeCountry", widget.argumentUserData["homeCountry"]!),
+                linePadding("Home Town","homeTown", widget.argumentUserData["homeTown"]!),
+                linePadding("gender","gender", widget.argumentUserData["gender"]!),
+                linePadding("Place I wanna go","placeWannaGo", widget.argumentUserData["placeWannaGo"]!),
+                linePadding("Greeting","greeting", widget.argumentUserData["greeting"]!),
+                linePadding("Description","description", widget.argumentUserData["description"]!),
 
 
           ])),
         ));
   }
 
-  Padding linePadding (String displayedItem,String databaseItem, String? stringValue, int? intValue,String valueType) {
+  Padding linePadding (String displayedItem,String databaseItem, String value) {
     //valueType:String or int or selectString(セグメント)
     String displayedValue;
-    if(valueType=="String"){
-      displayedValue=stringValue!;
-    }else if(valueType=="int"){
-      displayedValue=intValue.toString();
+    if(databaseItem=="gender"
+    ||databaseItem=="level"){
+      displayedValue=widget.argumentMasterData[databaseItem+"_"+value]!;
     }else{
-      displayedValue=widget.argumentMasterData[databaseItem+"_"+stringValue!]!;
+      displayedValue=value;
     }
     return Padding(
-        padding: const EdgeInsets.only(left:10,right:10,bottom:4),
+        padding: const EdgeInsets.only(left:14,right:14,bottom:10),
         child: Container(
-          height: 40,
+          height: 52,
           child:Column(children:[
             Container(
+              height: 18,
               width: double.infinity,
               child: Text(
                 displayedItem,
@@ -225,23 +251,21 @@ class _Setting extends State<Setting> {
                       Text(displayedValue,
                 style: TextStyle(
                 fontWeight: FontWeight.normal,
-                  fontSize: 16,
+                  fontSize: 18,
                   color: Colors.black87,
                 ),),
 
-            Padding(padding:const EdgeInsets.only(left:4),
+            Padding(padding:const EdgeInsets.only(left:5),
               child:GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pushReplacement(
+                          onTap: () async{
+                            await Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) {
                                 return SettingEditPage(
                                     argumentUserData: widget.argumentUserData,
                                     argumentMasterData:widget.argumentMasterData ,
                                     displayedItem: displayedItem,
                                     databaseItem: databaseItem,
-                                    stringValue:stringValue,
-                                    intValue:intValue,
-                                    valueType:valueType
+                                    value:value,
                                 );
                               }),
                             );

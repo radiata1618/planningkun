@@ -13,7 +13,7 @@ import 'chat.dart';
 import 'common.dart';
 
 class FriendList extends StatelessWidget {
-  UserInfoData argumentUserData;
+  Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
 
   FriendList({required this.argumentUserData,required this.argumentMasterData});
@@ -23,7 +23,7 @@ class FriendList extends StatelessWidget {
       appBar: AppBar(
         title: Text(""),
       ),
-      body: buildFriendList(argumentUserData.getEmail()!),
+      body: buildFriendList(argumentUserData["email"]!),
     );
   }
 
@@ -34,7 +34,7 @@ class FriendList extends StatelessWidget {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('talks')
         .where('oppositeUserDocId', isEqualTo: oppositeUserDocId)
-        .where('userDocId', isEqualTo: argumentUserData.getUserDocId())
+        .where('userDocId', isEqualTo: argumentUserData["userDocId"])
         .get();
 
     if(snapshot.size==0){
@@ -43,13 +43,13 @@ class FriendList extends StatelessWidget {
         'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
         'oppositeUserDocId': oppositeUserDocId,
-        'userDocId': argumentUserData.getUserDocId()
+        'userDocId': argumentUserData["userDocId"]
       });
     }
     Navigator.push(
       context,MaterialPageRoute(
         builder: (context) => Chat(
-          argumentUserDocId: argumentUserData.getUserDocId(),
+          argumentUserDocId: argumentUserData["userDocId"],
           argumentOppositeUserDocId: oppositeUserDocId
         ),
       ),
