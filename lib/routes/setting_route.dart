@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
-import 'package:planningkun/routes/settingTextEdit.dart';
+import 'package:planningkun/routes/settingEditPage.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -97,72 +97,6 @@ class _Setting extends State<Setting> {
     }
   }
 
-  void moveToEdit(String item,value) async {
-
-    switch(item){
-      case "name":
-        Navigator.push(
-          context,MaterialPageRoute(
-          builder: (context) => SettingTextEdit(
-              argumentItem: item,
-              argumentValue: value
-          ),
-        ),
-        );
-         break;
-      case "occupation":
-        Navigator.push(
-          context,MaterialPageRoute(
-          builder: (context) => SettingTextEdit(
-              argumentItem: item,
-              argumentValue: value
-          ),
-        ),
-        );
-        break;
-      case "nativeLang":
-        Navigator.push(
-          context,MaterialPageRoute(
-          builder: (context) => SettingTextEdit(
-              argumentItem: item,
-              argumentValue: value
-          ),
-        ),
-        );
-        break;
-      case "town":
-        Navigator.push(
-          context,MaterialPageRoute(
-          builder: (context) => SettingTextEdit(
-              argumentItem: item,
-              argumentValue: value
-          ),
-        ),
-        );
-        break;
-      case "homeTown":
-        Navigator.push(
-          context,MaterialPageRoute(
-          builder: (context) => SettingTextEdit(
-              argumentItem: item,
-              argumentValue: value
-          ),
-        ),
-        );
-        break;
-      case "placeWannaGo":
-        Navigator.push(
-          context,MaterialPageRoute(
-          builder: (context) => SettingTextEdit(
-              argumentItem: item,
-              argumentValue: value
-          ),
-        ),
-        );
-        break;
-    }
-
-  }
 
   Future<void> getFirebaseData() async {
 
@@ -170,6 +104,8 @@ class _Setting extends State<Setting> {
     var box = await Hive.openBox('record');
 
     //FirebaseのデータをHiveに取得
+    box.put("userDocId",widget.argumentUserData.getUserDocId());
+    box.put("name",firebaseUserData.get('name'));
     box.put("email",firebaseUserData.get('email'));
     box.put("age",firebaseUserData.get('age'));
     box.put("level",firebaseUserData.get('level'));
@@ -188,7 +124,6 @@ class _Setting extends State<Setting> {
     String nameTmp=await box.get("name");
     int ageTmp=await box.get("age");
     String levelTmp=await box.get("level");
-    String levelDisplayedTmp=await masterBox.get("level_"+levelTmp);
     String placeWannaGoTmp=await box.get("placeWannaGo");
 
     setState(() {
@@ -245,10 +180,10 @@ class _Setting extends State<Setting> {
                       //TODO 画像はローカルのアプリ固有フォルダにも保存して、ローカルにあるならローカルのものを使う⇨DB上のデータなども全般的な話
                       ),
                 ])),
-                linePadding("name","name", widget.argumentUserData.getName(),null,"String"),
-                linePadding("age","age", null,widget.argumentUserData.getAge(),"int"),
-                linePadding("level","level", widget.argumentUserData.getLevel(), null,"selectString"),
-                linePadding("place I wanna go","placeWannaGo",  widget.argumentUserData.getPlaceWannaGo(),null,"String"),
+                linePadding("Name","name", widget.argumentUserData.getName(),null,"String"),
+                linePadding("Age","age", null,widget.argumentUserData.getAge(),"int"),
+                linePadding("Level","level", widget.argumentUserData.getLevel(), null,"selectString"),
+                linePadding("Place I wanna go","placeWannaGo",  widget.argumentUserData.getPlaceWannaGo(),null,"String"),
 
 
           ])),
@@ -257,13 +192,13 @@ class _Setting extends State<Setting> {
 
   Padding linePadding (String displayedItem,String databaseItem, String? stringValue, int? intValue,String valueType) {
     //valueType:String or int or selectString(セグメント)
-    String displeyedValue;
+    String displayedValue;
     if(valueType=="String"){
-      displeyedValue=stringValue!;
+      displayedValue=stringValue!;
     }else if(valueType=="int"){
-      displeyedValue=intValue.toString();
+      displayedValue=intValue.toString();
     }else{
-      displeyedValue=widget.argumentMasterData[databaseItem+"_"+stringValue!]!;
+      displayedValue=widget.argumentMasterData[databaseItem+"_"+stringValue!]!;
     }
     return Padding(
         padding: const EdgeInsets.only(left:10,right:10,bottom:4),
@@ -287,19 +222,34 @@ class _Setting extends State<Setting> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(displeyedValue,
+                      Text(displayedValue,
                 style: TextStyle(
                 fontWeight: FontWeight.normal,
                   fontSize: 16,
-                  color: Colors.black54,
+                  color: Colors.black87,
                 ),),
 
             Padding(padding:const EdgeInsets.only(left:4),
               child:GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) {
+                                return SettingEditPage(
+                                    argumentUserData: widget.argumentUserData,
+                                    argumentMasterData:widget.argumentMasterData ,
+                                    displayedItem: displayedItem,
+                                    databaseItem: databaseItem,
+                                    stringValue:stringValue,
+                                    intValue:intValue,
+                                    valueType:valueType
+                                );
+                              }),
+                            );
+
+                          },
                           child: Icon(
                             Icons.edit,
-                            color: Colors.black54,
+                            color: Colors.black87,
                             size:18
                           )
                       ),)]),

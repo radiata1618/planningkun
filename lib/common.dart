@@ -18,17 +18,6 @@ Text GrayText(String txt) {
 }
 
 
-Text BlackText(String txt) {
-  return Text(txt,
-    style: TextStyle(
-      fontWeight: FontWeight.normal,
-      fontSize: 16,
-      color: Colors.black38,
-    ),
-
-  );
-}
-
 
 class UserInfoData{
   String? userDocId;

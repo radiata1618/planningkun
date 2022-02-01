@@ -103,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
       {'email':email ,
       'name': "テスト用",
       'age':21 ,
-      'level':1,
+      'level':"1",
       'occupation':'consultant',
       'nativeLang':"JPN",
       'country':"JPN",
