@@ -31,19 +31,19 @@ class _MapPage extends State<MapPage> {
     // ファイルのダウンロード
     // テキスト
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference textRef = storage.ref().child("DL").child("hello.txt");
+    // Reference textRef = storage.ref().child("DL").child("hello.txt");
     //Reference ref = storage.ref("DL/hello.txt"); // refで一度に書いてもOK
 
-    var data = await textRef.getData();
+    // var data = await textRef.getData();
 
     // 画像
-    Reference imageRef = storage.ref().child("DL").child("icon.png");
+    Reference imageRef = storage.ref().child("UL").child("upload-pic.png");
     String imageUrl = await imageRef.getDownloadURL();
 
     // 画面に反映
     setState(() {
       _img = Image.network(imageUrl);
-      _text = Text(ascii.decode(data!));
+      // _text = Text(ascii.decode(data!));
     });
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
@@ -80,7 +80,7 @@ class _MapPage extends State<MapPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              if (_text != null) _text!,
+              // if (_text != null) _text!,
               if (_img != null) _img!,
             ],
           ),
