@@ -96,9 +96,9 @@ class _SettingTextEdit extends State<SettingEditPage> {
 
     //FirebaseのデータをHiveに取得
     await box.put(widget.databaseItem, widget.value);
-
     await box.close();
 
+    widget.argumentUserData[widget.databaseItem]=widget.value;
     Navigator.pop(context);
   }
 

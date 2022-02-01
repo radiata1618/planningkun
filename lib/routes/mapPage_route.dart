@@ -1,64 +1,102 @@
-import 'package:flutter/material.dart';
 
-class MapPage extends StatelessWidget { // <- (※1)
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert';
+
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+class MapPage extends StatefulWidget { // <- (※1)
+  @override
+
+
+
+  @override
+  _MapPage createState() => _MapPage();
+}
+
+
+class _MapPage extends State<MapPage> {
+  Image? _img;
+  Text? _text;
+
+  Future<void> _download() async {
+    // ログイン処理
+    // await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //     email: "test@test.com", password: "testtest");
+
+    // ファイルのダウンロード
+    // テキスト
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference textRef = storage.ref().child("DL").child("hello.txt");
+    //Reference ref = storage.ref("DL/hello.txt"); // refで一度に書いてもOK
+
+    var data = await textRef.getData();
+
+    // 画像
+    Reference imageRef = storage.ref().child("DL").child("icon.png");
+    String imageUrl = await imageRef.getDownloadURL();
+
+    // 画面に反映
+    setState(() {
+      _img = Image.network(imageUrl);
+      _text = Text(ascii.decode(data!));
+    });
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File downloadToFile = File("${appDocDir.path}/download-logo.png");
+    try {
+      await imageRef.writeToFile(downloadToFile);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _upload() async {
+    // imagePickerで画像を選択する
+    // upload
+    PickedFile pickerFile =
+    (await ImagePicker().getImage(source: ImageSource.gallery))!;
+    File file = File(pickerFile.path);
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    try {
+      await storage.ref("UL/upload-pic.png").putFile(file);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("マップはAPI設定中"), // <- (※2)
-      ),
-      body: Center(child: Text("マップはAPI設定中") // <- (※3)
-      ),
-    );
+        appBar: AppBar(
+          title: Text("画像テスト"),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              if (_text != null) _text!,
+              if (_img != null) _img!,
+            ],
+          ),
+        ),
+        floatingActionButton:
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          FloatingActionButton(
+            onPressed: _download,
+            child: Icon(Icons.download_outlined),
+          ),
+          FloatingActionButton(
+            onPressed: _upload,
+            child: Icon(Icons.upload_outlined),
+          ),
+        ]));
   }
 }
 
 
-
-// import 'dart:async';
-//
-// import 'package:flutter/material.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-//
-// class Map extends StatefulWidget {
-//   @override
-//   State<Map> createState() => MapState();
-// }
-
-// class MapState extends State<Map> {
-//   Completer<GoogleMapController> _controller = Completer();
-//
-//   static final CameraPosition _kGooglePlex = CameraPosition(
-//     target: LatLng(37.42796133580664, -122.085749655962),
-//     zoom: 14.4746,
-//   );
-//
-//   static final CameraPosition _kLake = CameraPosition(
-//       bearing: 192.8334901395799,
-//       target: LatLng(37.43296265331129, -122.08832357078792),
-//       tilt: 59.440717697143555,
-//       zoom: 19.151926040649414);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Scaffold(
-//       body: GoogleMap(
-//         mapType: MapType.hybrid,
-//         initialCameraPosition: _kGooglePlex,
-//         onMapCreated: (GoogleMapController controller) {
-//           _controller.complete(controller);
-//         },
-//       ),
-//       floatingActionButton: FloatingActionButton.extended(
-//         onPressed: _goToTheLake,
-//         label: Text('To the lake!'),
-//         icon: Icon(Icons.directions_boat),
-//       ),
-//     );
-//   }
-//
-//   Future<void> _goToTheLake() async {
-//     final GoogleMapController controller = await _controller.future;
-//     controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-//   }
-// }

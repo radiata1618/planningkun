@@ -47,6 +47,7 @@ class _Setting extends State<Setting> {
   Image? _img;
   Text? _text;
 
+  bool initialProcessFlg=true;
 
   var box;
   var firebaseUserData;
@@ -120,15 +121,16 @@ class _Setting extends State<Setting> {
     await arrangeUserDataUnit("greeting");
     await arrangeUserDataUnit("description");
 
-    //await box.close();Closeするとエラーになるのでオープンしたまま
+    await box.close();//Closeするとエラーになるのでオープンしたまま
 
-    setState(() {
+
+    setState(()  {
 
     });
   }
 
   Future<void> arrangeUserDataUnit(String item) async {
-    box.put(item,firebaseUserData.get(item));
+    await box.put(item,firebaseUserData.get(item));
     widget.argumentUserData[item]=await firebaseUserData.get(item);
   }
 
@@ -136,7 +138,10 @@ class _Setting extends State<Setting> {
   @override
   Widget build(BuildContext context) {
 
-    var getData = getFirebaseData();
+    if (initialProcessFlg){
+      initialProcessFlg=false;
+      getFirebaseData();
+    }
 
 
     return Scaffold(
@@ -252,7 +257,9 @@ class _Setting extends State<Setting> {
                                 );
                               }),
                             );
+                            setState(()  {
 
+                            });//TODO FutureBuilderを使用するようにして非同期のデータ取得のあとSetStateするダサい処理を削除したい
                           },
                           child: Icon(
                             Icons.edit,

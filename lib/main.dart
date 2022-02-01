@@ -188,9 +188,6 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     });
 
-
-
-
   }
   Future<void> arrangeUserDataUnit(String item) async {
     userData[item]=snapshot!.docs[0].get(item);
@@ -285,19 +282,6 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 8),
         ],
       ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<TabsPage>(
-              settings: const RouteSettings(name: TabsPage.routeName),
-              builder: (BuildContext context) {
-                return TabsPage(widget.observer);
-              },
-            ),
-          );
-        },
-        child: const Icon(Icons.tab),
       ),
     );
   }
