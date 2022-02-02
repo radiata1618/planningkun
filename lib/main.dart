@@ -103,19 +103,24 @@ class _MyHomePageState extends State<MyHomePage> {
     if(snapshot!.size==0){
       FirebaseFirestore.instance.collection('users').add(
       {'email':email ,
-      'name': "テスト用",
-      'age':"21" ,
-      'level':"1",
-      'occupation':'consultant',
-      'nativeLang':"JPN",
-      'country':"JPN",
-      'town':"Tokyo",
-      'homeCountry':"JPN",
-      'homeTown':"Nagano",
-      'gender':"1",
-      'placeWannaGo':'antarctic',
-      'greeting':'おはようございます！',
-      'description':'わたしは～～～'
+        'name': "テスト用",
+        'age':"21" ,
+        'level':"1",
+        'occupation':'consultant',
+        'nativeLang':"JPN",
+        'country':"JPN",
+        'town':"Tokyo",
+        'homeCountry':"JPN",
+        'homeTown':"Nagano",
+        'gender':"1",
+        'placeWannaGo':'antarctic',
+        'greeting':'おはようございます！',
+        'description':'わたしは～～～',
+        'searchConditionAge':'18,30',
+        'searchConditionLevel':'1,2,3,4',
+        'searchConditionNativeLang':'JPN',
+        'searchConditionCountry':'JPN,USA',
+        'searchConditionGender':'1,2,3',
       },
       );
 
@@ -155,6 +160,11 @@ class _MyHomePageState extends State<MyHomePage> {
     await arrangeUserDataUnit("placeWannaGo");
     await arrangeUserDataUnit("greeting");
     await arrangeUserDataUnit("description");
+    await arrangeUserDataUnit("searchConditionAge");
+    await arrangeUserDataUnit("searchConditionLevel");
+    await arrangeUserDataUnit("searchConditionNativeLang");
+    await arrangeUserDataUnit("searchConditionCountry");
+    await arrangeUserDataUnit("searchConditionGender");
 
 
     await box.close();

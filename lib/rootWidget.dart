@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // == 作成したWidget をインポート ==================
 import 'routes/home_route.dart';
 import 'routes/talk_route.dart';
-import 'routes/timeline_route.dart';
+import 'routes/search_route.dart';
 import 'routes/mapPage_route.dart';
 import 'routes/setting_route.dart';
 import 'common.dart';
@@ -29,7 +29,7 @@ class _RootWidgetState extends State<RootWidget> {
   static const _footerIcons = [
     Icons.home,
     Icons.textsms,
-    Icons.access_time,
+    Icons.search,
     Icons.content_paste,
     Icons.work,
   ];
@@ -37,7 +37,7 @@ class _RootWidgetState extends State<RootWidget> {
   static const _footerItemNames = [
     'おすすめ',
     'トーク',
-    'カレンダ',
+    'Search',
     'Me',
     'マップ',
   ];
@@ -115,7 +115,8 @@ class _RootWidgetState extends State<RootWidget> {
             argumentMasterData:widget.argumentMasterData);
         break;
       case 2:
-        return TimeLine();
+        return Search(argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData);
       case 3:
         return Setting(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData);
