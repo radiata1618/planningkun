@@ -81,78 +81,81 @@ class _Search extends State<Search> {
             child:Padding(padding:const EdgeInsets.only(top:14,left:14,right:14,bottom:10),
               child:Column(
                 children:[
-                  Container(
-                    height: 42,
-                    child:Row(
-                      children:[
-                        Expanded(
-                    child:Container(
-                          child:Padding(
-                            padding:const EdgeInsets.symmetric(horizontal:13),
-                            child:Row(
-                            children:[Align(
-                              alignment:Alignment.centerLeft
-                              ,child:Text("set conditions",
-                            style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 18,
-                            color: Colors.deepOrangeAccent,
-                          ),
-                          )),
-                              Expanded(
-                                child:Align(
-                                      alignment:Alignment.centerRight
-                                      ,child:GestureDetector(
+                  Padding(
+                    padding: const EdgeInsets.only(bottom:10.0),
+                    child: Container(
+                      height: 42,
+                      child:Row(
+                        children:[
+                          Expanded(
+                      child:Container(
+                            child:Padding(
+                              padding:const EdgeInsets.symmetric(horizontal:13),
+                              child:Row(
+                              children:[Align(
+                                alignment:Alignment.centerLeft
+                                ,child:Text("set conditions",
+                              style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Colors.deepOrangeAccent,
+                            ),
+                            )),
+                                Expanded(
+                                  child:Align(
+                                        alignment:Alignment.centerRight
+                                        ,child:GestureDetector(
+                                    onTap: () async{
+                                      await Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                          return SearchConditionPage(
+                                            argumentUserData: widget.argumentUserData,
+                                            argumentMasterData:widget.argumentMasterData,
+                                            argumentSearchProcessFlg: searchProcessFlg ,
+                                            //★★★★★★★★★★searchProcessFlgは帰ってきたときにしっかり値が入っているのか
+                                          );
+                                        }),
+                                      );
+
+                                    },
+                                    child: Icon(
+                                        Icons.view_headline_sharp,
+                                        color: Colors.deepOrangeAccent,
+                                        size:26
+                                    )
+                                )
+                                  ),
+                                )
+                              ],),),
+                            decoration: BoxDecoration(
+                              color:Color.fromRGBO(	252,217,151, 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),),
+                          Container(
+                            width:40,
+                          child:Align(
+                              alignment:Alignment.center,
+                              child:GestureDetector(
                                   onTap: () async{
-                                    await Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) {
-                                        return SearchConditionPage(
-                                          argumentUserData: widget.argumentUserData,
-                                          argumentMasterData:widget.argumentMasterData,
-                                          argumentSearchProcessFlg: searchProcessFlg ,
-                                          //★★★★★★★★★★searchProcessFlgは帰ってきたときにしっかり値が入っているのか
-                                        );
-                                      }),
-                                    );
 
                                   },
                                   child: Icon(
-                                      Icons.view_headline_sharp,
-                                      color: Colors.deepOrangeAccent,
+                                      Icons.search,
+                                      color: Colors.black87,
                                       size:26
                                   )
                               )
-                                ),
-                              )
-                            ],),),
-                          decoration: BoxDecoration(
-                            color:Color.fromRGBO(	255,228,181, 1),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),),
-                        Container(
-                          width:40,
-                        child:Align(
-                            alignment:Alignment.center,
-                            child:GestureDetector(
-                                onTap: () async{
-
-                                },
-                                child: Icon(
-                                    Icons.search,
-                                    color: Colors.black87,
-                                    size:26
-                                )
-                            )
-                        ))
-                      ]
-                    )
+                          ))
+                        ]
+                      )
+                    ),
                   ),
                 Expanded(
                     child:ListView.builder(
                         itemCount:objectList.length,
                         itemBuilder:(BuildContext context,int index){
-                          return Text(objectList[index].data["name"]);
+                          return userResultList(objectList[index]);
                         }
                 ))
                 ]
@@ -160,6 +163,87 @@ class _Search extends State<Search> {
             )
         )
     );
+  }
+
+  Widget userResultList(AlgoliaObjectSnapshot userData){
+    return Container(
+      height:80,
+      child:Row(
+        children:[
+          Container(
+            child:CircleAvatar(radius:32),
+                width:80
+          ),
+          Expanded(
+            child:Column(
+              children:[
+                Padding(
+                  padding: const EdgeInsets.only(top:8.0),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child:Text(userData.data["name"],
+                          style:TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                      )
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top:4.0),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child:Text(userData.data["country"],
+                        style:TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          color: Colors.black54,
+                        ),
+                      )
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top:4.0),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child:Text(userData.data["greeting"],
+                        style:TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          color: Colors.black54,
+                        ),
+                      )
+                  ),
+                ),
+              ],
+            )
+          ),
+          Container(
+              width:70,
+            child:Column(
+              children:[
+                Padding(
+                  padding: const EdgeInsets.only(top:8.0),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child:Text(userData.data["ageNumber"].toString(),
+                        style:TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          color: Colors.black54,
+                        ),
+                      )
+                  ),
+                ),
+              ]
+            )
+          )
+        ]
+      )
+
+    );
+
   }
 
 
