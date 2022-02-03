@@ -16,3 +16,17 @@ Text GrayText(String txt) {
 
   );
 }
+List<String> FromTextToList(String txt){
+
+  String workText =txt;
+  List<String> outputList=[];
+
+  for (;workText.contains(',');){
+    outputList.add(workText.substring(0, workText.indexOf(',')));
+    workText=workText.substring(workText.indexOf(',')+1);
+  }
+  outputList.add(workText);
+
+  return outputList;
+
+}

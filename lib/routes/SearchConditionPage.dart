@@ -48,6 +48,7 @@ class _SearchConditionPage extends State<SearchConditionPage> {
 
     //FirebaseのデータをHiveに取得
 
+    await arrangeUserDataUnit("searchConditionAge");
     await arrangeUserDataUnit("searchConditionLevel");
     await arrangeUserDataUnit("searchConditionNativeLang");
     await arrangeUserDataUnit("searchConditionCountry");
@@ -100,11 +101,18 @@ class _SearchConditionPage extends State<SearchConditionPage> {
   }
 
   Padding linePadding (String displayedItem,String databaseItem, String value) {
-    //valueType:String or int or selectString(セグメント)
+
     String displayedValue;
-    if(databaseItem=="gender"
-        ||databaseItem=="level"){
-      displayedValue=widget.argumentMasterData[databaseItem+"_"+value]!;
+    if(databaseItem=="searchConditionLevel"
+        ||databaseItem=="searchConditionGender"){
+      //displayedValue=widget.argumentMasterData[databaseItem+"_"+value]!;
+
+      displayedValue=value;
+
+    }else if(databaseItem=="searchConditionAge"){
+
+      displayedValue=value;
+
     }else{
       displayedValue=value;
     }

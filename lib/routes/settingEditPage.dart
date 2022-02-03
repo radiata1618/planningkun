@@ -92,6 +92,12 @@ class _SettingTextEdit extends State<SettingEditPage> {
     await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
         .update({widget.databaseItem: widget.value});
 
+    //age　など、検索で使う項目は数値情報を保持
+    if(widget.databaseItem=="age"){
+      await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
+          .update({"ageNumber": int.parse(widget.value)});
+    }
+
     var box = await Hive.openBox('record');
 
     //FirebaseのデータをHiveに取得

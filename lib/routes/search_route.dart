@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,14 +22,50 @@ class Search extends StatefulWidget {
   @override
   _Search createState() => _Search();
 }
+class Application {
+  static final Algolia algolia = Algolia.init(
+    applicationId: '41YFHNYKRN',
+    apiKey: '0e766cd86ee6c9465c229119c69009d0',
+  );
+}
 
 class _Search extends State<Search> {
 
   bool searchProcessFlg=true;//検索を実行するかどうか、条件画面から検索ボタンで戻ってきたときにONになっている
+  AlgoliaQuerySnapshot? snap;
+  List<AlgoliaObjectSnapshot> objectList=[];
+
+  Future<void> userSearch(Algolia algolia)async {
+
+    AlgoliaQuery query = algolia.instance.index('planningkun').query("");
+    snap = await query.getObjects();
+    //query=query.filters("country:USA");文字検索の成功例
+    query=query.filters("ageNumber:30 TO 40");
+   // query.search
+    //query=query.filters("age:30");数字情報の検索も成功
+    //query=query.facetFilter(["age:30"],);
+    //query=query.filters(value)
+    snap = await query.getObjects();
+    objectList=snap!.hits;
+
+    setState(() {
+    });
+  }
+
   //検索後にOFFにする
 
   @override
   Widget build(BuildContext context) {
+
+
+    Algolia algolia = Application.algolia;
+    if(searchProcessFlg==true){
+
+      searchProcessFlg=false;
+      userSearch(algolia);
+
+    }
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white10,
@@ -84,7 +121,9 @@ class _Search extends State<Search> {
                                       color: Colors.deepOrangeAccent,
                                       size:26
                                   )
-                              )),)
+                              )
+                                ),
+                              )
                             ],),),
                           decoration: BoxDecoration(
                             color:Color.fromRGBO(	255,228,181, 1),
@@ -108,11 +147,20 @@ class _Search extends State<Search> {
                         ))
                       ]
                     )
-                  )
+                  ),
+                Expanded(
+                    child:ListView.builder(
+                        itemCount:objectList.length,
+                        itemBuilder:(BuildContext context,int index){
+                          return Text(objectList[index].data["name"]);
+                        }
+                ))
                 ]
               )
             )
         )
     );
   }
+
+
 }
