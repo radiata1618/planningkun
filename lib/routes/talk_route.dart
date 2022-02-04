@@ -14,7 +14,7 @@ import '../common.dart';
 class Talk extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
-  Map<String, String> argumentFriendData;
+  Map<String,Map<String,String>>  argumentFriendData;
 
 
   Talk({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
@@ -57,7 +57,7 @@ class _Talk extends State<Talk> {
             argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
             argumentFriendData:widget.argumentFriendData,
-            argumentfriendUserDocId:friendUserDocId
+            argumentFriendUserDocId:friendUserDocId
         ),
       ),
     );
@@ -69,7 +69,7 @@ class _Talk extends State<Talk> {
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('talks')
+          .collection('friends')
           .where('userDocId', isEqualTo: userDocId)
           .orderBy('lastTime', descending: true)
           .snapshots(),
@@ -89,11 +89,11 @@ class _Talk extends State<Talk> {
               child: ListTile(
                 leading: CircleAvatar(),
                 trailing: Text(data['lastTime'].toDate().toString()),
-                title: Text(data['oppositeUserDocId']),
-                //TODO IDを名前に変更
+                title: Text(data['friendUserName']),
+
                 subtitle: Text(data['lastMessageContent']),
                 onTap: () {
-                  _MoveToChat(userDocId,data['oppositeUserDocId'], context);
+                  _MoveToChat(userDocId,data['friendUserDocId'], context);
                 },
               ),
             );

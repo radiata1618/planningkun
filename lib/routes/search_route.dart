@@ -16,7 +16,7 @@ import 'SearchConditionPage.dart';
 class Search extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
-  Map<String, String> argumentFriendData;
+  Map<String,Map<String,String>>  argumentFriendData;
 
 
   Search({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
@@ -241,7 +241,7 @@ class _Search extends State<Search> {
                 ),
                 ElevatedButton(
                     onPressed: () async{
-                      InsertFriend(userData.data["objectID"]);
+                      await InsertFriend(userData.data["objectID"],userData.data["name"]);
 
                   await Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) {
@@ -249,7 +249,7 @@ class _Search extends State<Search> {
                      argumentUserData: widget.argumentUserData,
                         argumentMasterData:widget.argumentMasterData,
                           argumentFriendData:widget.argumentFriendData,
-                        argumentfriendUserDocId:userData.data["objectID"]
+                        argumentFriendUserDocId:userData.data["objectID"]
                       );
                     }),
                   );
@@ -274,21 +274,49 @@ class _Search extends State<Search> {
   }
 
 
-  Future<void> InsertFriend(String friendUserDocId) async{
+  Future<void> InsertFriend(String friendUserDocId,String friendUserName) async{
     String insertedDocId="";
+
+    //相手側のFriendデータもFirebaseのみに作成する
+    FirebaseFirestore.instance.collection('friends').add(
+      {'userDocId':friendUserDocId ,
+        'friendUserDocId': widget.argumentUserData["userDocId"] ,
+        'friendUserName': widget.argumentUserData["name"] ,
+        'lastMessageContent': "",
+        'lastMessageDocId': "",
+        'lastTime': Timestamp.fromDate(DateTime.now()),
+      },
+    );
 
     FirebaseFirestore.instance.collection('friends').add(
       {'userDocId':widget.argumentUserData["userDocId"] ,
         'friendUserDocId': friendUserDocId,
+        'friendUserName': friendUserName ,
+        'lastMessageContent': "",
+        'lastMessageDocId': "",
+        'lastTime': Timestamp.fromDate(DateTime.now()),
       },
     ).then((value){
       insertedDocId=value.id;
     });
 
     var friendBox = await Hive.openBox('friend');
-    await friendBox.put(friendUserDocId,insertedDocId);
-    friendBox.close();
-    widget.argumentFriendData[friendUserDocId]=insertedDocId;
+    await friendBox.put(friendUserDocId,{
+      'friendUserDocId': insertedDocId,
+      'friendUserName': friendUserName,
+      'lastMessageContent': "",
+      'lastMessageDocId': "",
+      'lastTime': Timestamp.fromDate(DateTime.now()).toString(),
+    });
+    await friendBox.close();
+
+    widget.argumentFriendData[friendUserDocId]={
+      'friendUserDocId': insertedDocId,
+      'friendUserName': friendUserName,
+      'lastMessageContent': "",
+      'lastMessageDocId': "",
+      'lastTime': Timestamp.fromDate(DateTime.now()).toString(),
+    };
 
   }
 

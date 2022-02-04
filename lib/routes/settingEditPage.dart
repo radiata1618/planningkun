@@ -89,6 +89,7 @@ class _SettingTextEdit extends State<SettingEditPage> {
   Future<void> _updateUserInfo() async {
 
 
+    //TODO 名前を変更する場合は、Friendデータも更新する
     await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
         .update({widget.databaseItem: widget.value});
 

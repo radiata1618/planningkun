@@ -11,10 +11,10 @@ import 'tabs_page.dart';
 class Chat extends StatefulWidget {
   Map<String,String> argumentUserData;
   Map<String,String>  argumentMasterData;
-  Map<String,String>  argumentFriendData;
-  String argumentfriendUserDocId;
+  Map<String,Map<String,String>>  argumentFriendData;
+  String argumentFriendUserDocId;
 
-  Chat({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentfriendUserDocId});
+  Chat({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentFriendUserDocId});
 
   @override
   _Chat createState() => _Chat();
@@ -73,7 +73,7 @@ class _Chat extends State<Chat> {
         backgroundColor: Theme.of(context).canvasColor,
         elevation: .6,
         title: Text(
-          widget.argumentfriendUserDocId,
+          widget.argumentFriendData[widget.argumentFriendUserDocId]!["friendUserName"]!,
           //TODO IDを名前に変更
           style: TextStyle(color: Colors.black87),
         ),
@@ -89,7 +89,7 @@ class _Chat extends State<Chat> {
             child: Column(
               children: <Widget>[
                 buildMessageList(
-                    widget.argumentUserData["userDocId"]!, widget.argumentfriendUserDocId),
+                    widget.argumentUserData["userDocId"]!, widget.argumentFriendUserDocId),
               ],
             ),
           ),
@@ -199,7 +199,7 @@ class _Chat extends State<Chat> {
           color: Colors.black54,
           onPressed: () {
             _insertMessage(
-                widget.argumentUserData["userDocId"]!, widget.argumentfriendUserDocId, content);
+                widget.argumentUserData["userDocId"]!, widget.argumentFriendUserDocId, content);
           },
         ),
         IconButton(

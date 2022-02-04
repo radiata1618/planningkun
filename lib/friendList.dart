@@ -15,7 +15,7 @@ import 'common.dart';
 class FriendList extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
-  Map<String, String> argumentFriendData;
+  Map<String,Map<String,String>>  argumentFriendData;
 
   FriendList({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
 
@@ -34,30 +34,30 @@ class _FriendList extends State<FriendList> {
 
 
   Future<void> _insertOrMoveTalks(String friendUserDocId,BuildContext context) async {
-    // addによるドキュメントIDを指定しない追加
-    // この場合は、ドキュメントIDはハッシュ値が払い出されます
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('talks')
-        .where('oppositeUserDocId', isEqualTo: friendUserDocId)
-        .where('userDocId', isEqualTo: widget.argumentUserData["userDocId"])
-        .get();
-
-    if(snapshot.size==0){
-      FirebaseFirestore.instance.collection('talks').add({
-        'lastMessageContent': "あああ",
-        'lastMessageDocId': "",
-        'lastTime': Timestamp.fromDate(DateTime.now()),
-        'oppositeUserDocId': friendUserDocId,
-        'userDocId': widget.argumentUserData["userDocId"]
-      });
-    }
+    // // addによるドキュメントIDを指定しない追加
+    // // この場合は、ドキュメントIDはハッシュ値が払い出されます
+    // QuerySnapshot snapshot = await FirebaseFirestore.instance
+    //     .collection('talks')
+    //     .where('oppositeUserDocId', isEqualTo: friendUserDocId)
+    //     .where('userDocId', isEqualTo: widget.argumentUserData["userDocId"])
+    //     .get();
+    //
+    // if(snapshot.size==0){
+    //   FirebaseFirestore.instance.collection('talks').add({
+    //     'lastMessageContent': "あああ",
+    //     'lastMessageDocId': "",
+    //     'lastTime': Timestamp.fromDate(DateTime.now()),
+    //     'oppositeUserDocId': friendUserDocId,
+    //     'userDocId': widget.argumentUserData["userDocId"]
+    //   });
+    // }
     Navigator.push(
       context,MaterialPageRoute(
         builder: (context) => Chat(
             argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
             argumentFriendData:widget.argumentFriendData,
-            argumentfriendUserDocId:friendUserDocId
+            argumentFriendUserDocId:friendUserDocId
         ),
       ),
     );

@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String infoText = "";
   Map<String,String> userData={};
   Map<String,String> masterData={};
-  Map<String,String> friendData={};
+  Map<String,Map<String,String>> friendData={};
   var box;
   QuerySnapshot? snapshot;
 
@@ -178,11 +178,27 @@ class _MyHomePageState extends State<MyHomePage> {
       snapshot.docs.forEach((doc) async{
 
         //Hiveとメモリにデータをセットする処理を追加
-        await boxFriend.put(doc.get('friendUserDocId'),doc.id);
-        friendData[doc.get('friendUserDocId')]=doc.id;
-      });
+        await boxFriend.put(doc.get('friendUserDocId'),{
+          'friendUserDocId': doc.id,
+          'friendUserName':doc.get('friendUserName'),
+          'lastMessageContent': doc.get('lastMessageContent'),
+          'lastMessageDocId': doc.get('lastMessageDocId'),
+          'lastTime': doc.get('lastTime'),
+        });
+
+
+        friendData[doc.get('friendUserDocId')]={
+          'friendUserDocId': doc.id,
+          'friendUserName':doc.get('friendUserName'),
+          'lastMessageContent': doc.get('lastMessageContent'),
+          'lastMessageDocId': doc.get('lastMessageDocId'),
+          'lastTime': doc.get('lastTime'),
+        };
+
+
+        });
       await boxFriend.close();
-    });
+      });
 
 
     //マスタデータをFirebaseからHiveへ

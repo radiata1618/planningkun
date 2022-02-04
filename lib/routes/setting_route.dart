@@ -26,7 +26,7 @@ import '../common.dart';
 class Setting extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
-  Map<String, String> argumentFriendData;
+  Map<String, Map<String,String>> argumentFriendData;
 
   Setting({required this.argumentUserData, required this.argumentMasterData, required this.argumentFriendData});
 
