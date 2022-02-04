@@ -46,7 +46,7 @@ class _Setting extends State<Setting> {
   //   imageFile = File(pickedFile!.path);
   // }
   Image? _img;
-  Text? _text;
+  //Text? _text;
 
   bool initialProcessFlg=true;
 
@@ -58,23 +58,20 @@ class _Setting extends State<Setting> {
     // ファイルのダウンロード
     // テキスト
     FirebaseStorage storage = await FirebaseStorage.instance;
-    Reference textRef = storage.ref().child("DL").child("hello.txt");
+    // Reference textRef = storage.ref().child("DL").child("hello.txt");
     //Reference ref = storage.ref("DL/hello.txt"); // refで一度に書いてもOK
 
-    var data = await textRef.getData();
+    // var data = await textRef.getData();
 
     // 画像
-    Reference imageRef = await storage.ref().child("DL").child("icon.png");
+    Reference imageRef = await storage.ref().child("profile").child(userDocId).child("mainPhoto.png");
     String imageUrl = await imageRef.getDownloadURL();
 
-    // 画面に反映
-    setState(() {
-      _img = Image.network(imageUrl);
-      _text = Text(ascii.decode(data!));
-    });
+      _img = Image.network(imageUrl,
+      width:90);
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File("${appDocDir.path}/" + userDocId + ".png");
+    File downloadToFile = File("${appDocDir.path}/mainPhoto.png");
     try {
       await imageRef.writeToFile(downloadToFile);
     } catch (e) {
@@ -82,7 +79,7 @@ class _Setting extends State<Setting> {
     }
   }
 
-  void _upload(String userDocId) async {
+  Future<void> _upload(String userDocId) async {
     // imagePickerで画像を選択する
     // upload
     PickedFile? pickerFile =
@@ -91,9 +88,9 @@ class _Setting extends State<Setting> {
 
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
-      await storage.ref("UL/" + userDocId + ".png").putFile(file);
+      await storage.ref("profile/" + userDocId + "/mainPhoto.png").putFile(file);
 
-      // await _download(userDocId);
+
     } catch (e) {
       print(e);
     }
@@ -101,6 +98,8 @@ class _Setting extends State<Setting> {
 
 
   Future<void> getFirebaseData() async {
+
+    await _download(widget.argumentUserData["userDocId"]!);
 
     firebaseUserData =await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"]).get();
     box = await Hive.openBox('record');
@@ -159,33 +158,25 @@ class _Setting extends State<Setting> {
         body: SingleChildScrollView(
           child: SafeArea(
               child: Column(children: <Widget>[
-            Container(
-                height: 120,
-                child: Row(children: <Widget>[
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        if (_text != null) _text!,
-                        if (_img != null) _img!,
-                      ],
-                    ),
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      //                      if (_text != null) _text!,
+                      if (_img != null)_img!,
+                    ],
                   ),
-                  MaterialButton(
-                      onPressed: () {
-                        _upload(widget.argumentUserData["userDocId"]!);
-                      },
-                      child: const Text('写真アップロード') //,
-                      ),
-                  MaterialButton(
-                      onPressed: () {
-                        _download(widget.argumentUserData["userDocId"]!);
-                      },
-                      child: const Text('写真ダウンロード') //,
-                      //TODO ダウンロード機能が不完全
-                      //TODO 画像はローカルのアプリ固有フォルダにも保存して、ローカルにあるならローカルのものを使う⇨DB上のデータなども全般的な話
-                      ),
-                ])),
+                ),
+                MaterialButton(
+                    onPressed: () async{
+                      await _upload(widget.argumentUserData["userDocId"]!);
+                      await _download(widget.argumentUserData["userDocId"]!);
+                      setState(()  {
+
+                      });
+                    },
+                    child: const Text('写真アップロード') //,
+                ),
                 linePadding("Name","name", widget.argumentUserData["name"]!),
                 linePadding("E-mail","email", widget.argumentUserData["email"]!),
                 linePadding("Age","age", widget.argumentUserData["age"]!),
