@@ -14,9 +14,10 @@ import '../common.dart';
 class Talk extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
+  Map<String, String> argumentFriendData;
 
 
-  Talk({required this.argumentUserData,required this.argumentMasterData});
+  Talk({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
 
   @override
   _Talk createState() => _Talk();
@@ -37,7 +38,8 @@ class _Talk extends State<Talk> {
             MaterialPageRoute(
               builder: (context) => FriendList(
                   argumentUserData: widget.argumentUserData,
-                  argumentMasterData:widget.argumentMasterData),
+                  argumentMasterData:widget.argumentMasterData,
+                  argumentFriendData:widget.argumentFriendData),
             ),
           );
         },
@@ -47,13 +49,16 @@ class _Talk extends State<Talk> {
   }
 
   Future<void> _MoveToChat(String userDocId,
-      String oppositeUserDocId, BuildContext context) async {
+      String friendUserDocId, BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Chat(
-            argumentUserDocId: userDocId,
-            argumentOppositeUserDocId: oppositeUserDocId),
+            argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData,
+            argumentfriendUserDocId:friendUserDocId
+        ),
       ),
     );
   }

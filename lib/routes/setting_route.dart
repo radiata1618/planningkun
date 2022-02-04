@@ -26,8 +26,9 @@ import '../common.dart';
 class Setting extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
+  Map<String, String> argumentFriendData;
 
-  Setting({required this.argumentUserData, required this.argumentMasterData});
+  Setting({required this.argumentUserData, required this.argumentMasterData, required this.argumentFriendData});
 
   @override
   _Setting createState() => _Setting();
@@ -204,6 +205,7 @@ class _Setting extends State<Setting> {
           ])),
         ));
   }
+
 
   Padding linePadding (String displayedItem,String databaseItem, String value) {
     //valueType:String or int or selectString(セグメント)

@@ -84,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String infoText = "";
   Map<String,String> userData={};
   Map<String,String> masterData={};
+  Map<String,String> friendData={};
   var box;
   QuerySnapshot? snapshot;
 
@@ -131,10 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
-
-
-
-
     }
 
 
@@ -172,6 +169,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
     await box.close();
 
+    await FirebaseFirestore.instance.collection('friends').get().then((QuerySnapshot snapshot)async {
+
+      var boxFriend = await Hive.openBox('friend');
+      await boxFriend.clear();
+      friendData.clear();
+
+      snapshot.docs.forEach((doc) async{
+
+        //Hiveとメモリにデータをセットする処理を追加
+        await boxFriend.put(doc.get('friendUserDocId'),doc.id);
+        friendData[doc.get('friendUserDocId')]=doc.id;
+      });
+      await boxFriend.close();
+    });
+
+
     //マスタデータをFirebaseからHiveへ
 
     await FirebaseFirestore.instance.collection('masters').get().then((QuerySnapshot snapshot)async {
@@ -190,16 +203,17 @@ class _MyHomePageState extends State<MyHomePage> {
       await boxMaster.close();
 
 
+    });
       // ログインに成功した場合
       // チャット画面に遷移＋ログイン画面を破棄
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) {
           return RootWidget(
             argumentUserData: userData,
-            argumentMasterData: masterData);
+              argumentMasterData: masterData,
+              argumentFriendData: friendData);
         }),
       );
-    });
 
   }
   Future<void> arrangeUserDataUnit(String item) async {

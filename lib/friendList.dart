@@ -12,29 +12,34 @@ import 'friendList.dart';
 import 'chat.dart';
 import 'common.dart';
 
-class FriendList extends StatelessWidget {
+class FriendList extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
+  Map<String, String> argumentFriendData;
 
-  FriendList({required this.argumentUserData,required this.argumentMasterData});
+  FriendList({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
+
   @override
+  _FriendList createState() => _FriendList();
+}
+class _FriendList extends State<FriendList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(""),
       ),
-      body: buildFriendList(argumentUserData["email"]!),
+      body: buildFriendList(widget.argumentUserData["email"]!),
     );
   }
 
 
-  Future<void> _insertOrMoveTalks(String oppositeUserDocId,BuildContext context) async {
+  Future<void> _insertOrMoveTalks(String friendUserDocId,BuildContext context) async {
     // addによるドキュメントIDを指定しない追加
     // この場合は、ドキュメントIDはハッシュ値が払い出されます
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('talks')
-        .where('oppositeUserDocId', isEqualTo: oppositeUserDocId)
-        .where('userDocId', isEqualTo: argumentUserData["userDocId"])
+        .where('oppositeUserDocId', isEqualTo: friendUserDocId)
+        .where('userDocId', isEqualTo: widget.argumentUserData["userDocId"])
         .get();
 
     if(snapshot.size==0){
@@ -42,15 +47,17 @@ class FriendList extends StatelessWidget {
         'lastMessageContent': "あああ",
         'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
-        'oppositeUserDocId': oppositeUserDocId,
-        'userDocId': argumentUserData["userDocId"]
+        'oppositeUserDocId': friendUserDocId,
+        'userDocId': widget.argumentUserData["userDocId"]
       });
     }
     Navigator.push(
       context,MaterialPageRoute(
         builder: (context) => Chat(
-          argumentUserDocId: argumentUserData["userDocId"],
-          argumentOppositeUserDocId: oppositeUserDocId
+            argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData,
+            argumentfriendUserDocId:friendUserDocId
         ),
       ),
     );

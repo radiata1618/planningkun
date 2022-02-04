@@ -9,10 +9,12 @@ import 'firebase_config.dart';
 import 'tabs_page.dart';
 
 class Chat extends StatefulWidget {
-  final argumentUserDocId;
-  final argumentOppositeUserDocId;
+  Map<String,String> argumentUserData;
+  Map<String,String>  argumentMasterData;
+  Map<String,String>  argumentFriendData;
+  String argumentfriendUserDocId;
 
-  Chat({this.argumentUserDocId,this.argumentOppositeUserDocId});
+  Chat({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentfriendUserDocId});
 
   @override
   _Chat createState() => _Chat();
@@ -71,7 +73,7 @@ class _Chat extends State<Chat> {
         backgroundColor: Theme.of(context).canvasColor,
         elevation: .6,
         title: Text(
-          widget.argumentOppositeUserDocId,
+          widget.argumentfriendUserDocId,
           //TODO IDを名前に変更
           style: TextStyle(color: Colors.black87),
         ),
@@ -87,7 +89,7 @@ class _Chat extends State<Chat> {
             child: Column(
               children: <Widget>[
                 buildMessageList(
-                    widget.argumentUserDocId, widget.argumentOppositeUserDocId),
+                    widget.argumentUserData["userDocId"]!, widget.argumentfriendUserDocId),
               ],
             ),
           ),
@@ -197,7 +199,7 @@ class _Chat extends State<Chat> {
           color: Colors.black54,
           onPressed: () {
             _insertMessage(
-                widget.argumentUserDocId, widget.argumentOppositeUserDocId, content);
+                widget.argumentUserData["userDocId"]!, widget.argumentfriendUserDocId, content);
           },
         ),
         IconButton(

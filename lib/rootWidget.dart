@@ -14,9 +14,10 @@ import 'dart:core';
 class RootWidget extends StatefulWidget {
   Map<String,String>  argumentUserData;
   Map<String, String> argumentMasterData;
+  Map<String, String> argumentFriendData;
 
 
-  RootWidget({required this.argumentUserData,required this.argumentMasterData});
+  RootWidget({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
 
   @override
   _RootWidgetState createState() => _RootWidgetState();
@@ -112,14 +113,17 @@ class _RootWidgetState extends State<RootWidget> {
         break;
       case 1:
         return Talk(argumentUserData: widget.argumentUserData,
-            argumentMasterData:widget.argumentMasterData);
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData);
         break;
       case 2:
         return Search(argumentUserData: widget.argumentUserData,
-            argumentMasterData:widget.argumentMasterData);
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData);
       case 3:
         return Setting(argumentUserData: widget.argumentUserData,
-            argumentMasterData:widget.argumentMasterData);
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData);
       default:
         return MapPage();
     }

@@ -5,19 +5,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
-import '../FriendList.dart';
+import '../friendList.dart';
 import '../common.dart';
 import 'SearchConditionPage.dart';
 
 class Search extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
+  Map<String, String> argumentFriendData;
 
 
-  Search({required this.argumentUserData,required this.argumentMasterData});
+  Search({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
 
   @override
   _Search createState() => _Search();
@@ -139,6 +141,7 @@ class _Search extends State<Search> {
                               child:GestureDetector(
                                   onTap: () async{
 
+                                    userSearch(algolia);
                                   },
                                   child: Icon(
                                       Icons.search,
@@ -236,6 +239,30 @@ class _Search extends State<Search> {
                       )
                   ),
                 ),
+                ElevatedButton(
+                    onPressed: () async{
+                      InsertFriend(userData.data["objectID"]);
+
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) {
+                      return Chat(
+                     argumentUserData: widget.argumentUserData,
+                        argumentMasterData:widget.argumentMasterData,
+                          argumentFriendData:widget.argumentFriendData,
+                        argumentfriendUserDocId:userData.data["objectID"]
+                      );
+                    }),
+                  );
+                },
+
+                  style:ButtonStyle(
+                  ),
+                  child: Text("add",
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),),)
               ]
             )
           )
@@ -243,6 +270,25 @@ class _Search extends State<Search> {
       )
 
     );
+
+  }
+
+
+  Future<void> InsertFriend(String friendUserDocId) async{
+    String insertedDocId="";
+
+    FirebaseFirestore.instance.collection('friends').add(
+      {'userDocId':widget.argumentUserData["userDocId"] ,
+        'friendUserDocId': friendUserDocId,
+      },
+    ).then((value){
+      insertedDocId=value.id;
+    });
+
+    var friendBox = await Hive.openBox('friend');
+    await friendBox.put(friendUserDocId,insertedDocId);
+    friendBox.close();
+    widget.argumentFriendData[friendUserDocId]=insertedDocId;
 
   }
 
