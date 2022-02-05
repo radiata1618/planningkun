@@ -125,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'searchConditionCountry':'JPN,USA',
         'searchConditionGender':'1,2,3',
         'profilePhotoPath':'',
+        'profilePhotoUpdateCnt':'0',
       },
       );
 
@@ -165,6 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
     await arrangeUserDataUnit("searchConditionCountry");
     await arrangeUserDataUnit("searchConditionGender");
     await arrangeUserDataUnit("profilePhotoPath");
+    await arrangeUserDataUnit("profilePhotoUpdateCnt");
 
 
     await box.close();
@@ -184,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
           'lastMessageContent': doc.get('lastMessageContent'),
           'lastMessageDocId': doc.get('lastMessageDocId'),
           'lastTime': doc.get('lastTime'),
+          'profilePhotoUpdateCnt': doc.get('profilePhotoUpdateCnt'),
         });
 
 
@@ -193,6 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
           'lastMessageContent': doc.get('lastMessageContent'),
           'lastMessageDocId': doc.get('lastMessageDocId'),
           'lastTime': doc.get('lastTime'),
+          'profilePhotoUpdateCnt': doc.get('profilePhotoUpdateCnt'),
         };
 
 
@@ -352,6 +356,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                  'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -377,6 +382,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
                 FirebaseFirestore.instance.collection('users').add(
@@ -401,6 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -426,6 +433,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -451,6 +459,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -476,6 +485,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -502,6 +512,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -527,6 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -552,6 +564,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -578,6 +591,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -603,6 +617,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
                 FirebaseFirestore.instance.collection('users').add(
@@ -627,6 +642,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -652,6 +668,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -677,6 +694,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -702,6 +720,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -728,6 +747,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -753,6 +773,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
 
@@ -778,6 +799,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'searchConditionCountry':'JPN,USA',
                     'searchConditionGender':'1,2,3',
                     'profilePhotoPath':'',
+                    'profilePhotoUpdateCnt':'0',
                   },
                 );
               },

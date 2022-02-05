@@ -241,7 +241,7 @@ class _Search extends State<Search> {
                 ),
                 ElevatedButton(
                     onPressed: () async{
-                      await InsertFriend(userData.data["objectID"],userData.data["name"]);
+                      await InsertFriend(userData.data["objectID"],userData.data["name"],userData.data["profilePhotoPath"],userData.data["profilePhotoUpdateCnt"]);
 
                   await Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) {
@@ -274,7 +274,7 @@ class _Search extends State<Search> {
   }
 
 
-  Future<void> InsertFriend(String friendUserDocId,String friendUserName) async{
+  Future<void> InsertFriend(String friendUserDocId,String friendUserName,String friendProfilePhotoPath ,String friendProfilePhotoUpdateCnt) async{
     String insertedDocId="";
 
     //相手側のFriendデータもFirebaseのみに作成する
@@ -282,6 +282,8 @@ class _Search extends State<Search> {
       {'userDocId':friendUserDocId ,
         'friendUserDocId': widget.argumentUserData["userDocId"] ,
         'friendUserName': widget.argumentUserData["name"] ,
+        'profilePhotoPath': widget.argumentUserData["profilePhotoPath"] ,
+        'profilePhotoUpdateCnt': widget.argumentUserData["profilePhotoUpdateCnt"] ,
         'lastMessageContent': "",
         'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
@@ -292,6 +294,8 @@ class _Search extends State<Search> {
       {'userDocId':widget.argumentUserData["userDocId"] ,
         'friendUserDocId': friendUserDocId,
         'friendUserName': friendUserName ,
+        'profilePhotoPath': friendProfilePhotoPath ,
+        'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
         'lastMessageContent': "",
         'lastMessageDocId': "",
         'lastTime': Timestamp.fromDate(DateTime.now()),
@@ -304,6 +308,8 @@ class _Search extends State<Search> {
     await friendBox.put(friendUserDocId,{
       'friendUserDocId': insertedDocId,
       'friendUserName': friendUserName,
+      'profilePhotoPath': friendProfilePhotoPath ,
+      'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
       'lastMessageContent': "",
       'lastMessageDocId': "",
       'lastTime': Timestamp.fromDate(DateTime.now()).toString(),
@@ -313,6 +319,8 @@ class _Search extends State<Search> {
     widget.argumentFriendData[friendUserDocId]={
       'friendUserDocId': insertedDocId,
       'friendUserName': friendUserName,
+      'profilePhotoPath': friendProfilePhotoPath ,
+      'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
       'lastMessageContent': "",
       'lastMessageDocId': "",
       'lastTime': Timestamp.fromDate(DateTime.now()).toString(),

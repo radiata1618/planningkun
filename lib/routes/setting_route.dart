@@ -58,10 +58,6 @@ class _Setting extends State<Setting> {
     // ファイルのダウンロード
     // テキスト
     FirebaseStorage storage = await FirebaseStorage.instance;
-    // Reference textRef = storage.ref().child("DL").child("hello.txt");
-    //Reference ref = storage.ref("DL/hello.txt"); // refで一度に書いてもOK
-
-    // var data = await textRef.getData();
 
     // 画像
     Reference imageRef = await storage.ref().child("profile").child(userDocId).child("mainPhoto.png");
@@ -83,27 +79,61 @@ class _Setting extends State<Setting> {
     // imagePickerで画像を選択する
     // upload
     PickedFile? pickerFile =
-        await ImagePicker().getImage(source: ImageSource.gallery);
+        await ImagePicker().getImage(source: ImageSource.gallery,imageQuality:20 );
     File file = File(pickerFile!.path);
+    //TODO 圧縮率などは調整
+
+    // Future<PickedFile> getImage({
+    //   @required ImageSource source,
+    //   double maxWidth,
+    //   double maxHeight,
+    //   int imageQuality,
+    //   CameraDevice preferredCameraDevice = CameraDevice.rear,
+    // }) {
+    //   // 略
+    // }
 
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
       await storage.ref("profile/" + userDocId + "/mainPhoto.png").putFile(file);
+      //TODO 拡張子はPNGとは限らない。
 
+      await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
+          .update({"profilePhotoUpdateCnt": (int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString(),
+        "profilePhotoPath": "profile/" + userDocId + "/mainPhoto.png"
+          });
+
+
+      widget.argumentUserData["profilePhotoUpdateCnt"]=(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString();
+      await box.put("profilePhotoPath","profile/" + userDocId + "/mainPhoto.png");
 
     } catch (e) {
       print(e);
     }
   }
 
+  Future<void> _showLocalPhoto()async{
+
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File localFile = File("${appDocDir.path}/mainPhoto.png");
+    _img = Image.file(localFile,width:90);
+    setState(()  {
+    });
+  }
+
 
   Future<void> getFirebaseData() async {
 
-    await _download(widget.argumentUserData["userDocId"]!);
 
     firebaseUserData =await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"]).get();
     box = await Hive.openBox('record');
 
+
+    if(firebaseUserData.get("profilePhotoUpdateCnt")!=widget.argumentUserData["profilePhotoUpdateCnt"]){
+      await _download(widget.argumentUserData["userDocId"]!);
+
+    }
     //FirebaseのデータをHiveに取得
 
     await arrangeUserDataUnit("name");
@@ -120,12 +150,12 @@ class _Setting extends State<Setting> {
     await arrangeUserDataUnit("placeWannaGo");
     await arrangeUserDataUnit("greeting");
     await arrangeUserDataUnit("description");
+    await arrangeUserDataUnit("profilePhotoPath");
+    await arrangeUserDataUnit("profilePhotoUpdateCnt");
 
     await box.close();//Closeするとエラーになるのでオープンしたまま
 
-
     setState(()  {
-
     });
   }
 
@@ -140,7 +170,8 @@ class _Setting extends State<Setting> {
 
     if (initialProcessFlg){
       initialProcessFlg=false;
-      getFirebaseData();
+      _showLocalPhoto();
+      //getFirebaseData();
     }
 
 
@@ -159,12 +190,10 @@ class _Setting extends State<Setting> {
           child: SafeArea(
               child: Column(children: <Widget>[
                 Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      //                      if (_text != null) _text!,
-                      if (_img != null)_img!,
-                    ],
+                  child: CircleAvatar(
+                    radius: 80,
+                    backgroundColor: Colors.white,
+                    backgroundImage:  (_img != null)?_img!.image:null,
                   ),
                 ),
                 MaterialButton(
