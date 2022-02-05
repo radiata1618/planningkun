@@ -1,39 +1,33 @@
 import 'dart:developer';
 
-import 'dart:io';
-import "package:flutter/src/foundation/platform.dart";
-import 'package:permission_handler/permission_handler.dart';
-//import 'package:../config/agora.config.dart' as config;
-
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-
+//import 'package:agora_rtc_engine_example/config/agora.config.dart' as config;
 import '../config/agora.config.dart' as config;
-import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
+import 'package:permission_handler/permission_handler.dart';
 
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-class MapPage extends StatefulWidget { // <- (※1)
-
+/// MultiChannel Example
+class JoinChannelVideo extends StatefulWidget {
   @override
-  _MapPage createState() => _MapPage();
+  State<StatefulWidget> createState() => _State();
 }
 
-
-class _MapPage extends State<MapPage> {
+class _State extends State<JoinChannelVideo> {
   late final RtcEngine _engine;
+  String channelId = "aaaaa";
   bool isJoined = false, switchCamera = true, switchRender = true;
   List<int> remoteUid = [];
+  TextEditingController? _controller;
 
   @override
   void initState() {
     super.initState();
-    //this._initEngine();
+    _controller = TextEditingController(text: channelId);
+    this._initEngine();
   }
 
   @override
@@ -82,25 +76,11 @@ class _MapPage extends State<MapPage> {
     ));
   }
 
-  //Future <void>
-  _leaveAndJoinChannel(bool ifJoined,String channelId) async {
-    await this._initEngine();
-
-    if (ifJoined){
-      await _leaveChannel();
-    }else{
-      await  _joinChannel(channelId);
-    }
-
-  }
-
-  String channel = "aaaaa";
-  int userId=0;
-  _joinChannel(String channel) async {
+  _joinChannel() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       await [Permission.microphone, Permission.camera].request();
     }
-    await _engine.joinChannel("", channel, null, userId);
+    await _engine.joinChannel("", channelId, null, 0);
   }
 
   _leaveChannel() async {
@@ -124,43 +104,52 @@ class _MapPage extends State<MapPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("ビデオテスト"),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              TextFormField(
-                // テキスト入力のラベルを設定
-                decoration: InputDecoration(labelText: "チャネルID"),
-                onChanged: (String value) {
+    return SafeArea(
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              TextField(
+                controller: _controller,
+                decoration: InputDecoration(hintText: 'Channel ID'),
+                onChanged: (text) {
                   setState(() {
-                    channel = value;
+                    channelId = text;
                   });
                 },
               ),
-              // ElevatedButton(onPressed: _joinChannel(channel), child: Text("Join")),
-              // ElevatedButton(onPressed: _joinChannel(channel), child: Text("Leave")),
-              ElevatedButton(
-                  onPressed:this._leaveAndJoinChannel(isJoined,channel),
-                  // isJoined
-                      // ? this._leaveChannel
-                      // :this._joinChannel(channel),
-                child: Text('${isJoined ? 'Leave' : 'Join'} channel'),),
-              ElevatedButton(
-                onPressed: this._switchCamera,
-                child: Text('Camera ${switchCamera ? 'front' : 'rear'}'),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: ElevatedButton(
+                      onPressed:
+                      isJoined ? this._leaveChannel : this._joinChannel,
+                      child: Text('${isJoined ? 'Leave' : 'Join'} channel'),
+                    ),
+                  )
+                ],
               ),
-
               _renderVideo(),
             ],
           ),
-        ));
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: this._switchCamera,
+                  child: Text('Camera ${switchCamera ? 'front' : 'rear'}'),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   _renderVideo() {
@@ -193,5 +182,3 @@ class _MapPage extends State<MapPage> {
     );
   }
 }
-
-
