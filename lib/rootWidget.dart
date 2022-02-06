@@ -16,9 +16,9 @@ class RootWidget extends StatefulWidget {
   Map<String,String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String,Map<String,String>>  argumentFriendData;
+  Image argumentMainPhotoData;
 
-
-  RootWidget({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
+  RootWidget({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData});
 
   @override
   _RootWidgetState createState() => _RootWidgetState();
@@ -124,7 +124,8 @@ class _RootWidgetState extends State<RootWidget> {
       case 3:
         return Setting(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
-            argumentFriendData:widget.argumentFriendData);
+            argumentFriendData:widget.argumentFriendData,
+            argumentMainPhotoData:widget.argumentMainPhotoData);
       default:
         return MapPage();
         //return JoinChannelVideo();

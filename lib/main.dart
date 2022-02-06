@@ -1,6 +1,8 @@
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+import 'dart:io';
+
 import 'package:algolia/algolia.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
@@ -12,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'firebase_config.dart';
 import 'NotUse_tabs_page.dart';
@@ -221,17 +224,23 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       await boxMaster.close();
-
-
     });
-      // ログインに成功した場合
+
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File localFile = File("${appDocDir.path}/mainPhoto.png");
+    Image?  _img = Image.file(localFile,width:90);
+
+
+    // ログインに成功した場合
       // チャット画面に遷移＋ログイン画面を破棄
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) {
           return RootWidget(
             argumentUserData: userData,
               argumentMasterData: masterData,
-              argumentFriendData: friendData);
+              argumentFriendData: friendData,
+              argumentMainPhotoData:_img);
         }),
       );
 

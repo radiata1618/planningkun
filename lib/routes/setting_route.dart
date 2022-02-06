@@ -27,8 +27,9 @@ class Setting extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String, Map<String,String>> argumentFriendData;
+  Image argumentMainPhotoData;
 
-  Setting({required this.argumentUserData, required this.argumentMasterData, required this.argumentFriendData});
+  Setting({required this.argumentUserData, required this.argumentMasterData, required this.argumentFriendData,required this.argumentMainPhotoData});
 
   @override
   _Setting createState() => _Setting();
@@ -45,7 +46,7 @@ class _Setting extends State<Setting> {
   //
   //   imageFile = File(pickedFile!.path);
   // }
-  Image? _img;
+
   //Text? _text;
 
   bool initialProcessFlg=true;
@@ -63,7 +64,7 @@ class _Setting extends State<Setting> {
     Reference imageRef = await storage.ref().child("profile").child(userDocId).child("mainPhoto.png");
     String imageUrl = await imageRef.getDownloadURL();
 
-      _img = Image.network(imageUrl,
+    widget.argumentMainPhotoData = Image.network(imageUrl,
       width:90);
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
@@ -117,7 +118,7 @@ class _Setting extends State<Setting> {
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     File localFile = File("${appDocDir.path}/mainPhoto.png");
-    _img = Image.file(localFile,width:90);
+    widget.argumentMainPhotoData = Image.file(localFile,width:90);
     setState(()  {
     });
   }
@@ -193,7 +194,7 @@ class _Setting extends State<Setting> {
                   child: CircleAvatar(
                     radius: 80,
                     backgroundColor: Colors.white,
-                    backgroundImage:  (_img != null)?_img!.image:null,
+                    backgroundImage:  widget.argumentMainPhotoData.image,
                   ),
                 ),
                 MaterialButton(
