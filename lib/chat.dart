@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'firebase_config.dart';
 import 'join_channel_video.dart';
+import 'confirmCall.dart';
 import 'NotUse_tabs_page.dart';
 
 class Chat extends StatefulWidget {
@@ -65,8 +66,37 @@ class _Chat extends State<Chat> {
 
   String content = "";
 
+
+
   @override
   Widget build(BuildContext context) {
+
+    final Stream<QuerySnapshot> _callStream = FirebaseFirestore.instance
+        .collection('calls')
+        .where('sender', isEqualTo: widget.argumentFriendUserDocId)
+        .where('receiver', isEqualTo: widget.argumentUserData["userDocId"])
+        .where('status', isEqualTo: "yet")
+        .snapshots();
+
+    _callStream.listen((QuerySnapshot snapshot) async{
+      if(snapshot.size!=0){
+
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) {
+            return confirmCall(
+              argumentFriendData: widget.argumentFriendData,
+              argumentMasterData: widget.argumentMasterData,
+              argumentUserData: widget.argumentUserData,
+              argumentFriendUserDocId: widget.argumentFriendUserDocId,
+              argumentChannelId: snapshot.docs[0].id,
+            );
+          }),
+        );
+
+      }
+
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).canvasColor,
@@ -94,7 +124,7 @@ class _Chat extends State<Chat> {
                                   argumentUserData: widget.argumentUserData,
                                   argumentMasterData:widget.argumentMasterData,
                                   argumentFriendData:widget.argumentFriendData,
-                                  //argumentChannelId: channelId,
+                                  argumentChannelId: "",
                                   argumentFriendUserDocId: widget.argumentFriendUserDocId,
 
                                 );

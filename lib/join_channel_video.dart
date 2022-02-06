@@ -18,11 +18,13 @@ class JoinChannelVideo extends StatefulWidget {
   Map<String, String> argumentMasterData;
   Map<String, Map<String, String>> argumentFriendData;
   String argumentFriendUserDocId;
+  String argumentChannelId;//Sender側の場合は値が""、Receiverのときのみ値が入っている
 
   JoinChannelVideo({required this.argumentUserData,
     required this.argumentMasterData,
     required this.argumentFriendData,
-  required this.argumentFriendUserDocId});
+    required this.argumentFriendUserDocId,
+    required this.argumentChannelId});
 
   @override
   State<StatefulWidget> createState() => _State();
@@ -39,6 +41,9 @@ class _State extends State<JoinChannelVideo> {
 
 
   Future<void> call()async{
+
+    if(widget.argumentChannelId==""){
+
 
     await FirebaseFirestore.instance.collection('calls').add({
       'sender':widget.argumentUserData["userDocId"],
@@ -79,6 +84,12 @@ class _State extends State<JoinChannelVideo> {
       'insertProgramId': "join_channel_video",
       'insertTime': DateTime.now().toString(),
     });
+
+    }else{
+
+      channelId=widget.argumentChannelId;
+
+    }
 
     await this._joinChannel();
 
@@ -139,6 +150,7 @@ class _State extends State<JoinChannelVideo> {
   }
 
   _joinChannel() async {
+
     if (defaultTargetPlatform == TargetPlatform.android) {
       await [Permission.microphone, Permission.camera].request();
     }
