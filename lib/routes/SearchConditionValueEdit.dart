@@ -90,7 +90,12 @@ class _SettingTextEdit extends State<SearchConditionValueEdit> {
 
 
     await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
-        .update({widget.databaseItem: widget.value});
+        .update({
+      widget.databaseItem: widget.value,
+      'updateUserDocId':widget.argumentUserData["userDocId"],
+      'updateProgramId': "SearchConditionValueEdit",
+      'updateTime': DateTime.now().toString(),
+        });
 
     var box = await Hive.openBox('record');
 

@@ -9,7 +9,7 @@ import 'routes/mapPage_route.dart';
 import 'routes/setting_route.dart';
 import 'common.dart';
 import 'dart:core';
-import 'routes/join_channel_video.dart';
+import 'join_channel_video.dart';
 // =============================================
 
 class RootWidget extends StatefulWidget {
@@ -126,8 +126,8 @@ class _RootWidgetState extends State<RootWidget> {
             argumentMasterData:widget.argumentMasterData,
             argumentFriendData:widget.argumentFriendData);
       default:
-        //return MapPage();
-        return JoinChannelVideo();
+        return MapPage();
+        //return JoinChannelVideo();
 
     }
   }

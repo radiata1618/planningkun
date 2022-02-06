@@ -6,15 +6,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_config.dart';
-import 'tabs_page.dart';
+import 'join_channel_video.dart';
+import 'NotUse_tabs_page.dart';
 
 class Chat extends StatefulWidget {
-  Map<String,String> argumentUserData;
-  Map<String,String>  argumentMasterData;
-  Map<String,Map<String,String>>  argumentFriendData;
+  Map<String, String> argumentUserData;
+  Map<String, String> argumentMasterData;
+  Map<String, Map<String, String>> argumentFriendData;
   String argumentFriendUserDocId;
 
-  Chat({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentFriendUserDocId});
+  Chat(
+      {required this.argumentUserData,
+      required this.argumentMasterData,
+      required this.argumentFriendData,
+      required this.argumentFriendUserDocId});
 
   @override
   _Chat createState() => _Chat();
@@ -25,40 +30,34 @@ class _Chat extends State<Chat> {
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
+
   Future<void> _insertMessage(
-
-      //相手ユーザの画面にトークデータがなかったら新規作成する
-      String userDocId, String oppositeUserDocId, String messageContent) async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('talks')
-        .where('oppositeUserDocId', isEqualTo: userDocId)
-        .where('userDocId', isEqualTo: oppositeUserDocId)
-        .get();
-
-    if (snapshot.size == 0) {
-      FirebaseFirestore.instance.collection('talks').add({
-        'lastMessageContent': "あああ",
-        'lastMessageDocId': "",
-        'lastTime': Timestamp.fromDate(DateTime.now()),
-        'oppositeUserDocId': userDocId,
-        'userDocId': oppositeUserDocId
-      });
-    }
+      String messageContent) async {
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userDocId': userDocId,
-      'oppositeUserDocId': oppositeUserDocId,
+      'userDocId': widget.argumentUserData["userDocId"],
+      'oppositeUserDocId':widget.argumentFriendUserDocId ,
       'receiveSend': "send",
-      'sendTime': Timestamp.fromDate(DateTime.now()),
+      'sendTime': DateTime.now().toString(),
+      'messageType':"chat",
+      'callChannelId':"",
+    'insertUserDocId':widget.argumentUserData["userDocId"],
+    'insertProgramId': "Chat",
+    'insertTime': DateTime.now().toString(),
     });
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userDocId': oppositeUserDocId,
-      'oppositeUserDocId': userDocId,
+      'userDocId': widget.argumentFriendUserDocId,
+      'oppositeUserDocId': widget.argumentUserData["userDocId"],
       'receiveSend': "receive",
-      'sendTime': Timestamp.fromDate(DateTime.now()),
+      'sendTime': DateTime.now().toString(),
+      'messageType':"chat",
+      'callChannelId':"",
+      'insertUserDocId':widget.argumentUserData["userDocId"],
+      'insertProgramId': "Chat",
+      'insertTime': DateTime.now().toString(),
     });
 
     //TODO トークデータを更新
@@ -72,14 +71,44 @@ class _Chat extends State<Chat> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).canvasColor,
         elevation: .6,
-        title: Text(
-          widget.argumentFriendData[widget.argumentFriendUserDocId]!["friendUserName"]!,
-          //TODO IDを名前に変更
-          style: TextStyle(color: Colors.black87),
+        title: Container(
+          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.argumentFriendData[widget.argumentFriendUserDocId]![
+                    "friendUserName"]!,
+                style: TextStyle(color: Colors.black87),
+              ),
+              Container(
+                  width: 40,
+                  child: Align(
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                          onTap: () async {
+
+                            //String channelId =await call();
+                            //userSearch(algolia);
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) {
+                                return JoinChannelVideo(
+                                  argumentUserData: widget.argumentUserData,
+                                  argumentMasterData:widget.argumentMasterData,
+                                  argumentFriendData:widget.argumentFriendData,
+                                  //argumentChannelId: channelId,
+                                  argumentFriendUserDocId: widget.argumentFriendUserDocId,
+
+                                );
+                              }),
+                            );
+
+                          },
+                          child: Icon(Icons.call_sharp,
+                              color: Colors.black87, size: 26))))
+            ],
+          ),
         ),
         iconTheme: IconThemeData(color: Colors.black87),
       ),
-
       body: SafeArea(
           child: Column(children: <Widget>[
         Expanded(
@@ -88,8 +117,8 @@ class _Chat extends State<Chat> {
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
             child: Column(
               children: <Widget>[
-                buildMessageList(
-                    widget.argumentUserData["userDocId"]!, widget.argumentFriendUserDocId),
+                buildMessageList(widget.argumentUserData["userDocId"]!,
+                    widget.argumentFriendUserDocId),
               ],
             ),
           ),
@@ -198,8 +227,7 @@ class _Chat extends State<Chat> {
           iconSize: 28,
           color: Colors.black54,
           onPressed: () {
-            _insertMessage(
-                widget.argumentUserData["userDocId"]!, widget.argumentFriendUserDocId, content);
+            _insertMessage(content);
           },
         ),
         IconButton(

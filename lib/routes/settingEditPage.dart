@@ -91,12 +91,19 @@ class _SettingTextEdit extends State<SettingEditPage> {
 
     //TODO 名前を変更する場合は、Friendデータも更新する
     await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
-        .update({widget.databaseItem: widget.value});
+        .update({widget.databaseItem: widget.value,
+      'updateUserDocId':widget.argumentUserData["userDocId"],
+      'updateProgramId': "settingEditPage",
+      'updateTime': DateTime.now().toString(),
+        });
 
     //age　など、検索で使う項目は数値情報を保持
     if(widget.databaseItem=="age"){
       await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
-          .update({"ageNumber": int.parse(widget.value)});
+          .update({"ageNumber": int.parse(widget.value),
+        'updateUserDocId':widget.argumentUserData["userDocId"],
+        'updateProgramId': "settingEditPage",
+        'updateTime': DateTime.now().toString()});
     }
 
     var box = await Hive.openBox('record');

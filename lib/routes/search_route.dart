@@ -9,7 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
-import '../friendList.dart';
+import '../NotUse_friendList.dart';
 import '../common.dart';
 import 'SearchConditionPage.dart';
 
@@ -31,18 +31,61 @@ class Application {
   );
 }
 
+
 class _Search extends State<Search> {
 
   bool searchProcessFlg=true;//検索を実行するかどうか、条件画面から検索ボタンで戻ってきたときにONになっている
   AlgoliaQuerySnapshot? snap;
   List<AlgoliaObjectSnapshot> objectList=[];
 
+
+  String addConditionList(String conditionString, String conditionItemName,String itemName){
+
+    if((widget.argumentUserData[conditionItemName]!)!=""){
+
+      conditionString= conditionString + " AND (";
+
+      List<String > countryConditionList=FromTextToList(widget.argumentUserData[conditionItemName]!);
+      for(int i=0;i<countryConditionList.length;i++){
+        if(i!=0){
+          conditionString= conditionString + " OR ";
+        }
+        conditionString= conditionString + " "+itemName+":"+countryConditionList[i];
+      }
+      conditionString= conditionString + " )";
+    }
+
+    return conditionString;
+
+  }
+
+
   Future<void> userSearch(Algolia algolia)async {
+
+
 
     AlgoliaQuery query = algolia.instance.index('planningkun').query("");
     snap = await query.getObjects();
-    //query=query.filters("country:USA");文字検索の成功例
-    query=query.filters("ageNumber:30 TO 40");
+
+
+    List<String > ageConditionList=FromTextToList(widget.argumentUserData["searchConditionAge"]!);
+
+    String filterConditions = "ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1];
+    filterConditions=filterConditions+" AND NOT objectID:"+widget.argumentUserData["userDocId"]!+" ";
+
+    //filterConditions=addConditionList(filterConditions,"searchConditionLevel","level");
+    //filterConditions=addConditionList(filterConditions,"searchConditionNativeLang","nativeLang");TODO なぜか追加すると検索できない
+    filterConditions=addConditionList(filterConditions,"searchConditionCountry","country");
+    //filterConditions=addConditionList(filterConditions,"searchConditionGender","gender");TODO なぜか追加すると検索できない
+
+        //query=query.filters("country:USA");文字検索の成功例
+    //query=query.filters("ageNumber:30 TO 40");
+    //query=query.facetFilter(["ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1]]);
+    //query=query.filters("country:"+widget.argumentUserData["searchConditionCountry"]!);
+    //query=query.filters("country:JPN");
+    query=query.filters(filterConditions);
+    //query=query.filters("nativeLang:JPN");TODO NATIVELANGが取れない
+    //query=query.filters("ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1]);
    // query.search
     //query=query.filters("age:30");数字情報の検索も成功
     //query=query.facetFilter(["age:30"],);
@@ -286,7 +329,10 @@ class _Search extends State<Search> {
         'profilePhotoUpdateCnt': widget.argumentUserData["profilePhotoUpdateCnt"] ,
         'lastMessageContent': "",
         'lastMessageDocId': "",
-        'lastTime': Timestamp.fromDate(DateTime.now()),
+        'lastTime': DateTime.now().toString(),
+        'insertUserDocId':widget.argumentUserData["userDocId"],
+        'insertProgramId': "search_route",
+        'insertTime': DateTime.now().toString(),
       },
     );
 
@@ -298,7 +344,10 @@ class _Search extends State<Search> {
         'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
         'lastMessageContent': "",
         'lastMessageDocId': "",
-        'lastTime': Timestamp.fromDate(DateTime.now()),
+        'lastTime': DateTime.now().toString(),
+        'insertUserDocId':widget.argumentUserData["userDocId"],
+        'insertProgramId': "search_route",
+        'insertTime': DateTime.now().toString(),
       },
     ).then((value){
       insertedDocId=value.id;
@@ -312,7 +361,7 @@ class _Search extends State<Search> {
       'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
       'lastMessageContent': "",
       'lastMessageDocId': "",
-      'lastTime': Timestamp.fromDate(DateTime.now()).toString(),
+      'lastTime': DateTime.now().toString(),
     });
     await friendBox.close();
 
@@ -323,7 +372,7 @@ class _Search extends State<Search> {
       'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
       'lastMessageContent': "",
       'lastMessageDocId': "",
-      'lastTime': Timestamp.fromDate(DateTime.now()).toString(),
+      'lastTime': DateTime.now().toString(),
     };
 
   }

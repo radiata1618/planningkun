@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
-import '../FriendList.dart';
+import '../NotUse_friendList.dart';
 import '../common.dart';
 
 
@@ -88,7 +88,7 @@ class _Talk extends State<Talk> {
             return Card(
               child: ListTile(
                 leading: CircleAvatar(),
-                trailing: Text(data['lastTime'].toDate().toString()),
+                trailing: Text(data['lastTime']),
                 title: Text(data['friendUserName']),
 
                 subtitle: Text(data['lastMessageContent']),

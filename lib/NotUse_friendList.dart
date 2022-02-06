@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import 'firebase_config.dart';
-import 'tabs_page.dart';
-import 'friendList.dart';
+import 'NotUse_tabs_page.dart';
+import 'NotUse_friendList.dart';
 import 'chat.dart';
 import 'common.dart';
 
