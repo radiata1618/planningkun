@@ -115,15 +115,15 @@ class _Setting extends State<Setting> {
     }
   }
 
-  Future<void> _showLocalPhoto()async{
-
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    File localFile = File("${appDocDir.path}/mainPhoto.png");
-    widget.argumentMainPhotoData = Image.file(localFile,width:90);
-    setState(()  {
-    });
-  }
+  // Future<void> _showLocalPhoto()async{
+  //
+  //
+  //   Directory appDocDir = await getApplicationDocumentsDirectory();
+  //   File localFile = File("${appDocDir.path}/mainPhoto.png");
+  //   widget.argumentMainPhotoData = Image.file(localFile,width:90);
+  //   setState(()  {
+  //   });
+  // }
 
 
   Future<void> getFirebaseData() async {

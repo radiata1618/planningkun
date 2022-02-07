@@ -1,9 +1,14 @@
-//import 'dart:html';
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'topicRegister.dart';
+
 class Home extends StatefulWidget {
+  Map<String,String>  argumentUserData;
+  Map<String, String> argumentMasterData;
+  Map<String,Map<String,String>>  argumentFriendData;
+  Image argumentMainPhotoData;
+
+  Home({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData});
   @override
   _Home createState() => _Home();
 }
@@ -11,8 +16,7 @@ class Home extends StatefulWidget {
 class _Home extends State<Home> {
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
-
+      FirebaseAnalyticsObserver(analytics: analytics);
 
   DateTime? startDateTime;
   DateTime? endDateTime;
@@ -22,70 +26,32 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(child:Container(
-            child: SfCalendar(
-              view: CalendarView.month,
-      //        dataSource: EventDataSource(_getDataSource()),
-              monthViewSettings: MonthViewSettings(showAgenda: true),
-            ))));
+        body: SafeArea(
+            child: Container(
+                child: Column(children: [
+      ElevatedButton(
+        style: ButtonStyle(),
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) {
+              return TopicRegister(argumentUserData: widget.argumentUserData,
+                  argumentMasterData:widget.argumentMasterData,
+                  argumentFriendData:widget.argumentFriendData,
+                  argumentMainPhotoData:widget.argumentMainPhotoData);
+            }),
+          );
+          setState(
+              () {}); //TODO FutureBuilderを使用するようにして非同期のデータ取得のあとSetStateするダサい処理を削除したい
+        },
+        child: Text(
+          "トピック登録画面",
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+      )
+    ]))));
   }
 }
-
-
-
-//
-//
-//   List<Event> _getDataSource() {
-//
-// //データをまとめるリスト
-// //    final List<Event> event = <Event>[];
-//
-// //データの用意
-//     final DateTime today = DateTime.now();
-//     final DateTime startTime =
-//     DateTime(today.year, today.month, today.day, 9, 0, 0);
-//     final DateTime endTime = startTime.add(const Duration(hours: 2));
-//
-// //データをリストに追加
-//     //event.add(Event('イベント', startTime, endTime, const Color(0xFF0F8644), false));
-//
-//     return event;
-//   }
-//
-// }
-//
-// class EventDataSource extends CalendarDataSource {
-//
-//   EventDataSource(List<Event> event) {
-//     appointments = event;
-//   }
-//
-// //イベントのカラー
-//   @override
-//   Color getColor(int index) {
-//     return appointments![index].background;
-//   }
-//
-// //イベントの終了時間
-//   @override
-//   DateTime getEndTime(int index) {
-//     return appointments![index].to;
-//   }
-//
-// //イベントの開始時間
-//   @override
-//   DateTime getStartTime(int index) {
-//     return appointments![index].from;
-//   }
-//
-// //イベントの名前
-//   @override
-//   String getSubject(int index) {
-//     return appointments![index].eventName;
-//   }
-//
-//   @override
-//   bool isAllDay(int index) {
-//     return appointments![index].isAllDay;
-//   }
-// }

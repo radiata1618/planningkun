@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:planningkun/routes/home_route.dart';
 
 // == 作成したWidget をインポート ==================
 import 'routes/home_route.dart';
@@ -110,7 +111,10 @@ class _RootWidgetState extends State<RootWidget> {
   Widget routeElement(int selectedIndex,String email,String userDocId) {
     switch (selectedIndex) {
       case 0:
-        return Home();
+        return Home(argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData,
+            argumentMainPhotoData:widget.argumentMainPhotoData);
         break;
       case 1:
         return Talk(argumentUserData: widget.argumentUserData,
