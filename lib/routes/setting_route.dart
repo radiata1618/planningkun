@@ -106,6 +106,8 @@ class _Setting extends State<Setting> {
 
 
       widget.argumentUserData["profilePhotoUpdateCnt"]=(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString();
+      widget.argumentUserData["profilePhotoPath"]="profile/" + userDocId + "/mainPhoto.png";
+      await box.put("profilePhotoUpdateCnt",(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString());
       await box.put("profilePhotoPath","profile/" + userDocId + "/mainPhoto.png");
 
     } catch (e) {
@@ -171,8 +173,8 @@ class _Setting extends State<Setting> {
 
     if (initialProcessFlg){
       initialProcessFlg=false;
-      _showLocalPhoto();
-      //getFirebaseData();
+      //_showLocalPhoto();
+      getFirebaseData();
     }
 
 

@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
+import 'friendProfile.dart';
 import '../NotUse_friendList.dart';
 import '../common.dart';
 import 'SearchConditionPage.dart';
@@ -17,9 +18,10 @@ class Search extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String,Map<String,String>>  argumentFriendData;
+  Image argumentMainPhotoData;
 
 
-  Search({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData});
+  Search({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentMainPhotoData});
 
   @override
   _Search createState() => _Search();
@@ -212,106 +214,122 @@ class _Search extends State<Search> {
   }
 
   Widget userResultList(AlgoliaObjectSnapshot userData){
-    return Container(
-      height:80,
-      child:Row(
-        children:[
-          Container(
-            child:CircleAvatar(radius:32),
-                width:80
-          ),
-          Expanded(
-            child:Column(
-              children:[
-                Padding(
-                  padding: const EdgeInsets.only(top:8.0),
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child:Text(userData.data["name"],
+    return GestureDetector(
+      onTap:()async{
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) {
+            return FriendProfile(
+                argumentUserData: widget.argumentUserData,
+                argumentMasterData:widget.argumentMasterData,
+                argumentFriendData:widget.argumentFriendData,
+                argumentFriendUserDocId:userData.data["objectID"],
+              argumentMainPhotoData: widget.argumentMainPhotoData,
+            );
+          }),
+        );
+      },
+      child: Container(
+        color: Colors.white10,
+        height:80,
+        child:Row(
+          children:[
+            Container(
+              child:CircleAvatar(radius:32),
+                  width:80
+            ),
+            Expanded(
+              child:Column(
+                children:[
+                  Padding(
+                    padding: const EdgeInsets.only(top:8.0),
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child:Text(userData.data["name"],
+                            style:TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                        )
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top:4.0),
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child:Text(userData.data["country"],
                           style:TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Colors.black87,
+                            fontSize: 13,
+                            color: Colors.black54,
                           ),
-                      )
+                        )
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top:4.0),
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child:Text(userData.data["country"],
-                        style:TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          color: Colors.black54,
-                        ),
-                      )
+                  Padding(
+                    padding: const EdgeInsets.only(top:4.0),
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child:Text(userData.data["greeting"],
+                          style:TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.black54,
+                          ),
+                        )
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top:4.0),
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child:Text(userData.data["greeting"],
-                        style:TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          color: Colors.black54,
-                        ),
-                      )
+                ],
+              )
+            ),
+            Container(
+                width:70,
+              child:Column(
+                children:[
+                  Padding(
+                    padding: const EdgeInsets.only(top:8.0),
+                    child: Align(
+                        alignment: Alignment.topLeft,
+                        child:Text(userData.data["ageNumber"].toString(),
+                          style:TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.black54,
+                          ),
+                        )
+                    ),
                   ),
-                ),
-              ],
+                  ElevatedButton(
+                      onPressed: () async{
+                        await InsertFriend(userData.data["objectID"],userData.data["name"],userData.data["profilePhotoPath"],userData.data["profilePhotoUpdateCnt"]);
+
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) {
+                        return Chat(
+                       argumentUserData: widget.argumentUserData,
+                          argumentMasterData:widget.argumentMasterData,
+                            argumentFriendData:widget.argumentFriendData,
+                          argumentFriendUserDocId:userData.data["objectID"]
+                        );
+                      }),
+                    );
+                  },
+
+                    style:ButtonStyle(
+                    ),
+                    child: Text("add",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),),)
+                ]
+              )
             )
-          ),
-          Container(
-              width:70,
-            child:Column(
-              children:[
-                Padding(
-                  padding: const EdgeInsets.only(top:8.0),
-                  child: Align(
-                      alignment: Alignment.topLeft,
-                      child:Text(userData.data["ageNumber"].toString(),
-                        style:TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          color: Colors.black54,
-                        ),
-                      )
-                  ),
-                ),
-                ElevatedButton(
-                    onPressed: () async{
-                      await InsertFriend(userData.data["objectID"],userData.data["name"],userData.data["profilePhotoPath"],userData.data["profilePhotoUpdateCnt"]);
+          ]
+        )
 
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) {
-                      return Chat(
-                     argumentUserData: widget.argumentUserData,
-                        argumentMasterData:widget.argumentMasterData,
-                          argumentFriendData:widget.argumentFriendData,
-                        argumentFriendUserDocId:userData.data["objectID"]
-                      );
-                    }),
-                  );
-                },
-
-                  style:ButtonStyle(
-                  ),
-                  child: Text("add",
-                  style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),),)
-              ]
-            )
-          )
-        ]
-      )
-
+      ),
     );
 
   }

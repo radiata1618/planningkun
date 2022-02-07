@@ -120,7 +120,8 @@ class _RootWidgetState extends State<RootWidget> {
       case 2:
         return Search(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
-            argumentFriendData:widget.argumentFriendData);
+            argumentFriendData:widget.argumentFriendData,
+            argumentMainPhotoData:widget.argumentMainPhotoData);
       case 3:
         return Setting(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,

@@ -3,7 +3,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 
-
+//TODO Main モジュールでFirebaseからデータが取得できないとき、Hiveのデータをメモリに読み出すように処理をCOMMONに追加する。
 
 const Color themeColorDeep =Colors.orangeAccent;
 Text GrayText(String txt) {
