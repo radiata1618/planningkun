@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,48 +29,67 @@ class _TopicRegister extends State<TopicRegister> {
   var box;
   String topicName = "";
   String categoryName = "";
-  Image? topicImage;
   File? topicImagePhotoFile;
+  TextEditingController? topicEditingController;
+  TextEditingController? categoryEditingController;
 
-  Future<void> _download(String userDocId) async {
-    // ファイルのダウンロード
-    // テキスト
-    FirebaseStorage storage = await FirebaseStorage.instance;
 
-    // 画像
-    Reference imageRef = await storage
-        .ref()
-        .child("profile")
-        .child(userDocId)
-        .child("mainPhoto.png");
-    String imageUrl = await imageRef.getDownloadURL();
-
-    widget.argumentMainPhotoData = Image.network(imageUrl, width: 90);
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File("${appDocDir.path}/mainPhoto.png");
-    try {
-      await imageRef.writeToFile(downloadToFile);
-    } catch (e) {
-      print(e);
-    }
+  @override
+  void initState() {
+    super.initState();
+    topicEditingController = new TextEditingController(text: '');
+    categoryEditingController = new TextEditingController(text: '');
   }
+
+  @override
+  void dispose() {
+    topicEditingController!.dispose();
+    categoryEditingController!.dispose();
+    super.dispose();
+  }
+
+  // Future<void> _download(String userDocId) async {
+  //   // ファイルのダウンロード
+  //   // テキスト
+  //   FirebaseStorage storage = await FirebaseStorage.instance;
+  //
+  //   // 画像
+  //   Reference imageRef = await storage
+  //       .ref()
+  //       .child("profile")
+  //       .child(userDocId)
+  //       .child("mainPhoto.png");
+  //   String imageUrl = await imageRef.getDownloadURL();
+  //
+  //   widget.argumentMainPhotoData = Image.network(imageUrl, width: 90);
+  //
+  //   Directory appDocDir = await getApplicationDocumentsDirectory();
+  //   File downloadToFile = File("${appDocDir.path}/mainPhoto.png");
+  //   try {
+  //     await imageRef.writeToFile(downloadToFile);
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   Future<void> setImage() async {
     // imagePickerで画像を選択する
     // upload
     PickedFile? pickerFile = await ImagePicker()
         .getImage(source: ImageSource.gallery, imageQuality: 20);
-    topicImagePhotoFile=File(pickerFile!.path);
-    topicImage = Image.file(File(pickerFile!.path));
-    //TODO 圧縮率などは調整
+    if(pickerFile!=null){
+      topicImagePhotoFile=File(pickerFile.path);
+      //TODO 圧縮率などは調整
+
+    }
   }
 
   Future<void> insertTopic() async {
 
     String insertedDocId="";
 
-    FirebaseFirestore.instance.collection('topics').add(
+    try {
+    await FirebaseFirestore.instance.collection('topics').add(
       {'categoryDocId':"XXXX" ,
         'categoryName':'categoryName',
         'photoPath':'',
@@ -85,13 +105,15 @@ class _TopicRegister extends State<TopicRegister> {
     });
 
     FirebaseStorage storage = FirebaseStorage.instance;
-    try {
-      await storage.ref("topics/" + insertedDocId + "/photo.png").putFile(topicImagePhotoFile!);
+      await storage.ref("topics/" + insertedDocId + ".png").putFile(topicImagePhotoFile!);
       //TODO 拡張子はPNGとは限らない。
 
       await FirebaseFirestore.instance.collection('topics').doc(insertedDocId)
           .update({"photoUpdateCnt":"1",
-        "photoPath": "topics/" + insertedDocId + "/photo.png"
+        "photoPath": "topics/" + insertedDocId + ".png",
+      'updateUserDocId':widget.argumentUserData["userDocId"],
+      'updateProgramId': "topicRegister",
+      'updateTime': DateTime.now().toString(),
       });
 
       // widget.argumentUserData["profilePhotoUpdateCnt"]=(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString();
@@ -99,10 +121,35 @@ class _TopicRegister extends State<TopicRegister> {
       // await box.put("profilePhotoUpdateCnt",(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString());
       // await box.put("profilePhotoPath","profile/" + userDocId + "/mainPhoto.png");
 
+      //TODO Hive,メモリへのデータ登録
+      showDialog(
+          context: context,
+          builder: (_) => CupertinoAlertDialog(
+            title: Text("Info"),
+            content: Text("data has been inserted"),
+            actions: [
+              CupertinoDialogAction(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ));
+
+
+
     } catch (e) {
       print(e);
     }
-    setState(() {});
+    setState(() {
+      //データの初期化
+      topicName = "";
+      categoryName = "";
+      topicImagePhotoFile=null;
+      topicEditingController = new TextEditingController(text: '');
+      categoryEditingController = new TextEditingController(text: '');
+    });
   }
 
   @override
@@ -115,7 +162,7 @@ class _TopicRegister extends State<TopicRegister> {
         child: CircleAvatar(
           radius: 80,
           backgroundColor: Colors.white,
-          backgroundImage: topicImage == null ? null : topicImage!.image,
+          backgroundImage: topicImagePhotoFile == null ? null : Image.file(topicImagePhotoFile!).image,
         ),
       ),
       MaterialButton(
@@ -128,6 +175,8 @@ class _TopicRegister extends State<TopicRegister> {
       TextFormField(
         // テキスト入力のラベルを設定
         decoration: InputDecoration(labelText: "Topic Name"),
+        controller: topicEditingController,
+        //initialValue: "",
         onChanged: (String value) {
           setState(() {
             topicName = value;
@@ -137,8 +186,7 @@ class _TopicRegister extends State<TopicRegister> {
       const SizedBox(height: 8),
       TextFormField(
         decoration: InputDecoration(labelText: "Category Name"),
-        // パスワードが見えないようにする
-        obscureText: true,
+        controller: categoryEditingController,
         onChanged: (String value) {
           setState(() {
             categoryName = value;

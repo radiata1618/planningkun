@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'topicRegister.dart';
+import 'categoryRegister.dart';
 
 class Home extends StatefulWidget {
   Map<String,String>  argumentUserData;
@@ -51,7 +52,30 @@ class _Home extends State<Home> {
             color: Colors.white,
           ),
         ),
-      )
+      ),
+                  ElevatedButton(
+                    style: ButtonStyle(),
+                    onPressed: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) {
+                          return CategoryRegister(argumentUserData: widget.argumentUserData,
+                              argumentMasterData:widget.argumentMasterData,
+                              argumentFriendData:widget.argumentFriendData,
+                              argumentMainPhotoData:widget.argumentMainPhotoData);
+                        }),
+                      );
+                      setState(
+                              () {}); //TODO FutureBuilderを使用するようにして非同期のデータ取得のあとSetStateするダサい処理を削除したい
+                    },
+                    child: Text(
+                      "カテゴリ登録画面",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
     ]))));
   }
 }
