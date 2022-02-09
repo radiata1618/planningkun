@@ -221,7 +221,6 @@ class _TopicRegister extends State<TopicRegister> {
         // テキスト入力のラベルを設定
         decoration: InputDecoration(labelText: "Topic Name"),
         controller: topicEditingController,
-        //initialValue: "",
         onChanged: (String value) {
           setState(() {
             topicName = value;

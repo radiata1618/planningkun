@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'topicRegister.dart';
 import 'categoryRegister.dart';
@@ -28,7 +29,9 @@ class _Topic extends State<Topic> {
   List<Widget> workCategoryList = [];
   bool initialProcessflg = true;
 
-  int status = 1; //1:スタート時間を選択中、2:エンド時間を選択中
+
+  FirebaseStorage storage = FirebaseStorage.instance;
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +64,7 @@ class _Topic extends State<Topic> {
     final List<Widget> outputList = workCategoryList;
 
     if(outputList.length==0){
-      return [Text("initial")];
+      return [Text("")];
     }else{
 
       return outputList;
@@ -70,6 +73,8 @@ class _Topic extends State<Topic> {
   }
 
   Future<void> setCategoryLines() async {
+
+
     await setCategoryUnit("food");
     await setCategoryUnit("nature");
     await setCategoryUnit("religion");
@@ -86,9 +91,40 @@ class _Topic extends State<Topic> {
         .where('categoryName', isEqualTo: categoryName)
         .get().then((QuerySnapshot snapshot)async {
 
-      snapshot.docs.forEach((doc) async{
 
-        topicList.add(Text(doc.get("topicName")));
+      snapshot.docs.forEach((doc) async{
+        //
+        // Reference imageRef = await storage.ref(doc.get("photoPath"));
+        // String imageUrl = await imageRef.getDownloadURL();
+        // Image img =await Image.network(imageUrl,width:90);
+
+        topicList.add(
+          // Padding(
+          //   padding:const EdgeInsets.symmetric(horizontal:4,vertical:3 ),
+          //   child:Container(
+          //     width:100,
+          //     child: Column(
+          //       children:[
+          //
+          //         // CircleAvatar(
+          //         //   radius: 90,
+          //         //   backgroundColor: Colors.white,
+          //         //   backgroundImage:  img.image,
+          //         // ),
+
+                  Text(doc.get("topicName"),
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                      color: Colors.black45,
+                    ),)
+          //       ]
+          //     ),
+          //   )
+          // )
+
+
+        );
       });
     });
 
@@ -100,5 +136,6 @@ class _Topic extends State<Topic> {
       ),
     ));
 
+    //topicList.clear();
   }
 }
