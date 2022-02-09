@@ -17,9 +17,9 @@ class TopicRegister extends StatefulWidget {
 
   TopicRegister(
       {required this.argumentUserData,
-      required this.argumentMasterData,
-      required this.argumentFriendData,
-      required this.argumentMainPhotoData});
+        required this.argumentMasterData,
+        required this.argumentFriendData,
+        required this.argumentMainPhotoData});
 
   @override
   _TopicRegister createState() => _TopicRegister();
@@ -115,9 +115,16 @@ class _TopicRegister extends State<TopicRegister> {
   Future<void> setImage() async {
     // imagePickerで画像を選択する
     // upload
-    PickedFile? pickerFile = await ImagePicker()
-        .getImage(source: ImageSource.gallery, imageQuality: 20);
+    // PickedFile? pickerFile = await ImagePicker()
+    //     .getImage(source: ImageSource.gallery, imageQuality: 20);
+    // if(pickerFile!=null){
+    //   topicImagePhotoFile=File(pickerFile.path);
+
+
+    XFile? pickerFile = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 10);
     if(pickerFile!=null){
+
       topicImagePhotoFile=File(pickerFile.path);
       //TODO 圧縮率などは調整
 
@@ -134,31 +141,30 @@ class _TopicRegister extends State<TopicRegister> {
           .doc(_selectCategoryItem)
           .get();
 
-    await FirebaseFirestore.instance.collection('topics').add(
-      {'categoryDocId':_selectCategoryItem ,
-        'categoryName':firebaseUserData.get("categoryName"),
-        'photoPath':'',
-        'photoUpdateCnt':'0',
-        'topicName':topicName,
-        'insertUserDocId':widget.argumentUserData["userDocId"],
-        'insertProgramId': "topicRegister",
-        'insertTime': DateTime.now().toString(),
+      await FirebaseFirestore.instance.collection('topics').add(
+        {'categoryDocId':_selectCategoryItem ,
+          'categoryName':firebaseUserData.get("categoryName"),
+          'photoPath':'',
+          'photoUpdateCnt':'0',
+          'topicName':topicName,
+          'insertUserDocId':widget.argumentUserData["userDocId"],
+          'insertProgramId': "topicRegister",
+          'insertTime': DateTime.now().toString(),
 
-      },
-    ).then((value){
-      insertedDocId=value.id;
-    });
+        },
+      ).then((value){
+        insertedDocId=value.id;
+      });
 
-    FirebaseStorage storage = FirebaseStorage.instance;
-      await storage.ref("topics/" + insertedDocId + ".png").putFile(topicImagePhotoFile!);
-      //TODO 拡張子はPNGとは限らない。
+      FirebaseStorage storage = FirebaseStorage.instance;
+      await storage.ref("topics/" + insertedDocId + topicImagePhotoFile!.path.substring(topicImagePhotoFile!.path.lastIndexOf('.'),)).putFile(topicImagePhotoFile!);
 
       await FirebaseFirestore.instance.collection('topics').doc(insertedDocId)
           .update({"photoUpdateCnt":"1",
-        "photoPath": "topics/" + insertedDocId + ".png",
-      'updateUserDocId':widget.argumentUserData["userDocId"],
-      'updateProgramId': "topicRegister",
-      'updateTime': DateTime.now().toString(),
+        "photoPath": "topics/" + insertedDocId + topicImagePhotoFile!.path.substring(topicImagePhotoFile!.path.lastIndexOf('.'),),
+        'updateUserDocId':widget.argumentUserData["userDocId"],
+        'updateProgramId': "topicRegister",
+        'updateTime': DateTime.now().toString(),
       });
 
       // widget.argumentUserData["profilePhotoUpdateCnt"]=(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString();
@@ -203,37 +209,37 @@ class _TopicRegister extends State<TopicRegister> {
         body: SafeArea(
             child: Container(
                 child: Column(children: [
-      Center(
-        child: CircleAvatar(
-          radius: 80,
-          backgroundColor: Colors.white,
-          backgroundImage: topicImagePhotoFile == null ? null : Image.file(topicImagePhotoFile!).image,
-        ),
-      ),
-      MaterialButton(
-          onPressed: () async {
-            await setImage();
-            setState(() {});
-          },
-          child: const Text('写真アップロード') //,
-          ),
-      TextFormField(
-        // テキスト入力のラベルを設定
-        decoration: InputDecoration(labelText: "Topic Name"),
-        controller: topicEditingController,
-        onChanged: (String value) {
-          setState(() {
-            topicName = value;
-          });
-        },
-      ),
-      const SizedBox(height: 8),
-                  DropdownButton(
-                  style: TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 6,
-                  color: Colors.black45,
+                  Center(
+                    child: CircleAvatar(
+                      radius: 80,
+                      backgroundColor: Colors.white,
+                      backgroundImage: topicImagePhotoFile == null ? null : Image.file(topicImagePhotoFile!).image,
+                    ),
                   ),
+                  MaterialButton(
+                      onPressed: () async {
+                        await setImage();
+                        setState(() {});
+                      },
+                      child: const Text('写真アップロード') //,
+                  ),
+                  TextFormField(
+                    // テキスト入力のラベルを設定
+                    decoration: InputDecoration(labelText: "Topic Name"),
+                    controller: topicEditingController,
+                    onChanged: (String value) {
+                      setState(() {
+                        topicName = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButton(
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 6,
+                      color: Colors.black45,
+                    ),
                     items: _categoryItems,
                     value: _selectCategoryItem,
                     onChanged: (value) => {
@@ -242,28 +248,28 @@ class _TopicRegister extends State<TopicRegister> {
                       }),
                     },
                   ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Container(
-          color: Colors.orangeAccent,
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            style: ButtonStyle(),
-            onPressed: ()async{
-                  insertTopic();
-            },
-            child: Text(
-              "Register",
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ]))));
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                      color: Colors.orangeAccent,
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ButtonStyle(),
+                        onPressed: ()async{
+                          insertTopic();
+                        },
+                        child: Text(
+                          "Register",
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ]))));
   }
 }

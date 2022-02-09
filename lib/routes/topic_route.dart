@@ -75,9 +75,9 @@ class _Topic extends State<Topic> {
   Future<void> setCategoryLines() async {
 
 
-    await setCategoryUnit("food");
+    // await setCategoryUnit("food");
     await setCategoryUnit("nature");
-    await setCategoryUnit("religion");
+    // await setCategoryUnit("religion");
 
     setState(() {
 
