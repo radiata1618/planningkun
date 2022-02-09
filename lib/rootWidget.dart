@@ -8,6 +8,7 @@ import 'routes/talk_route.dart';
 import 'routes/search_route.dart';
 import 'routes/mapPage_route.dart';
 import 'routes/setting_route.dart';
+import 'routes/topic_route.dart';
 import 'common.dart';
 import 'dart:core';
 import 'join_channel_video.dart';
@@ -42,7 +43,7 @@ class _RootWidgetState extends State<RootWidget> {
     'トーク',
     'Search',
     'Me',
-    'マップ',
+    'Topic',
   ];
 
 
@@ -132,7 +133,10 @@ class _RootWidgetState extends State<RootWidget> {
             argumentFriendData:widget.argumentFriendData,
             argumentMainPhotoData:widget.argumentMainPhotoData);
       default:
-        return MapPage();
+        return Topic(argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData,
+            argumentMainPhotoData:widget.argumentMainPhotoData);
         //return JoinChannelVideo();
 
     }

@@ -62,7 +62,7 @@ class _CategoryRegister extends State<CategoryRegister> {
 
     try {
       await FirebaseFirestore.instance.collection('categories').add(
-        {'categoryName':'categoryName',
+        {'categoryName':categoryName,
           'photoPath':'',
           'photoUpdateCnt':'0',
           'insertUserDocId':widget.argumentUserData["userDocId"],

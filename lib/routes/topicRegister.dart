@@ -32,13 +32,53 @@ class _TopicRegister extends State<TopicRegister> {
   File? topicImagePhotoFile;
   TextEditingController? topicEditingController;
   TextEditingController? categoryEditingController;
-
+  List<DropdownMenuItem<String>> _categoryItems=[];
+  String _selectCategoryItem = "";
+  var firebaseUserData;
 
   @override
   void initState() {
     super.initState();
     topicEditingController = new TextEditingController(text: '');
     categoryEditingController = new TextEditingController(text: '');
+    setCategoryItems();
+  }
+
+  void setCategoryItems() async{
+
+    //マスタデータをFirebaseからHiveへ
+
+    await FirebaseFirestore.instance.collection('categories').get().then((QuerySnapshot snapshot)async {
+
+      // var boxMaster = await Hive.openBox('master');
+      // await boxMaster.clear();
+      // masterData.clear();
+
+      snapshot.docs.forEach((doc) async{
+
+        // //TODO Hiveとメモリにデータをセットする処理を追加
+        // await boxMaster.put(doc.get('item')+"_"+doc.get('selectedValue'),doc.get('displayedValue'));
+        // masterData[doc.get('item')+"_"+doc.get('selectedValue')]=doc.get('displayedValue');
+
+        _categoryItems
+          ..add(DropdownMenuItem(
+            child: Text(doc.get('categoryName'), style: TextStyle(fontSize: 40.0),),
+            value: doc.id,
+          ));
+
+
+      });
+
+      // await boxMaster.close();
+    });
+
+
+
+    _selectCategoryItem = _categoryItems[0].value!;
+
+    setState(() {
+
+    });
   }
 
   @override
@@ -89,12 +129,17 @@ class _TopicRegister extends State<TopicRegister> {
     String insertedDocId="";
 
     try {
+      firebaseUserData = await FirebaseFirestore.instance
+          .collection('categories')
+          .doc(_selectCategoryItem)
+          .get();
+
     await FirebaseFirestore.instance.collection('topics').add(
-      {'categoryDocId':"XXXX" ,
-        'categoryName':'categoryName',
+      {'categoryDocId':_selectCategoryItem ,
+        'categoryName':firebaseUserData.get("categoryName"),
         'photoPath':'',
         'photoUpdateCnt':'0',
-        'topicName':'topicName',
+        'topicName':topicName,
         'insertUserDocId':widget.argumentUserData["userDocId"],
         'insertProgramId': "topicRegister",
         'insertTime': DateTime.now().toString(),
@@ -184,16 +229,20 @@ class _TopicRegister extends State<TopicRegister> {
         },
       ),
       const SizedBox(height: 8),
-      TextFormField(
-        decoration: InputDecoration(labelText: "Category Name"),
-        controller: categoryEditingController,
-        onChanged: (String value) {
-          setState(() {
-            categoryName = value;
-          });
-        },
-      ),
-      const SizedBox(height: 8),
+                  DropdownButton(
+                  style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 6,
+                  color: Colors.black45,
+                  ),
+                    items: _categoryItems,
+                    value: _selectCategoryItem,
+                    onChanged: (value) => {
+                      setState(() {
+                        _selectCategoryItem = value.toString();
+                      }),
+                    },
+                  ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Container(
