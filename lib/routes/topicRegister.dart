@@ -122,7 +122,7 @@ class _TopicRegister extends State<TopicRegister> {
 
 
     XFile? pickerFile = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 10);
+        .pickImage(source: ImageSource.gallery, maxWidth:400, maxHeight:400,imageQuality: 40);
     if(pickerFile!=null){
 
       topicImagePhotoFile=File(pickerFile.path);

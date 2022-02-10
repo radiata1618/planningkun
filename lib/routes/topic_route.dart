@@ -57,7 +57,7 @@ class _Topic extends State<Topic> {
                 padding: const EdgeInsets.all(8.0),
                 child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("Topic",
+                    child: Text("Topic&Text",
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 16,

@@ -48,8 +48,8 @@ class _CategoryRegister extends State<CategoryRegister> {
   Future<void> setImage() async {
     // imagePickerで画像を選択する
     // upload
-    PickedFile? pickerFile = await ImagePicker()
-        .getImage(source: ImageSource.gallery, imageQuality: 20);
+    XFile? pickerFile = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, maxWidth:400, maxHeight:400,imageQuality: 40);
     if(pickerFile!=null){
       categoryImagePhotoFile=File(pickerFile.path);
       //TODO 圧縮率などは調整

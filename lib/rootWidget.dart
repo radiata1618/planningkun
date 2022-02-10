@@ -1,14 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:planningkun/routes/home_route.dart';
+import 'package:planningkun/routes/myPage_route.dart';
 
 // == 作成したWidget をインポート ==================
-import 'routes/home_route.dart';
+import 'routes/myPage_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/search_route.dart';
 import 'routes/mapPage_route.dart';
 import 'routes/setting_route.dart';
 import 'routes/topic_route.dart';
+import 'routes/now_route.dart';
 import 'common.dart';
 import 'dart:core';
 import 'join_channel_video.dart';
@@ -31,19 +32,19 @@ class _RootWidgetState extends State<RootWidget> {
   final _bottomNavigationBarItems = <BottomNavigationBarItem>[];
 
   static const _footerIcons = [
-    Icons.home,
+    Icons.access_time,
     Icons.textsms,
     Icons.search,
-    Icons.content_paste,
-    Icons.work,
+    Icons.wallpaper_sharp,
+    Icons.work_outline,
   ];
 
   static const _footerItemNames = [
-    'おすすめ',
-    'トーク',
-    'Search',
-    'Me',
+    'Now',
+    'Talk',
+    'Find',
     'Topic',
+    'MyPage',
   ];
 
 
@@ -112,11 +113,10 @@ class _RootWidgetState extends State<RootWidget> {
   Widget routeElement(int selectedIndex,String email,String userDocId) {
     switch (selectedIndex) {
       case 0:
-        return Home(argumentUserData: widget.argumentUserData,
+        return Now(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
             argumentFriendData:widget.argumentFriendData,
             argumentMainPhotoData:widget.argumentMainPhotoData);
-        break;
       case 1:
         return Talk(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
@@ -128,15 +128,16 @@ class _RootWidgetState extends State<RootWidget> {
             argumentFriendData:widget.argumentFriendData,
             argumentMainPhotoData:widget.argumentMainPhotoData);
       case 3:
-        return Setting(argumentUserData: widget.argumentUserData,
-            argumentMasterData:widget.argumentMasterData,
-            argumentFriendData:widget.argumentFriendData,
-            argumentMainPhotoData:widget.argumentMainPhotoData);
-      default:
         return Topic(argumentUserData: widget.argumentUserData,
             argumentMasterData:widget.argumentMasterData,
             argumentFriendData:widget.argumentFriendData,
             argumentMainPhotoData:widget.argumentMainPhotoData);
+      default:
+        return MyPage(argumentUserData: widget.argumentUserData,
+            argumentMasterData:widget.argumentMasterData,
+            argumentFriendData:widget.argumentFriendData,
+            argumentMainPhotoData:widget.argumentMainPhotoData);
+        break;
         //return JoinChannelVideo();
 
     }
