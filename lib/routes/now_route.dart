@@ -7,7 +7,7 @@ class Now extends StatefulWidget {
   Map<String,String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String,Map<String,String>>  argumentFriendData;
-  Image argumentMainPhotoData;
+  Image? argumentMainPhotoData;
 
   Now({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData});
   @override
@@ -38,7 +38,7 @@ class _Now extends State<Now> {
                           return TopicRegister(argumentUserData: widget.argumentUserData,
                               argumentMasterData:widget.argumentMasterData,
                               argumentFriendData:widget.argumentFriendData,
-                              argumentMainPhotoData:widget.argumentMainPhotoData);
+                              argumentMainPhotoData:widget.argumentMainPhotoData!);
                         }),
                       );
                       setState(
@@ -61,7 +61,7 @@ class _Now extends State<Now> {
                           return CategoryRegister(argumentUserData: widget.argumentUserData,
                               argumentMasterData:widget.argumentMasterData,
                               argumentFriendData:widget.argumentFriendData,
-                              argumentMainPhotoData:widget.argumentMainPhotoData);
+                              argumentMainPhotoData:widget.argumentMainPhotoData!);
                         }),
                       );
                       setState(

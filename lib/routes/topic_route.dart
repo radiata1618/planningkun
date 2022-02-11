@@ -9,7 +9,7 @@ class Topic extends StatefulWidget {
   Map<String, String> argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String, Map<String, String>> argumentFriendData;
-  Image argumentMainPhotoData;
+  Image? argumentMainPhotoData;
 
   Topic(
       {required this.argumentUserData,

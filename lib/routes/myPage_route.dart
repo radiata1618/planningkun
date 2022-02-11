@@ -8,7 +8,7 @@ class MyPage extends StatefulWidget {
   Map<String,String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String,Map<String,String>>  argumentFriendData;
-  Image argumentMainPhotoData;
+  Image? argumentMainPhotoData;
 
   MyPage({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData});
   @override
@@ -89,7 +89,7 @@ class _MyPage extends State<MyPage> {
                               child: CircleAvatar(
                                 radius: 40,
                                 backgroundColor: Colors.white,
-                                backgroundImage:  widget.argumentMainPhotoData.image,
+                                backgroundImage:  widget.argumentMainPhotoData!.image,
                               ),
                             ),
                           ]
@@ -106,7 +106,7 @@ class _MyPage extends State<MyPage> {
                               return TopicRegister(argumentUserData: widget.argumentUserData,
                                   argumentMasterData:widget.argumentMasterData,
                                   argumentFriendData:widget.argumentFriendData,
-                                  argumentMainPhotoData:widget.argumentMainPhotoData);
+                                  argumentMainPhotoData:widget.argumentMainPhotoData!);
                             }),
                           );
                           setState(
@@ -129,7 +129,7 @@ class _MyPage extends State<MyPage> {
                               return CategoryRegister(argumentUserData: widget.argumentUserData,
                                   argumentMasterData:widget.argumentMasterData,
                                   argumentFriendData:widget.argumentFriendData,
-                                  argumentMainPhotoData:widget.argumentMainPhotoData);
+                                  argumentMainPhotoData:widget.argumentMainPhotoData!);
                             }),
                           );
                           setState(

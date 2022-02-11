@@ -22,8 +22,6 @@ import 'rootWidget.dart';
 import 'common.dart';
 import 'database.dart';
 
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
@@ -55,7 +53,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
       ),
       navigatorObservers: <NavigatorObserver>[observer],
-      home: MyHomePage(
+      home: LoginPage(
         title: 'Firebase Analytics Demo',
         analytics: analytics,
         observer: observer,
@@ -64,8 +62,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({
+class LoginPage extends ConsumerWidget  {
+  LoginPage({
     Key? key,
     required this.title,
     required this.analytics,
@@ -76,16 +74,7 @@ class MyHomePage extends StatefulWidget {
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  String _message = '';
-  String email = '';
   String userDocId = '';
-  // 入力されたパスワード
-  String password = "";
   // 登録・ログインに関する情報を表示
   String infoText = "";
   Map<String,String> userData={};
@@ -93,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String,Map<String,String>> friendData={};
   var box;
   QuerySnapshot? snapshot;
+  Image? _img;
 
 
   List<String> _contents=[];
@@ -110,29 +100,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if(snapshot!.size==0){
       FirebaseFirestore.instance.collection('users').add(
-      {'email':email ,
-        'name': "テスト用",
-        'age':"21" ,
-        'ageNumber':21 ,
-        'level':"1",
-        'occupation':'consultant',
-        'nativeLang':"JPN",
-        'country':"JPN",
-        'town':"Tokyo",
-        'homeCountry':"JPN",
-        'homeTown':"Nagano",
-        'gender':"1",
-        'placeWannaGo':'antarctic',
-        'greeting':'おはようございます！',
-        'description':'わたしは～～～',
-        'searchConditionAge':'18,30',
-        'searchConditionLevel':'1,2,3,4',
-        'searchConditionNativeLang':'JPN',
-        'searchConditionCountry':'JPN,USA',
-        'searchConditionGender':'1,2,3',
-        'profilePhotoPath':'',
-        'profilePhotoUpdateCnt':'0',
-      },
+        {'email':email ,
+          'name': "テスト用",
+          'age':"21" ,
+          'ageNumber':21 ,
+          'level':"1",
+          'occupation':'consultant',
+          'nativeLang':"JPN",
+          'country':"JPN",
+          'town':"Tokyo",
+          'homeCountry':"JPN",
+          'homeTown':"Nagano",
+          'gender':"1",
+          'placeWannaGo':'antarctic',
+          'greeting':'おはようございます！',
+          'description':'わたしは～～～',
+          'searchConditionAge':'18,30',
+          'searchConditionLevel':'1,2,3,4',
+          'searchConditionNativeLang':'JPN',
+          'searchConditionCountry':'JPN,USA',
+          'searchConditionGender':'1,2,3',
+          'profilePhotoPath':'',
+          'profilePhotoUpdateCnt':'0',
+        },
       );
 
       snapshot = await FirebaseFirestore.instance
@@ -206,9 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
         };
 
 
-        });
-      await boxFriend.close();
       });
+      await boxFriend.close();
+    });
 
 
     //マスタデータをFirebaseからHiveへ
@@ -219,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await boxMaster.clear();
       masterData.clear();
 
-       snapshot.docs.forEach((doc) async{
+      snapshot.docs.forEach((doc) async{
 
         //Hiveとメモリにデータをセットする処理を追加
         await boxMaster.put(doc.get('item')+"_"+doc.get('selectedValue'),doc.get('displayedValue'));
@@ -232,20 +222,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     File localFile = File("${appDocDir.path}/mainPhoto.png");
-    Image?  _img = Image.file(localFile,width:90);
+    _img = Image.file(localFile,width:90);
 
 
-    // ログインに成功した場合
-      // チャット画面に遷移＋ログイン画面を破棄
-      await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) {
-          return RootWidget(
-            argumentUserData: userData,
-              argumentMasterData: masterData,
-              argumentFriendData: friendData,
-              argumentMainPhotoData:_img);
-        }),
-      );
+
 
   }
   Future<void> arrangeUserDataUnit(String item) async {
@@ -254,572 +234,128 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Providerから値を受け取る
+    final infoText = ref.watch(infoTextProvider);
+    final email = ref.watch(emailProvider);
+    final password = ref.watch(passwordProvider);
+
     return Scaffold(
       body: SafeArea(
         child:Column(
-        children: <Widget>[
-          Container(
-            child:Text("ログイン")
-          ),
-          TextFormField(
-            // テキスト入力のラベルを設定
-            decoration: InputDecoration(labelText: "メールアドレス"),
-            onChanged: (String value) {
-              setState(() {
-                email = value;
-              });
-            },
-          ),
-          const SizedBox(height: 8),
-          TextFormField(
-            decoration: InputDecoration(labelText: "パスワード（６文字以上）"),
-            // パスワードが見えないようにする
-            obscureText: true,
-            onChanged: (String value) {
-              setState(() {
-                password = value;
-              });
-            },
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                // メール/パスワードでユーザー登録
-                final FirebaseAuth auth = FirebaseAuth.instance;
-                final UserCredential result =
-                await auth.createUserWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
+          children: <Widget>[
+            Container(
+                child:Text("ログイン")
+            ),
+            TextFormField(
+              // テキスト入力のラベルを設定
+              decoration: InputDecoration(labelText: "メールアドレス"),
+              onChanged: (String value) {
 
-                // 登録したユーザー情報
-                final User user = result.user!;
-                setState(() {
-                  infoText = "登録OK：${user.email}";
+                ref.read(emailProvider.state).update((state) => value);
+              },
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              decoration: InputDecoration(labelText: "パスワード（６文字以上）"),
+              // パスワードが見えないようにする
+              obscureText: true,
+              onChanged: (String value) {
 
-                  _insertUserAndMove(email);
-                });
-              } catch (e) {
-                // 登録に失敗した場合
-                setState(() {
-                  infoText = "登録NG：${e.toString()}";
-                });
-              }
-
-
-            },
-            child: Text("ユーザー登録"),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            // ログイン登録ボタン
-            child: OutlinedButton(
-              child: Text('ログイン'),
+                ref.read(passwordProvider.state).update((state) => value);
+              },
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
               onPressed: () async {
                 try {
-                  // メール/パスワードでログイン
+                  // メール/パスワードでユーザー登録
                   final FirebaseAuth auth = FirebaseAuth.instance;
-                  await auth.signInWithEmailAndPassword(
+                  final UserCredential result =
+                  await auth.createUserWithEmailAndPassword(
                     email: email,
                     password: password,
                   );
-                  _insertUserAndMove(email);
 
+                  // 登録したユーザー情報
+                  final User user = result.user!;
+
+                  ref.read(infoTextProvider.state).update((state) => "登録OK:"+ref.watch(emailProvider));
+                    await _insertUserAndMove(email);
+                    // ログインに成功した場合
+                    // チャット画面に遷移＋ログイン画面を破棄
+                    await Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) {
+                        return RootWidget(
+                            argumentUserData: userData,
+                            argumentMasterData: masterData,
+                            argumentFriendData: friendData,
+                            argumentMainPhotoData:_img);
+                      }),
+                    );
                 } catch (e) {
-                  // ログインに失敗した場合
-                  setState(() {
-                    infoText = "ログインに失敗しました：${e.toString()}";
-                  });
+                  // 登録に失敗した場合
+
+                  ref.read(infoTextProvider.state).update((state) => "登録NG:${e.toString()}");
                 }
+
+
               },
+              child: Text("ユーザー登録"),
             ),
-          ),
-          Text(infoText),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            child: OutlinedButton(
-              child: Text('テストデータ登録'),
-              onPressed: ()  {
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              // ログイン登録ボタン
+              child: OutlinedButton(
+                child: Text('ログイン'),
+                onPressed: () async {
+                  try {
+                    // メール/パスワードでログイン
+                    final FirebaseAuth auth = FirebaseAuth.instance;
+                    await auth.signInWithEmailAndPassword(
+                      email: email,
+                      password: password,
+                    );
+                    await _insertUserAndMove(email);
+                    // ログインに成功した場合
+                    // チャット画面に遷移＋ログイン画面を破棄
+                    await Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) {
+                        return RootWidget(
+                            argumentUserData: userData,
+                            argumentMasterData: masterData,
+                            argumentFriendData: friendData,
+                            argumentMainPhotoData:_img);
+                      }),
+                    );
 
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testaaaaa@gmail.com" ,
-                    'name': "testaaaaaさん",
-                    'age':"44" ,
-                    'ageNumber':44 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"2",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                  'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testbbbb@gmail.com" ,
-                    'name': "testbbbbさん",
-                    'age':"50" ,
-                    'ageNumber':50 ,
-                    'level':"4",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testcccc@gmail.com" ,
-                    'name': "testccccさん",
-                    'age':"29" ,
-                    'ageNumber':29 ,
-                    'level':"3",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testdddd@gmail.com" ,
-                    'name': "testddddさん",
-                    'age':"30" ,
-                    'ageNumber':30 ,
-                    'level':"3",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testeeee@gmail.com" ,
-                    'name': "testeeeeさん",
-                    'age':"60" ,
-                    'ageNumber':60 ,
-                    'level':"3",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testffff@gmail.com" ,
-                    'name': "testffffさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testfgggg@gmail.com" ,
-                    'name': "testggggさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testhhhf@gmail.com" ,
-                    'name': "teshhhさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"CHN",
-                    'country':"JPN",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testiii@gmail.com" ,
-                    'name': "tesiiiiiさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testaaaaa@gmail.com" ,
-                    'name': "testaaaaaさん",
-                    'age':"44" ,
-                    'ageNumber':44 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"2",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testbbbb@gmail.com" ,
-                    'name': "testbbbbさん",
-                    'age':"50" ,
-                    'ageNumber':50 ,
-                    'level':"4",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testcccc@gmail.com" ,
-                    'name': "testccccさん",
-                    'age':"29" ,
-                    'ageNumber':29 ,
-                    'level':"3",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testdddd@gmail.com" ,
-                    'name': "testddddさん",
-                    'age':"30" ,
-                    'ageNumber':30 ,
-                    'level':"3",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testeeee@gmail.com" ,
-                    'name': "testeeeeさん",
-                    'age':"60" ,
-                    'ageNumber':60 ,
-                    'level':"3",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testffff@gmail.com" ,
-                    'name': "testffffさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testfgggg@gmail.com" ,
-                    'name': "testggggさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testhhhf@gmail.com" ,
-                    'name': "teshhhさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"CHN",
-                    'country':"JPN",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-
-                FirebaseFirestore.instance.collection('users').add(
-                  {'email':"testiii@gmail.com" ,
-                    'name': "tesiiiiiさん",
-                    'age':"37" ,
-                    'ageNumber':37 ,
-                    'level':"2",
-                    'occupation':'staff',
-                    'nativeLang':"ENG",
-                    'country':"USA",
-                    'town':"Tokyo",
-                    'homeCountry':"JPN",
-                    'homeTown':"Toyota",
-                    'gender':"3",
-                    'placeWannaGo':'antarctic',
-                    'greeting':'おはようございます！',
-                    'description':'わたしは～～～',
-                    'searchConditionAge':'18,30',
-                    'searchConditionLevel':'1,2,3,4',
-                    'searchConditionNativeLang':'JPN',
-                    'searchConditionCountry':'JPN,USA',
-                    'searchConditionGender':'1,2,3',
-                    'profilePhotoPath':'',
-                    'profilePhotoUpdateCnt':'0',
-                  },
-                );
-              },
+                  } catch (e) {
+                    // ログインに失敗した場合
+                      ref.read(infoTextProvider.state).update((state) => "ログインに失敗しました:${e.toString()}");
+                  }
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+            Text(infoText),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              child: OutlinedButton(
+                child: Text('テストデータ登録'),
+                onPressed: ()  {
+
+                  //TODO テストデータ登録
+
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+
+
 }

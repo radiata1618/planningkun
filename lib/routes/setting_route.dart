@@ -27,7 +27,7 @@ class Setting extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String, Map<String,String>> argumentFriendData;
-  Image argumentMainPhotoData;
+  Image? argumentMainPhotoData;
 
   Setting({required this.argumentUserData, required this.argumentMasterData, required this.argumentFriendData,required this.argumentMainPhotoData});
 
@@ -196,7 +196,7 @@ class _Setting extends State<Setting> {
                   child: CircleAvatar(
                     radius: 80,
                     backgroundColor: Colors.white,
-                    backgroundImage:  widget.argumentMainPhotoData.image,
+                    backgroundImage:  widget.argumentMainPhotoData!.image,
                   ),
                 ),
                 MaterialButton(

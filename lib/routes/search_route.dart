@@ -18,7 +18,7 @@ class Search extends StatefulWidget {
   Map<String, String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String,Map<String,String>>  argumentFriendData;
-  Image argumentMainPhotoData;
+  Image? argumentMainPhotoData;
 
 
   Search({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentMainPhotoData});
@@ -223,7 +223,7 @@ class _Search extends State<Search> {
                 argumentMasterData:widget.argumentMasterData,
                 argumentFriendData:widget.argumentFriendData,
                 argumentFriendUserDocId:userData.data["objectID"],
-              argumentMainPhotoData: widget.argumentMainPhotoData,
+              argumentMainPhotoData: widget.argumentMainPhotoData!,
             );
           }),
         );

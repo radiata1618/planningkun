@@ -19,7 +19,7 @@ class RootWidget extends StatefulWidget {
   Map<String,String>  argumentUserData;
   Map<String, String> argumentMasterData;
   Map<String,Map<String,String>>  argumentFriendData;
-  Image argumentMainPhotoData;
+  Image? argumentMainPhotoData;
 
   RootWidget({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData});
 
