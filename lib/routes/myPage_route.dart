@@ -1,8 +1,11 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:planningkun/routes/setting_route.dart';
+import '../login.dart';
 import 'topicRegister.dart';
 import 'categoryRegister.dart';
+import '../main.dart';
 
 class MyPage extends StatefulWidget {
   Map<String,String>  argumentUserData;
@@ -137,6 +140,29 @@ class _MyPage extends State<MyPage> {
                         },
                         child: Text(
                           "カテゴリ登録画面",
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(),
+                        onPressed: () async {
+                          // ログアウト処理
+                          // 内部で保持しているログイン情報等が初期化される
+                          // （現時点ではログアウト時はこの処理を呼び出せばOKと、思うぐらいで大丈夫です）
+                          await FirebaseAuth.instance.signOut();
+                          // ログイン画面に遷移＋チャット画面を破棄
+                          await Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) {
+                              return LoginPage();
+                            }),
+                          );
+                        },
+                        child: Text(
+                          "Logout",
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             fontSize: 16,
