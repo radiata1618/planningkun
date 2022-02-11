@@ -18,12 +18,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'firebase_config.dart';
-import 'NotUse_tabs_page.dart';
-import 'NotUse_login.dart';
 import 'rootWidget.dart';
 import 'common.dart';
 import 'database.dart';
-import 'common.dart';
+
 
 
 Future<void> main() async {
