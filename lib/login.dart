@@ -19,7 +19,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'firebase_config.dart';
 import 'rootWidget.dart';
-import 'common.dart';
+import 'commonEntity.dart';
 import 'database.dart';
 
 
@@ -43,11 +43,7 @@ class LoginPage extends ConsumerWidget  {
   QuerySnapshot? snapshot;
   Image? _img;
 
-
   List<String> _contents=[];
-  @override
-  void initState(){
-  }
 
   Future<void> _insertUser(String email) async {
 
@@ -280,6 +276,7 @@ class LoginPage extends ConsumerWidget  {
                     // ログインしたユーザー情報
                     ref.read(userProvider.state).update((state) => result.user);
                     await _insertUser(email);
+                    final userMasterData = await ref.watch(passwordProvider);
                     // ログインに成功した場合
                     // チャット画面に遷移＋ログイン画面を破棄
                     await Navigator.of(context).pushReplacement(

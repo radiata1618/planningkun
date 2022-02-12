@@ -10,7 +10,7 @@ import 'firebase_config.dart';
 import 'NotUse_tabs_page.dart';
 import 'NotUse_friendList.dart';
 import 'chat.dart';
-import 'common.dart';
+import 'commonEntity.dart';
 
 class FriendList extends StatefulWidget {
   Map<String, String>  argumentUserData;

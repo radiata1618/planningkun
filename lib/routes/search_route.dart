@@ -11,7 +11,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../chat.dart';
 import 'friendProfile.dart';
 import '../NotUse_friendList.dart';
-import '../common.dart';
+import '../commonEntity.dart';
 import 'SearchConditionPage.dart';
 
 class Search extends StatefulWidget {

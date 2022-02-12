@@ -20,7 +20,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../firebase_config.dart';
 import '../NotUse_tabs_page.dart';
-import '../common.dart';
+import '../commonEntity.dart';
 
 
 class Setting extends StatefulWidget {

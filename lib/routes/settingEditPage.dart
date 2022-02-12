@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 
 import '../firebase_config.dart';
-import '../common.dart';
+import '../commonEntity.dart';
 
 class SettingEditPage extends StatefulWidget {
   Map<String, String>  argumentUserData;

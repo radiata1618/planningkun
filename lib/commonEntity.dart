@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
 //TODO Main モジュールでFirebaseからデータが取得できないとき、Hiveのデータをメモリに読み出すように処理をCOMMONに追加する。
 
@@ -65,6 +66,8 @@ final messageTextProvider = StateProvider.autoDispose((ref) {
   return '';
 });
 
+
+
 // StreamProviderを使うことでStreamも扱うことができる
 // ※ autoDisposeを付けることで自動的に値をリセットできます
 final postsQueryProvider = StreamProvider.autoDispose((ref) {
@@ -72,4 +75,71 @@ final postsQueryProvider = StreamProvider.autoDispose((ref) {
       .collection('posts')
       .orderBy('date')
       .snapshots();
+});
+
+//
+// final userDataProvidertest = StreamProvider<QuerySnapshot<Map<String, dynamic>>>((ref,email) {
+//   return FirebaseFirestore.instance
+//       .collection('posts')
+//       .orderBy('date')
+//       .snapshots();
+// });
+//
+//
+// class  User {
+// User(this.id, this.name);
+//
+// final String id;
+// final String name;
+// }
+
+final userDataProvider = Provider.family<Stream<QuerySnapshot<Map<String, dynamic>>>, String>((ref, email) {
+
+  final Stream<QuerySnapshot<Map<String, dynamic>>> _callStream =  FirebaseFirestore.instance
+      .collection('users')
+      .where('email', isEqualTo: email)
+      .snapshots();
+
+    _callStream.listen((QuerySnapshot snapshot) async{
+      if(snapshot.size!=0){
+
+        // String userDocId=snapshot!.docs[0].id;
+
+        //Hiveボックスをオープン
+        // var box = await Hive.openBox('record');
+        //
+        // //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
+        // await box.put("userDocId",userDocId);
+        // userData["userDocId"]=userDocId;
+        // await arrangeUserDataUnit("name");
+        // await arrangeUserDataUnit("email");
+        // await arrangeUserDataUnit("age");
+        // await arrangeUserDataUnit("level");
+        // await arrangeUserDataUnit("occupation");
+        // await arrangeUserDataUnit("nativeLang");
+        // await arrangeUserDataUnit("country");
+        // await arrangeUserDataUnit("town");
+        // await arrangeUserDataUnit("homeCountry");
+        // await arrangeUserDataUnit("homeTown");
+        // await arrangeUserDataUnit("gender");
+        // await arrangeUserDataUnit("placeWannaGo");
+        // await arrangeUserDataUnit("greeting");
+        // await arrangeUserDataUnit("description");
+        // await arrangeUserDataUnit("searchConditionAge");
+        // await arrangeUserDataUnit("searchConditionLevel");
+        // await arrangeUserDataUnit("searchConditionNativeLang");
+        // await arrangeUserDataUnit("searchConditionCountry");
+        // await arrangeUserDataUnit("searchConditionGender");
+        // await arrangeUserDataUnit("profilePhotoPath");
+        // await arrangeUserDataUnit("profilePhotoUpdateCnt");
+        //
+        //
+        // await box.close();
+
+      }
+
+    });
+
+    return _callStream;
+
 });

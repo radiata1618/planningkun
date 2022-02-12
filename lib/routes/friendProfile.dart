@@ -22,7 +22,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../chat.dart';
 import '../firebase_config.dart';
 import '../NotUse_tabs_page.dart';
-import '../common.dart';
+import '../commonEntity.dart';
 
 class FriendProfile extends StatefulWidget {
   Map<String, String> argumentUserData;
