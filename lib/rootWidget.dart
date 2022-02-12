@@ -13,25 +13,14 @@ import 'routes/topic_route.dart';
 import 'routes/now_route.dart';
 import 'commonEntity.dart';
 import 'dart:core';
-import 'join_channel_video.dart';
 // =============================================
 
 final _selectedIndexProvider = StateProvider.autoDispose((ref) {
   return 0;
 });
 
-final _bottomNavigationBarItemsProvider = StateProvider.autoDispose((ref) {
-
-  List<BottomNavigationBarItem>_bottomNavigationBarItems = <BottomNavigationBarItem>[];
-  return _bottomNavigationBarItems;
-});
-
-class RootWidget extends ConsumerWidget  {
-  Map<String,String>  argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String,Map<String,String>>  argumentFriendData;
-  Image? argumentMainPhotoData;
-  // int _selectedIndex=0;
+class BottomNavigationBarItems extends StateNotifier<List<BottomNavigationBarItem>> {
+  BottomNavigationBarItems() : super(<BottomNavigationBarItem>[]);
 
   static const _footerItemNames = [
     'Now',
@@ -48,6 +37,15 @@ class RootWidget extends ConsumerWidget  {
     Icons.wallpaper_sharp,
     Icons.work_outline,
   ];
+
+  void initialize(){
+    state.clear();
+    state.add(_UpdateActiveState(0));
+    for (var i = 1; i < _footerItemNames.length; i++) {
+      state.add(_UpdateDeactiveState(i));
+    }
+
+  }
 
   /// インデックスのアイテムをアクティベートする
   BottomNavigationBarItem _UpdateActiveState(int index) {
@@ -78,17 +76,21 @@ class RootWidget extends ConsumerWidget  {
         ));
   }
 
-  void _onItemTapped(int index, WidgetRef ref) {
-
-    final _selectedIndex=ref.watch(_selectedIndexProvider);
-
-    ref.watch(_bottomNavigationBarItemsProvider.state).update((state){
-      state[_selectedIndex] = _UpdateDeactiveState(_selectedIndex);
-      state[index] = _UpdateActiveState(index);
-      return state;}  );
-
-    ref.read(_selectedIndexProvider.state).update((state) => index); // 1加算する
+  void activateButton(int beforeSelectedIndex,int newSelectedIndex) {
+    state[beforeSelectedIndex] = _UpdateDeactiveState(beforeSelectedIndex);
+    state[newSelectedIndex] = _UpdateActiveState(newSelectedIndex);
   }
+}
+
+
+final _bottomNavigationBarItemsProvider = StateNotifierProvider<BottomNavigationBarItems,List<BottomNavigationBarItem>>((refs) =>BottomNavigationBarItems());
+
+class RootWidget extends ConsumerWidget  {
+  Map<String,String>  argumentUserData;
+  Map<String, String> argumentMasterData;
+  Map<String,Map<String,String>>  argumentFriendData;
+  Image? argumentMainPhotoData;
+
 
   RootWidget({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData}) {
 
@@ -97,27 +99,21 @@ class RootWidget extends ConsumerWidget  {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-
+    final bottomNavigationBarItems = ref.watch(_bottomNavigationBarItemsProvider);
+    ref.read(_bottomNavigationBarItemsProvider.notifier).initialize();
     final _selectedIndex=ref.watch(_selectedIndexProvider);
-
-    ref.watch(_bottomNavigationBarItemsProvider.state).update((state){
-      state.clear();
-      state.add(_UpdateActiveState(0));
-      for (var i = 1; i < _footerItemNames.length; i++) {
-        state.add(_UpdateDeactiveState(i));
-      }
-      return state;}  );
-
-    final _bottomNavigationBarItems=ref.watch(_bottomNavigationBarItemsProvider);
 
     return Scaffold(
       body:
       routeElement(_selectedIndex,argumentUserData["email"]!,argumentUserData["userDocId"]!),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
-        items: _bottomNavigationBarItems,
+        items: bottomNavigationBarItems,
         currentIndex: _selectedIndex,
-        onTap: (int index){ _onItemTapped(index,ref);
+        onTap: (int index){
+
+          ref.read(_bottomNavigationBarItemsProvider.notifier).activateButton(_selectedIndex, index);
+          ref.read(_selectedIndexProvider.state).update((state) => index);
         }
       ),
     );
