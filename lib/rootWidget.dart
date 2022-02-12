@@ -19,8 +19,18 @@ final _selectedIndexProvider = StateProvider.autoDispose((ref) {
   return 0;
 });
 
-class BottomNavigationBarItems extends StateNotifier<List<BottomNavigationBarItem>> {
-  BottomNavigationBarItems() : super(<BottomNavigationBarItem>[]);
+class BottomNavigationBarItems extends ChangeNotifier {
+  List <BottomNavigationBarItem>_bottomNavigationBarItems = [];
+  List <BottomNavigationBarItem> get bottomNavigationBarItems => _bottomNavigationBarItems;
+
+  void initialize(){
+    _bottomNavigationBarItems.clear();
+    _bottomNavigationBarItems.add(_UpdateActiveState(0));
+    for (var i = 1; i < _footerItemNames.length; i++) {
+      _bottomNavigationBarItems.add(_UpdateDeactiveState(i));
+    }
+
+  }
 
   static const _footerItemNames = [
     'Now',
@@ -38,26 +48,18 @@ class BottomNavigationBarItems extends StateNotifier<List<BottomNavigationBarIte
     Icons.work_outline,
   ];
 
-  void initialize(){
-    state.clear();
-    state.add(_UpdateActiveState(0));
-    for (var i = 1; i < _footerItemNames.length; i++) {
-      state.add(_UpdateDeactiveState(i));
-    }
-
-  }
 
   /// インデックスのアイテムをアクティベートする
   BottomNavigationBarItem _UpdateActiveState(int index) {
     return BottomNavigationBarItem(
         icon: Icon(
           _footerIcons[index],
-          color: Colors.black87,
+          // color: Colors.black87,
         ),
         title: Text(
           _footerItemNames[index],
           style: TextStyle(
-            color: Colors.black87,
+            // color: Colors.black87,
           ),
         ));
   }
@@ -66,24 +68,27 @@ class BottomNavigationBarItems extends StateNotifier<List<BottomNavigationBarIte
     return BottomNavigationBarItem(
         icon: Icon(
           _footerIcons[index],
-          color: Colors.black26,
+          // color: Colors.black26,
         ),
         title: Text(
           _footerItemNames[index],
           style: TextStyle(
-            color: Colors.black26,
+            // color: Colors.black26,
           ),
         ));
   }
 
   void activateButton(int beforeSelectedIndex,int newSelectedIndex) {
-    state[beforeSelectedIndex] = _UpdateDeactiveState(beforeSelectedIndex);
-    state[newSelectedIndex] = _UpdateActiveState(newSelectedIndex);
+    _bottomNavigationBarItems[beforeSelectedIndex] = _UpdateDeactiveState(beforeSelectedIndex);
+    _bottomNavigationBarItems[newSelectedIndex] = _UpdateActiveState(newSelectedIndex);
+
+    notifyListeners();
   }
 }
+final bottomNavigationBarItemsProvider = ChangeNotifierProvider(
+      (ref) => BottomNavigationBarItems(),
+);
 
-
-final _bottomNavigationBarItemsProvider = StateNotifierProvider<BottomNavigationBarItems,List<BottomNavigationBarItem>>((refs) =>BottomNavigationBarItems());
 
 class RootWidget extends ConsumerWidget  {
   Map<String,String>  argumentUserData;
@@ -99,8 +104,7 @@ class RootWidget extends ConsumerWidget  {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    final bottomNavigationBarItems = ref.watch(_bottomNavigationBarItemsProvider);
-    ref.read(_bottomNavigationBarItemsProvider.notifier).initialize();
+    ref.read(bottomNavigationBarItemsProvider.notifier).initialize();
     final _selectedIndex=ref.watch(_selectedIndexProvider);
 
     return Scaffold(
@@ -108,11 +112,11 @@ class RootWidget extends ConsumerWidget  {
       routeElement(_selectedIndex,argumentUserData["email"]!,argumentUserData["userDocId"]!),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
-        items: bottomNavigationBarItems,
+        items: ref.watch(bottomNavigationBarItemsProvider.notifier).bottomNavigationBarItems,
         currentIndex: _selectedIndex,
         onTap: (int index){
 
-          ref.read(_bottomNavigationBarItemsProvider.notifier).activateButton(_selectedIndex, index);
+          ref.read(bottomNavigationBarItemsProvider.notifier).activateButton(_selectedIndex, index);
           ref.read(_selectedIndexProvider.state).update((state) => index);
         }
       ),
