@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'firebase_config.dart';
 import 'join_channel_video.dart';
 import 'confirmCall.dart';
-import 'NotUse_tabs_page.dart';
 
 class Chat extends StatefulWidget {
   Map<String, String> argumentUserData;

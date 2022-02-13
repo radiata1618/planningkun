@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
-import '../NotUse_friendList.dart';
 import '../commonEntity.dart';
 
 
@@ -31,20 +30,6 @@ class _Talk extends State<Talk> {
         title: Text(""),
       ),
       body: buildTalkList(widget.argumentUserData["userDocId"]!),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FriendList(
-                  argumentUserData: widget.argumentUserData,
-                  argumentMasterData:widget.argumentMasterData,
-                  argumentFriendData:widget.argumentFriendData),
-            ),
-          );
-        },
-        child: const Icon(Icons.tab),
-      ),
     );
   }
 

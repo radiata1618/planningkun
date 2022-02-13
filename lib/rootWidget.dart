@@ -3,155 +3,83 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/myPage_route.dart';
 
-// == 作成したWidget をインポート ==================
 import 'routes/myPage_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/search_route.dart';
-import 'routes/mapPage_route.dart';
-import 'routes/setting_route.dart';
 import 'routes/topic_route.dart';
 import 'routes/now_route.dart';
 import 'commonEntity.dart';
+import 'rootWidgetEntity.dart';
 import 'dart:core';
-// =============================================
 
 final _selectedIndexProvider = StateProvider.autoDispose((ref) {
   return 0;
 });
 
-class BottomNavigationBarItems extends ChangeNotifier {
-  List <BottomNavigationBarItem>_bottomNavigationBarItems = [];
-  List <BottomNavigationBarItem> get bottomNavigationBarItems => _bottomNavigationBarItems;
-
-  void initialize(){
-    _bottomNavigationBarItems.clear();
-    _bottomNavigationBarItems.add(_UpdateActiveState(0));
-    for (var i = 1; i < _footerItemNames.length; i++) {
-      _bottomNavigationBarItems.add(_UpdateDeactiveState(i));
-    }
-
-  }
-
-  static const _footerItemNames = [
-    'Now',
-    'Talk',
-    'Find',
-    'Topic',
-    'MyPage',
-  ];
-
-  static const List _footerIcons = [
-    Icons.access_time,
-    Icons.textsms,
-    Icons.search,
-    Icons.wallpaper_sharp,
-    Icons.work_outline,
-  ];
-
-
-  /// インデックスのアイテムをアクティベートする
-  BottomNavigationBarItem _UpdateActiveState(int index) {
-    return BottomNavigationBarItem(
-        icon: Icon(
-          _footerIcons[index],
-          // color: Colors.black87,
-        ),
-        title: Text(
-          _footerItemNames[index],
-          style: TextStyle(
-            // color: Colors.black87,
-          ),
-        ));
-  }
-
-  BottomNavigationBarItem _UpdateDeactiveState(int index) {
-    return BottomNavigationBarItem(
-        icon: Icon(
-          _footerIcons[index],
-          // color: Colors.black26,
-        ),
-        title: Text(
-          _footerItemNames[index],
-          style: TextStyle(
-            // color: Colors.black26,
-          ),
-        ));
-  }
-
-  void activateButton(int beforeSelectedIndex,int newSelectedIndex) {
-    _bottomNavigationBarItems[beforeSelectedIndex] = _UpdateDeactiveState(beforeSelectedIndex);
-    _bottomNavigationBarItems[newSelectedIndex] = _UpdateActiveState(newSelectedIndex);
-
-    notifyListeners();
-  }
-}
-final bottomNavigationBarItemsProvider = ChangeNotifierProvider(
-      (ref) => BottomNavigationBarItems(),
-);
-
-
-class RootWidget extends ConsumerWidget  {
-  Map<String,String>  argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String,Map<String,String>>  argumentFriendData;
-  Image? argumentMainPhotoData;
-
-
-  RootWidget({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData, required this.argumentMainPhotoData}) {
-
-  }
+class RootWidget extends ConsumerWidget {
+  RootWidget({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     ref.read(bottomNavigationBarItemsProvider.notifier).initialize();
-    final _selectedIndex=ref.watch(_selectedIndexProvider);
+    final _selectedIndex = ref.watch(_selectedIndexProvider);
 
     return Scaffold(
-      body:
-      routeElement(_selectedIndex,argumentUserData["email"]!,argumentUserData["userDocId"]!),
+      body: routeElement(
+          _selectedIndex,
+          ref.watch(userDataProvider.notifier).userData["email"]!,
+          ref.watch(userDataProvider.notifier).userData["userDocId"]!,
+          ref),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
-        items: ref.watch(bottomNavigationBarItemsProvider.notifier).bottomNavigationBarItems,
-        currentIndex: _selectedIndex,
-        onTap: (int index){
-
-          ref.read(bottomNavigationBarItemsProvider.notifier).activateButton(_selectedIndex, index);
-          ref.read(_selectedIndexProvider.state).update((state) => index);
-        }
-      ),
+          type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
+          items: ref
+              .watch(bottomNavigationBarItemsProvider.notifier)
+              .bottomNavigationBarItems,
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.black,
+          onTap: (int index) {
+            ref
+                .read(bottomNavigationBarItemsProvider.notifier)
+                .activateButton(_selectedIndex, index);
+            ref.read(_selectedIndexProvider.state).update((state) => index);
+          }),
     );
   }
 
-  Widget routeElement(int selectedIndex,String email,String userDocId) {
+  Widget routeElement(
+      int selectedIndex, String email, String userDocId, WidgetRef ref) {
     switch (selectedIndex) {
       case 0:
-        return Now(argumentUserData: argumentUserData,
-            argumentMasterData:argumentMasterData,
-            argumentFriendData:argumentFriendData,
-            argumentMainPhotoData:argumentMainPhotoData);
+        return Now();
       case 1:
-        return Talk(argumentUserData: argumentUserData,
-            argumentMasterData:argumentMasterData,
-            argumentFriendData:argumentFriendData);
+        return Talk(
+          argumentUserData: ref.watch(userDataProvider.notifier).userData,
+          argumentMasterData: ref.watch(masterDataProvider.notifier).masterData,
+          argumentFriendData: ref.watch(friendDataProvider.notifier).friendData,
+        );
         break;
       case 2:
-        return Search(argumentUserData: argumentUserData,
-            argumentMasterData:argumentMasterData,
-            argumentFriendData:argumentFriendData,
-            argumentMainPhotoData:argumentMainPhotoData);
+        return Search(
+          argumentUserData: ref.watch(userDataProvider.notifier).userData,
+          argumentMasterData: ref.watch(masterDataProvider.notifier).masterData,
+          argumentFriendData: ref.watch(friendDataProvider.notifier).friendData,
+          argumentMainPhotoData:
+              ref.watch(mainPhotoDataProvider.notifier).mainPhotoData,
+        );
       case 3:
-        return Topic(argumentUserData: argumentUserData,
-            argumentMasterData:argumentMasterData,
-            argumentFriendData:argumentFriendData,
-            argumentMainPhotoData:argumentMainPhotoData);
+        return Topic(
+          argumentUserData: ref.watch(userDataProvider.notifier).userData,
+          argumentMasterData: ref.watch(masterDataProvider.notifier).masterData,
+          argumentFriendData: ref.watch(friendDataProvider.notifier).friendData,
+          argumentMainPhotoData:
+              ref.watch(mainPhotoDataProvider.notifier).mainPhotoData,
+        );
       default:
-        return MyPage(argumentUserData: argumentUserData,
-            argumentMasterData:argumentMasterData,
-            argumentFriendData:argumentFriendData,
-            argumentMainPhotoData:argumentMainPhotoData);
+        return MyPage();
         break;
-        //return JoinChannelVideo();
+      //return JoinChannelVideo();
 
     }
   }

@@ -108,8 +108,6 @@ class _CategoryRegister extends State<CategoryRegister> {
             ],
           ));
 
-
-
     } catch (e) {
       print(e);
     }

@@ -18,8 +18,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'firebase_config.dart';
-import 'rootWidget.dart';
-import 'commonEntity.dart';
+import 'autoLoginPage.dart';
 import 'database.dart';
 import 'login.dart';
 
@@ -28,9 +27,6 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
   await Hive.initFlutter();
   Hive.registerAdapter(UserDataAdapter());
-
-
-  //Hive.registerAdapter(RecordModelAdapter());
   runApp(
     ProviderScope(
       child: MyApp(),
@@ -71,16 +67,9 @@ class _LoginCheck extends StatelessWidget {
 
     if(_currentUser==null){
       return LoginPage(
-        // analytics: analytics,
-        // observer: observer,
       );
     }else{
-      return LoginPage(
-        // analytics: analytics,
-        // observer: observer,
-      );
-
+      return AutoLoginPage();
     }
-
   }
 }

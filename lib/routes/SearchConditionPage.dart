@@ -18,7 +18,6 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../firebase_config.dart';
-import '../NotUse_tabs_page.dart';
 import '../commonEntity.dart';
 import 'SearchConditionValueEdit.dart';
 

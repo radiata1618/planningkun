@@ -10,16 +10,12 @@ import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../firebase_config.dart';
-import '../NotUse_tabs_page.dart';
 import '../commonEntity.dart';
 
 
@@ -36,18 +32,6 @@ class Setting extends StatefulWidget {
 }
 
 class _Setting extends State<Setting> {
-  // File? imageFile;
-  //
-  // Future showImagePicker() async{
-  //
-  //   final picker = ImagePicker();
-  //   final pickedFile=await picker.getImage(source:ImageSource.gallery);
-  //   //cameraの設定も可
-  //
-  //   imageFile = File(pickedFile!.path);
-  // }
-
-  //Text? _text;
 
   bool initialProcessFlg=true;
 
@@ -84,16 +68,6 @@ class _Setting extends State<Setting> {
     File file = File(pickerFile!.path);
     //TODO 圧縮率などは調整
 
-    // Future<PickedFile> getImage({
-    //   @required ImageSource source,
-    //   double maxWidth,
-    //   double maxHeight,
-    //   int imageQuality,
-    //   CameraDevice preferredCameraDevice = CameraDevice.rear,
-    // }) {
-    //   // 略
-    // }
-
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
       await storage.ref("profile/" + userDocId + "/mainPhoto.png").putFile(file);
@@ -115,23 +89,10 @@ class _Setting extends State<Setting> {
     }
   }
 
-  // Future<void> _showLocalPhoto()async{
-  //
-  //
-  //   Directory appDocDir = await getApplicationDocumentsDirectory();
-  //   File localFile = File("${appDocDir.path}/mainPhoto.png");
-  //   widget.argumentMainPhotoData = Image.file(localFile,width:90);
-  //   setState(()  {
-  //   });
-  // }
-
-
   Future<void> getFirebaseData() async {
-
 
     firebaseUserData =await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"]).get();
     box = await Hive.openBox('record');
-
 
     if(firebaseUserData.get("profilePhotoUpdateCnt")!=widget.argumentUserData["profilePhotoUpdateCnt"]){
       await _download(widget.argumentUserData["userDocId"]!);
