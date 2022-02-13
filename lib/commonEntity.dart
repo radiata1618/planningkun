@@ -4,9 +4,11 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 //TODO Main モジュールでFirebaseからデータが取得できないとき、Hiveのデータをメモリに読み出すように処理をCOMMONに追加する。
@@ -68,11 +70,15 @@ final messageTextProvider = StateProvider.autoDispose((ref) {
   return '';
 });
 
-
 class UserDataProvider extends ChangeNotifier {
   Map<String, String> _userData = {};
-
   Map<String, String> get userData => _userData;
+
+  void setUnitItem(String itemName,String value){
+    _userData[itemName] = value;
+    notifyListeners();
+
+  }
 
   Future<void> insertAndReadUserData(String email) async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -147,12 +153,75 @@ class UserDataProvider extends ChangeNotifier {
     await arrangeUserDataUnit("profilePhotoUpdateCnt", snapshot, box);
 
     await box.close();
+    notifyListeners();
   }
-
   Future<void> arrangeUserDataUnit(
       String item, QuerySnapshot snapshot, var box) async {
     _userData[item] = snapshot.docs[0].get(item);
     await box.put(item, snapshot.docs[0].get(item));
+  }
+
+  Future<void> readUserDataFirebaseToHiveAndMemory(String userDocId) async {
+    DocumentSnapshot docSnapShot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .get();
+
+    //Hiveボックスをオープン
+    var box = await Hive.openBox('record');
+
+    //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
+    await box.put("userDocId", userDocId);
+    _userData["userDocId"] = userDocId;
+    await arrangeUserDataUnitDoc("name", docSnapShot, box);
+    await arrangeUserDataUnitDoc("email", docSnapShot, box);
+    await arrangeUserDataUnitDoc("age", docSnapShot, box);
+    await arrangeUserDataUnitDoc("level", docSnapShot, box);
+    await arrangeUserDataUnitDoc("occupation", docSnapShot, box);
+    await arrangeUserDataUnitDoc("nativeLang", docSnapShot, box);
+    await arrangeUserDataUnitDoc("country", docSnapShot, box);
+    await arrangeUserDataUnitDoc("town", docSnapShot, box);
+    await arrangeUserDataUnitDoc("homeCountry", docSnapShot, box);
+    await arrangeUserDataUnitDoc("homeTown", docSnapShot, box);
+    await arrangeUserDataUnitDoc("gender", docSnapShot, box);
+    await arrangeUserDataUnitDoc("placeWannaGo", docSnapShot, box);
+    await arrangeUserDataUnitDoc("greeting", docSnapShot, box);
+    await arrangeUserDataUnitDoc("description", docSnapShot, box);
+    await arrangeUserDataUnitDoc("searchConditionAge", docSnapShot, box);
+    await arrangeUserDataUnitDoc("searchConditionLevel", docSnapShot, box);
+    await arrangeUserDataUnitDoc("searchConditionNativeLang", docSnapShot, box);
+    await arrangeUserDataUnitDoc("searchConditionCountry", docSnapShot, box);
+    await arrangeUserDataUnitDoc("searchConditionGender", docSnapShot, box);
+    await arrangeUserDataUnitDoc("profilePhotoPath", docSnapShot, box);
+    await arrangeUserDataUnitDoc("profilePhotoUpdateCnt", docSnapShot, box);
+
+    await box.close();
+    notifyListeners();
+  }
+  Future<void> arrangeUserDataUnitDoc(
+      String item, DocumentSnapshot snapshot, var box) async {
+    _userData[item] = snapshot.get(item);
+    await box.put(item, snapshot.get(item));
+  }
+
+}
+Future<void> getFirebaseUserData(WidgetRef ref) async {
+  var box = await Hive.openBox('record');
+  await ref.read(userDataProvider.notifier).readUserDataFirebaseToHiveAndMemory(await box.get("userDocId"));
+  box.close();
+  //TODO 本来はUserDocIdをキーにデータを持ってくる。
+}
+
+Future<void> setImage(WidgetRef ref) async {
+  XFile? pickerFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 40);
+  if (pickerFile != null) {
+    ref.watch(mainPhotoDataProvider.notifier)
+        .uploadAndInsertPhoto(File(pickerFile.path),ref);
+    //TODO 圧縮率などは調整
   }
 }
 
@@ -197,6 +266,7 @@ class FriendDataProvider extends ChangeNotifier {
       });
       await boxFriend.close();
     });
+    notifyListeners();
   }
 }
 
@@ -226,6 +296,7 @@ class MasterDataProvider extends ChangeNotifier {
 
       await boxMaster.close();
     });
+    notifyListeners();
   }
 }
 
@@ -235,7 +306,7 @@ final friendDataProvider = ChangeNotifierProvider(
 
 
 
-class MainPhotoDataProvider extends ChangeNotifier {
+class MainPhotoDataNotifier extends ChangeNotifier {
   Image? _img;
   Image? get mainPhotoData => _img ;
 
@@ -243,11 +314,61 @@ class MainPhotoDataProvider extends ChangeNotifier {
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
     File localFile = File("${appDocDir.path}/mainPhoto.png");
+    //TODO filenameがPNG出なかったときの対応→ファイル名をUserDataに持つ
     _img = Image.file(localFile,width:90);
   }
+
+  Future<void> readMainPhotoFromFirebaseToDirectoryAndMemory(WidgetRef ref) async {
+
+    FirebaseStorage storage =  FirebaseStorage.instance;
+    Reference imageRef =  storage.ref().child("profile").child(ref.watch(userDataProvider.notifier).userData["userDocId"]!).child("mainPhoto.png");
+    //TODO filenameがPNG出なかったときの対応→ファイル名をUserDataに持つ
+    String imageUrl = await imageRef.getDownloadURL();
+
+    _img = Image.network(imageUrl,width:90);
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File downloadToFile = File("${appDocDir.path}/mainPhoto.png");
+    notifyListeners();
+    try {
+      await imageRef.writeToFile(downloadToFile);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> uploadAndInsertPhoto(File? imageFile,WidgetRef ref) async{
+
+    _img=Image.file(imageFile!);
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    try {
+      await storage.ref("profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png").putFile(imageFile);
+      //TODO 拡張子はPNGとは限らない。
+
+      await FirebaseFirestore.instance.collection('users').doc(ref.watch(userDataProvider.notifier).userData["userDocId"]!)
+          .update({"profilePhotoUpdateCnt": (int.parse(ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]!)+1).toString(),
+        "profilePhotoPath": "profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png"
+      });
+
+
+      var box = await Hive.openBox('record');
+      ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]=(int.parse(ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]!)+1).toString();
+      ref.watch(userDataProvider.notifier).userData["profilePhotoPath"]="profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png";
+      await box.put("profilePhotoUpdateCnt",(int.parse(ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]!)+1).toString());
+      await box.put("profilePhotoPath","profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png");
+
+      box.close();
+    } catch (e) {
+      print(e);
+    }
+
+    notifyListeners();
+  }
+
 }
 
 final mainPhotoDataProvider = ChangeNotifierProvider(
-      (ref) => MainPhotoDataProvider(),
+      (ref) => MainPhotoDataNotifier(),
 );
 

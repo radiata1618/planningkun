@@ -22,8 +22,7 @@ class CategoryRegister extends ConsumerWidget {
         maxHeight: 400,
         imageQuality: 40);
     if (pickerFile != null) {
-      ref
-          .watch(categoryImagePhotoFileProvider.notifier)
+      ref.watch(categoryImagePhotoFileProvider.notifier)
           .setCategoryImagePhotoFile(File(pickerFile.path));
       //TODO 圧縮率などは調整
     }
@@ -41,13 +40,11 @@ class CategoryRegister extends ConsumerWidget {
         child: CircleAvatar(
           radius: 80,
           backgroundColor: Colors.white,
-          backgroundImage: ref
-                      .watch(categoryImagePhotoFileProvider)
+          backgroundImage: ref.watch(categoryImagePhotoFileProvider)
                       .categoryImagePhotoFile ==
                   null
               ? null
-              : Image.file(ref
-                      .watch(categoryImagePhotoFileProvider)
+              : Image.file(ref.watch(categoryImagePhotoFileProvider)
                       .categoryImagePhotoFile!)
                   .image,
         ),

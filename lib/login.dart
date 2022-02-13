@@ -100,19 +100,7 @@ class LoginPage extends ConsumerWidget  {
                 },
               ),
             ),
-            Text(infoText),
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              child: OutlinedButton(
-                child: Text('テストデータ登録'),
-                onPressed: ()  {
-
-                  //TODO テストデータ登録
-
-                },
-              ),
-            ),
+            Text(infoText)
           ],
         ),
       ),
@@ -133,7 +121,4 @@ class LoginPage extends ConsumerWidget  {
     );
 
   }
-
-
-
 }

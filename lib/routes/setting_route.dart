@@ -1,143 +1,26 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
-import 'package:image_picker/image_picker.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/settingEditPage.dart';
-import 'package:video_player/video_player.dart';
-
-import 'package:firebase_storage/firebase_storage.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-import '../firebase_config.dart';
 import '../commonEntity.dart';
 
 
-class Setting extends StatefulWidget {
-  Map<String, String>  argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String, Map<String,String>> argumentFriendData;
-  Image? argumentMainPhotoData;
-
-  Setting({required this.argumentUserData, required this.argumentMasterData, required this.argumentFriendData,required this.argumentMainPhotoData});
-
-  @override
-  _Setting createState() => _Setting();
-}
-
-class _Setting extends State<Setting> {
+class Setting extends ConsumerWidget {
+  Setting({
+    Key? key,
+  }) : super(key: key) {
+    //コンストラクタ
+  }
 
   bool initialProcessFlg=true;
 
-  var box;
-  var firebaseUserData;
-
-
-  Future<void> _download(String userDocId) async {
-    // ファイルのダウンロード
-    // テキスト
-    FirebaseStorage storage = await FirebaseStorage.instance;
-
-    // 画像
-    Reference imageRef = await storage.ref().child("profile").child(userDocId).child("mainPhoto.png");
-    String imageUrl = await imageRef.getDownloadURL();
-
-    widget.argumentMainPhotoData = Image.network(imageUrl,
-      width:90);
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File("${appDocDir.path}/mainPhoto.png");
-    try {
-      await imageRef.writeToFile(downloadToFile);
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> _upload(String userDocId) async {
-    // imagePickerで画像を選択する
-    // upload
-    PickedFile? pickerFile =
-        await ImagePicker().getImage(source: ImageSource.gallery,imageQuality:20 );
-    File file = File(pickerFile!.path);
-    //TODO 圧縮率などは調整
-
-    FirebaseStorage storage = FirebaseStorage.instance;
-    try {
-      await storage.ref("profile/" + userDocId + "/mainPhoto.png").putFile(file);
-      //TODO 拡張子はPNGとは限らない。
-
-      await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
-          .update({"profilePhotoUpdateCnt": (int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString(),
-        "profilePhotoPath": "profile/" + userDocId + "/mainPhoto.png"
-          });
-
-
-      widget.argumentUserData["profilePhotoUpdateCnt"]=(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString();
-      widget.argumentUserData["profilePhotoPath"]="profile/" + userDocId + "/mainPhoto.png";
-      await box.put("profilePhotoUpdateCnt",(int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!)+1).toString());
-      await box.put("profilePhotoPath","profile/" + userDocId + "/mainPhoto.png");
-
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> getFirebaseData() async {
-
-    firebaseUserData =await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"]).get();
-    box = await Hive.openBox('record');
-
-    if(firebaseUserData.get("profilePhotoUpdateCnt")!=widget.argumentUserData["profilePhotoUpdateCnt"]){
-      await _download(widget.argumentUserData["userDocId"]!);
-
-    }
-    //FirebaseのデータをHiveに取得
-
-    await arrangeUserDataUnit("name");
-    await arrangeUserDataUnit("email");
-    await arrangeUserDataUnit("age");
-    await arrangeUserDataUnit("level");
-    await arrangeUserDataUnit("occupation");
-    await arrangeUserDataUnit("nativeLang");
-    await arrangeUserDataUnit("country");
-    await arrangeUserDataUnit("town");
-    await arrangeUserDataUnit("homeCountry");
-    await arrangeUserDataUnit("homeTown");
-    await arrangeUserDataUnit("gender");
-    await arrangeUserDataUnit("placeWannaGo");
-    await arrangeUserDataUnit("greeting");
-    await arrangeUserDataUnit("description");
-    await arrangeUserDataUnit("profilePhotoPath");
-    await arrangeUserDataUnit("profilePhotoUpdateCnt");
-
-    await box.close();//Closeするとエラーになるのでオープンしたまま
-
-    setState(()  {
-    });
-  }
-
-  Future<void> arrangeUserDataUnit(String item) async {
-    await box.put(item,firebaseUserData.get(item));
-    widget.argumentUserData[item]=await firebaseUserData.get(item);
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-
+  Widget build(BuildContext context, WidgetRef ref) {
     if (initialProcessFlg){
       initialProcessFlg=false;
       //_showLocalPhoto();
-      getFirebaseData();
+      getFirebaseUserData(ref);
     }
-
 
     return Scaffold(
         appBar: AppBar(
@@ -157,33 +40,31 @@ class _Setting extends State<Setting> {
                   child: CircleAvatar(
                     radius: 80,
                     backgroundColor: Colors.white,
-                    backgroundImage:  widget.argumentMainPhotoData!.image,
+                    backgroundImage:ref.watch(mainPhotoDataProvider).mainPhotoData ==null
+                        ? null
+                        : ref.watch(mainPhotoDataProvider).mainPhotoData!.image,
                   ),
                 ),
                 MaterialButton(
                     onPressed: () async{
-                      await _upload(widget.argumentUserData["userDocId"]!);
-                      await _download(widget.argumentUserData["userDocId"]!);
-                      setState(()  {
-
-                      });
+                      await setImage(ref);
                     },
                     child: const Text('写真アップロード') //,
                 ),
-                linePadding("Name","name", widget.argumentUserData["name"]!),
-                linePadding("E-mail","email", widget.argumentUserData["email"]!),
-                linePadding("Age","age", widget.argumentUserData["age"]!),
-                linePadding("English Level","level", widget.argumentUserData["level"]!),
-                linePadding("Occupation","occupation", widget.argumentUserData["occupation"]!),
-                linePadding("mother Tongue","nativeLang", widget.argumentUserData["nativeLang"]!),
-                linePadding("Country","country", widget.argumentUserData["country"]!),
-                linePadding("Town","town", widget.argumentUserData["town"]!),
-                linePadding("Home Country","homeCountry", widget.argumentUserData["homeCountry"]!),
-                linePadding("Home Town","homeTown", widget.argumentUserData["homeTown"]!),
-                linePadding("gender","gender", widget.argumentUserData["gender"]!),
-                linePadding("Place I wanna go","placeWannaGo", widget.argumentUserData["placeWannaGo"]!),
-                linePadding("Greeting","greeting", widget.argumentUserData["greeting"]!),
-                linePadding("Description","description", widget.argumentUserData["description"]!),
+                linePadding(context,ref,"Name","name", ref.watch(userDataProvider).userData["name"]!),
+                linePadding(context,ref,"E-mail","email", ref.watch(userDataProvider).userData["email"]!),
+                linePadding(context,ref,"Age","age", ref.watch(userDataProvider).userData["age"]!),
+                linePadding(context,ref,"English Level","level", ref.watch(userDataProvider).userData["level"]!),
+                linePadding(context,ref,"Occupation","occupation", ref.watch(userDataProvider).userData["occupation"]!),
+                linePadding(context,ref,"mother Tongue","nativeLang", ref.watch(userDataProvider).userData["nativeLang"]!),
+                linePadding(context,ref,"Country","country", ref.watch(userDataProvider).userData["country"]!),
+                linePadding(context,ref,"Town","town", ref.watch(userDataProvider).userData["town"]!),
+                linePadding(context,ref,"Home Country","homeCountry", ref.watch(userDataProvider).userData["homeCountry"]!),
+                linePadding(context,ref,"Home Town","homeTown", ref.watch(userDataProvider).userData["homeTown"]!),
+                linePadding(context,ref,"gender","gender", ref.watch(userDataProvider).userData["gender"]!),
+                linePadding(context,ref,"Place I wanna go","placeWannaGo", ref.watch(userDataProvider).userData["placeWannaGo"]!),
+                linePadding(context,ref,"Greeting","greeting", ref.watch(userDataProvider).userData["greeting"]!),
+                linePadding(context,ref,"Description","description", ref.watch(userDataProvider).userData["description"]!),
 
 
           ])),
@@ -191,12 +72,12 @@ class _Setting extends State<Setting> {
   }
 
 
-  Padding linePadding (String displayedItem,String databaseItem, String value) {
+  Padding linePadding (BuildContext context,WidgetRef ref,String displayedItem,String databaseItem, String value) {
     //valueType:String or int or selectString(セグメント)
     String displayedValue;
     if(databaseItem=="gender"
     ||databaseItem=="level"){
-      displayedValue=widget.argumentMasterData[databaseItem+"_"+value]!;
+      displayedValue=ref.watch(masterDataProvider.notifier).masterData[databaseItem+"_"+value]!;
     }else{
       displayedValue=value;
     }
@@ -235,17 +116,12 @@ class _Setting extends State<Setting> {
                             await Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) {
                                 return SettingEditPage(
-                                    argumentUserData: widget.argumentUserData,
-                                    argumentMasterData:widget.argumentMasterData ,
                                     displayedItem: displayedItem,
                                     databaseItem: databaseItem,
                                     value:value,
                                 );
                               }),
                             );
-                            setState(()  {
-
-                            });//TODO FutureBuilderを使用するようにして非同期のデータ取得のあとSetStateするダサい処理を削除したい
                           },
                           child: Icon(
                             Icons.edit,

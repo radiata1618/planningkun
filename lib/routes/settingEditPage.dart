@@ -1,49 +1,34 @@
-import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:planningkun/routes/settingEditPageEntity.dart';
 
-import '../firebase_config.dart';
-import '../commonEntity.dart';
-
-class SettingEditPage extends StatefulWidget {
-  Map<String, String>  argumentUserData;
-  Map<String, String> argumentMasterData;
-  String displayedItem;
-  String databaseItem;
-  String value;
-
+class SettingEditPage extends ConsumerWidget {
   SettingEditPage({
-    required this.argumentUserData,
-    required this.argumentMasterData,
     required this.displayedItem,
     required this.databaseItem,
     required this.value,
-  });
+    Key? key,
+  }) : super(key: key) {
+  }
+  String displayedItem;
+  String databaseItem;
+  String value;
+  bool initialProcessFlg=true;
 
   @override
-  _SettingTextEdit createState() => _SettingTextEdit();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    if(initialProcessFlg){
+      initialProcessFlg=false;
+      ref.watch(userItemDataProvider.notifier).initialize(displayedItem,databaseItem,value);
+    }
 
-class _SettingTextEdit extends State<SettingEditPage> {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
-
-  @override
-  Widget build(BuildContext context) {
-    //TODO ChangeNotifierProviderによる変わった値のウィジェットのみを再生成する
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white10,
         elevation: .0,
         title: Text(
-          widget.displayedItem,
+          ref.watch(userItemDataProvider).userItemDisplayedItem,
           style: TextStyle(color: Colors.black87,
           fontWeight: FontWeight.bold),
         ),
@@ -56,9 +41,9 @@ class _SettingTextEdit extends State<SettingEditPage> {
           children: <Widget>[
 
             Padding(padding:const EdgeInsets.symmetric(horizontal:10),
-            child:EditItemContainer(),),
+            child:EditItemContainer(context,  ref),),
             const SizedBox(height: 8),
-            (widget.databaseItem=="level"||widget.databaseItem=="gender")
+            (ref.watch(userItemDataProvider).userItemDataDatabaseItem=="level"||ref.watch(userItemDataProvider).userItemDataDatabaseItem=="gender")
             ?const SizedBox(height: 8)
             :Padding(padding:const EdgeInsets.symmetric(horizontal:10),
               child:Container(
@@ -69,7 +54,8 @@ class _SettingTextEdit extends State<SettingEditPage> {
                   style:ButtonStyle(
                   ),
                   onPressed: () {
-                    _updateUserInfo();
+                    ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                    Navigator.pop(context);
                   },
                   child: Text("OK",
                     style: TextStyle(
@@ -86,39 +72,9 @@ class _SettingTextEdit extends State<SettingEditPage> {
     );
   }
 
-  Future<void> _updateUserInfo() async {
+  Container EditItemContainer(BuildContext context, WidgetRef ref){
 
-
-    //TODO 名前を変更する場合は、Friendデータも更新する
-    await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
-        .update({widget.databaseItem: widget.value,
-      'updateUserDocId':widget.argumentUserData["userDocId"],
-      'updateProgramId': "settingEditPage",
-      'updateTime': DateTime.now().toString(),
-        });
-
-    //age　など、検索で使う項目は数値情報を保持
-    if(widget.databaseItem=="age"){
-      await FirebaseFirestore.instance.collection('users').doc(widget.argumentUserData["userDocId"])
-          .update({"ageNumber": int.parse(widget.value),
-        'updateUserDocId':widget.argumentUserData["userDocId"],
-        'updateProgramId': "settingEditPage",
-        'updateTime': DateTime.now().toString()});
-    }
-
-    var box = await Hive.openBox('record');
-
-    //FirebaseのデータをHiveに取得
-    await box.put(widget.databaseItem, widget.value);
-    await box.close();
-
-    widget.argumentUserData[widget.databaseItem]=widget.value;
-    Navigator.pop(context);
-  }
-
-  Container EditItemContainer(){
-
-    if(widget.databaseItem=="gender"){
+    if(ref.watch(userItemDataProvider).userItemDataDatabaseItem=="gender"){
       return Container(
         child:Column(
           children:[
@@ -130,9 +86,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                 child:ElevatedButton(
                   style:ButtonStyle(
                   ),
-                  onPressed: () {
-                    widget.value="1";
-                    _updateUserInfo();
+                  onPressed: () async{
+                    ref.watch(userItemDataProvider.notifier).setUserItemDataValue("1");
+                    await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                    Navigator.pop(context);
                   },
                   child: Text("Male",
                     style: TextStyle(
@@ -150,9 +107,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                 child:ElevatedButton(
                   style:ButtonStyle(
                   ),
-                  onPressed: () {
-                    widget.value="2";
-                    _updateUserInfo();
+                  onPressed: () async{
+                    ref.watch(userItemDataProvider.notifier).setUserItemDataValue("2");
+                    await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                    Navigator.pop(context);
                   },
                   child: Text("Female",
                     style: TextStyle(
@@ -170,9 +128,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                 child:ElevatedButton(
                   style:ButtonStyle(
                   ),
-                  onPressed: () {
-                    widget.value="3";
-                    _updateUserInfo();
+                  onPressed: () async{
+                    ref.watch(userItemDataProvider.notifier).setUserItemDataValue("3");
+                    await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                    Navigator.pop(context);
                   },
                   child: Text("Other",
                     style: TextStyle(
@@ -186,7 +145,7 @@ class _SettingTextEdit extends State<SettingEditPage> {
           ]
         ));
 
-    }else if(widget.databaseItem=="level"){
+    }else if(ref.watch(userItemDataProvider).userItemDataDatabaseItem=="level"){
 
       return Container(
           child:Column(
@@ -199,9 +158,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                     child:ElevatedButton(
                       style:ButtonStyle(
                       ),
-                      onPressed: () {
-                        widget.value="1";
-                        _updateUserInfo();
+                      onPressed: () async{
+                        ref.watch(userItemDataProvider.notifier).setUserItemDataValue("1");
+                        await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                        Navigator.pop(context);
                       },
                       child: Text("beginner",
                         style: TextStyle(
@@ -219,9 +179,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                     child:ElevatedButton(
                       style:ButtonStyle(
                       ),
-                      onPressed: () {
-                        widget.value="2";
-                        _updateUserInfo();
+                      onPressed: () async{
+                        ref.watch(userItemDataProvider.notifier).setUserItemDataValue("2");
+                        await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                        Navigator.pop(context);
                       },
                       child: Text("intermediate",
                         style: TextStyle(
@@ -239,9 +200,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                     child:ElevatedButton(
                       style:ButtonStyle(
                       ),
-                      onPressed: () {
-                        widget.value="3";
-                        _updateUserInfo();
+                      onPressed: () async{
+                        ref.watch(userItemDataProvider.notifier).setUserItemDataValue("3");
+                        await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                        Navigator.pop(context);
                       },
                       child: Text("advanced",
                         style: TextStyle(
@@ -259,9 +221,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
                     child:ElevatedButton(
                       style:ButtonStyle(
                       ),
-                      onPressed: () {
-                        widget.value="4";
-                        _updateUserInfo();
+                      onPressed: () async{
+                        ref.watch(userItemDataProvider.notifier).setUserItemDataValue("4");
+                        await ref.watch(userItemDataProvider.notifier).updateUserInfo(context, ref);
+                        Navigator.pop(context);
                       },
                       child: Text("native",
                         style: TextStyle(
@@ -275,18 +238,16 @@ class _SettingTextEdit extends State<SettingEditPage> {
               ]
           ));
 
-    }else if(widget.databaseItem=="age"){
+    }else if(ref.watch(userItemDataProvider).userItemDataDatabaseItem=="age"){
       return Container(
         child:TextFormField(
           // テキスト入力のラベルを設定
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: InputDecoration(labelText: widget.displayedItem),
-          initialValue:widget.value,
+          decoration: InputDecoration(labelText: ref.watch(userItemDataProvider).userItemDisplayedItem),
+          initialValue:ref.watch(userItemDataProvider).userItemDataValue,
           onChanged: (String inputValue) {
-            setState(() {
-              widget.value = inputValue;
-            });
+            ref.watch(userItemDataProvider.notifier).setUserItemDataValue(inputValue);
           },
         ),
       );
@@ -294,12 +255,10 @@ class _SettingTextEdit extends State<SettingEditPage> {
       return Container(
         child:TextFormField(
           // テキスト入力のラベルを設定
-          decoration: InputDecoration(labelText: widget.displayedItem),
-          initialValue:widget.value,
+          decoration: InputDecoration(labelText: ref.watch(userItemDataProvider).userItemDisplayedItem),
+          initialValue:ref.watch(userItemDataProvider).userItemDataValue,
           onChanged: (String inputValue) {
-            setState(() {
-              widget.value = inputValue;
-            });
+              ref.watch(userItemDataProvider.notifier).setUserItemDataValue(inputValue);
           },
         ),
       );
