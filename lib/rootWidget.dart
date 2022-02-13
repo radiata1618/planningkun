@@ -34,14 +34,12 @@ class RootWidget extends ConsumerWidget {
           ref),
       bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
-          items: ref
-              .watch(bottomNavigationBarItemsProvider.notifier)
+          items: ref.watch(bottomNavigationBarItemsProvider.notifier)
               .bottomNavigationBarItems,
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.black,
+          //selectedItemColor: Colors.black,
           onTap: (int index) {
-            ref
-                .read(bottomNavigationBarItemsProvider.notifier)
+            ref.read(bottomNavigationBarItemsProvider.notifier)
                 .activateButton(_selectedIndex, index);
             ref.read(_selectedIndexProvider.state).update((state) => index);
           }),
@@ -78,8 +76,6 @@ class RootWidget extends ConsumerWidget {
         );
       default:
         return MyPage();
-        break;
-      //return JoinChannelVideo();
 
     }
   }

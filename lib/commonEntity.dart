@@ -13,18 +13,6 @@ import 'package:path_provider/path_provider.dart';
 
 //TODO Main モジュールでFirebaseからデータが取得できないとき、Hiveのデータをメモリに読み出すように処理をCOMMONに追加する。
 
-const Color themeColorDeep = Colors.orangeAccent;
-
-Text GrayText(String txt) {
-  return Text(
-    txt,
-    style: TextStyle(
-      fontWeight: FontWeight.normal,
-      fontSize: 16,
-      color: Colors.black45,
-    ),
-  );
-}
 
 List<String> FromTextToList(String txt) {
   String workText = txt;
