@@ -38,11 +38,11 @@ class MyPage extends ConsumerWidget  {
                                 color: Colors.black87,
                               ),),
                                 ElevatedButton(onPressed: () async {
-                                  // await Navigator.of(context).push(
-                                  //   MaterialPageRoute(builder: (context) {
-                                  //     return Setting();
-                                  //   }),
-                                  // );
+                                  await Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (context) {
+                                      return Setting();
+                                    }),
+                                  );
                                 }, child: Text(
                                   "Edit Profile",
                                   style: TextStyle(
@@ -99,11 +99,11 @@ class MyPage extends ConsumerWidget  {
                       ElevatedButton(
                         style: ButtonStyle(),
                         onPressed: () async {
-                          // await Navigator.of(context).push(
-                          //   MaterialPageRoute(builder: (context) {
-                          //     return CategoryRegister();
-                          //   }),
-                          // );
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) {
+                              return CategoryRegister();
+                            }),
+                          );
                         },
                         child: Text(
                           "カテゴリ登録画面",
