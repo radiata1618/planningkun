@@ -1,120 +1,36 @@
 import 'dart:async';
 
 import 'package:algolia/algolia.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../chat.dart';
 import '../commonUI.dart';
 import 'friendProfile.dart';
-import '../commonEntity.dart';
+import '../commonAlgoria.dart';
 import 'SearchConditionPage.dart';
 
-class Search extends StatefulWidget {
-  Map<String, String>  argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String,Map<String,String>>  argumentFriendData;
-  Image? argumentMainPhotoData;
 
 
-  Search({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentMainPhotoData});
-
-  @override
-  _Search createState() => _Search();
-}
-class Application {
-  static final Algolia algolia = Algolia.init(
-    applicationId: '41YFHNYKRN',
-    apiKey: '0e766cd86ee6c9465c229119c69009d0',
-  );
-}
-
-
-class _Search extends State<Search> {
+class Search extends ConsumerWidget {
+  Search({
+    Key? key,
+  }) : super(key: key);
 
   bool searchProcessFlg=true;//検索を実行するかどうか、条件画面から検索ボタンで戻ってきたときにONになっている
-  AlgoliaQuerySnapshot? snap;
   List<AlgoliaObjectSnapshot> objectList=[];
 
-
-  String addConditionList(String conditionString, String conditionItemName,String itemName){
-
-    if((widget.argumentUserData[conditionItemName]!)!=""){
-
-      conditionString= conditionString + " AND (";
-
-      List<String > countryConditionList=FromTextToList(widget.argumentUserData[conditionItemName]!);
-      for(int i=0;i<countryConditionList.length;i++){
-        if(i!=0){
-          conditionString= conditionString + " OR ";
-        }
-        conditionString= conditionString + " "+itemName+":"+countryConditionList[i];
-      }
-      conditionString= conditionString + " )";
-    }
-
-    return conditionString;
-
-  }
-
-
-  Future<void> userSearch(Algolia algolia)async {
-
-
-
-    AlgoliaQuery query = algolia.instance.index('planningkun').query("");
-    snap = await query.getObjects();
-
-
-    List<String > ageConditionList=FromTextToList(widget.argumentUserData["searchConditionAge"]!);
-
-    String filterConditions = "ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1];
-    filterConditions=filterConditions+" AND NOT objectID:"+widget.argumentUserData["userDocId"]!+" ";
-
-    //filterConditions=addConditionList(filterConditions,"searchConditionLevel","level");
-    //filterConditions=addConditionList(filterConditions,"searchConditionNativeLang","nativeLang");TODO なぜか追加すると検索できない
-    filterConditions=addConditionList(filterConditions,"searchConditionCountry","country");
-    //filterConditions=addConditionList(filterConditions,"searchConditionGender","gender");TODO なぜか追加すると検索できない
-
-        //query=query.filters("country:USA");文字検索の成功例
-    //query=query.filters("ageNumber:30 TO 40");
-    //query=query.facetFilter(["ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1]]);
-    //query=query.filters("country:"+widget.argumentUserData["searchConditionCountry"]!);
-    //query=query.filters("country:JPN");
-    query=query.filters(filterConditions);
-    //query=query.filters("nativeLang:JPN");TODO NATIVELANGが取れない
-    //query=query.filters("ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1]);
-   // query.search
-    //query=query.filters("age:30");数字情報の検索も成功
-    //query=query.facetFilter(["age:30"],);
-    //query=query.filters(value)
-    snap = await query.getObjects();
-    objectList=snap!.hits;
-
-    setState(() {
-    });
-  }
-
-  //検索後にOFFにする
-
   @override
-  Widget build(BuildContext context) {
-
+  Widget build(BuildContext context, WidgetRef ref) {
 
     Algolia algolia = Application.algolia;
     if(searchProcessFlg==true){
 
       searchProcessFlg=false;
-      userSearch(algolia);
-
+      userSearch(ref,algolia);
     }
 
     return Scaffold(
-        appBar: whiteAppbar(text: 'Search'),
+        appBar: whiteAppbar(text:'Search'),
         body: SafeArea(
             child:Padding(padding:const EdgeInsets.only(top:14,left:14,right:14,bottom:10),
               child:Column(
@@ -147,14 +63,11 @@ class _Search extends State<Search> {
                                       await Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) {
                                           return SearchConditionPage(
-                                            argumentUserData: widget.argumentUserData,
-                                            argumentMasterData:widget.argumentMasterData,
-                                            argumentSearchProcessFlg: searchProcessFlg ,
-                                            //★★★★★★★★★★searchProcessFlgは帰ってきたときにしっかり値が入っているのか
                                           );
                                         }),
                                       );
 
+                                      userSearch(ref,algolia);
                                     },
                                     child: Icon(
                                         Icons.view_headline_sharp,
@@ -177,7 +90,7 @@ class _Search extends State<Search> {
                               child:GestureDetector(
                                   onTap: () async{
 
-                                    userSearch(algolia);
+                                    userSearch( ref,algolia);
                                   },
                                   child: Icon(
                                       Icons.search,
@@ -194,7 +107,7 @@ class _Search extends State<Search> {
                     child:ListView.builder(
                         itemCount:objectList.length,
                         itemBuilder:(BuildContext context,int index){
-                          return userResultList(objectList[index]);
+                          return userResultList( context,  ref,objectList[index]);
                         }
                 ))
                 ]
@@ -204,17 +117,13 @@ class _Search extends State<Search> {
     );
   }
 
-  Widget userResultList(AlgoliaObjectSnapshot userData){
+  Widget userResultList(BuildContext context, WidgetRef ref,AlgoliaObjectSnapshot userData){
     return GestureDetector(
       onTap:()async{
         await Navigator.of(context).push(
           MaterialPageRoute(builder: (context) {
             return FriendProfile(
-                argumentUserData: widget.argumentUserData,
-                argumentMasterData:widget.argumentMasterData,
-                argumentFriendData:widget.argumentFriendData,
                 argumentFriendUserDocId:userData.data["objectID"],
-              argumentMainPhotoData: widget.argumentMainPhotoData!,
             );
           }),
         );
@@ -290,27 +199,6 @@ class _Search extends State<Search> {
                         )
                     ),
                   ),
-                  ElevatedButton(
-                      onPressed: () async{
-                        await InsertFriend(userData.data["objectID"],userData.data["name"],userData.data["profilePhotoPath"],userData.data["profilePhotoUpdateCnt"]);
-
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) {
-                        return Chat(
-                          argumentFriendUserDocId:userData.data["objectID"]
-                        );
-                      }),
-                    );
-                  },
-
-                    style:ButtonStyle(
-                    ),
-                    child: Text("add",
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),),)
                 ]
               )
             )
@@ -319,69 +207,5 @@ class _Search extends State<Search> {
 
       ),
     );
-
   }
-
-
-  Future<void> InsertFriend(String friendUserDocId,String friendUserName,String friendProfilePhotoPath ,String friendProfilePhotoUpdateCnt) async{
-    String insertedDocId="";
-
-    //相手側のFriendデータもFirebaseのみに作成する
-    FirebaseFirestore.instance.collection('friends').add(
-      {'userDocId':friendUserDocId ,
-        'friendUserDocId': widget.argumentUserData["userDocId"] ,
-        'friendUserName': widget.argumentUserData["name"] ,
-        'profilePhotoPath': widget.argumentUserData["profilePhotoPath"] ,
-        'profilePhotoUpdateCnt': widget.argumentUserData["profilePhotoUpdateCnt"] ,
-        'lastMessageContent': "",
-        'lastMessageDocId': "",
-        'lastTime': DateTime.now().toString(),
-        'insertUserDocId':widget.argumentUserData["userDocId"],
-        'insertProgramId': "search_route",
-        'insertTime': DateTime.now().toString(),
-      },
-    );
-
-    FirebaseFirestore.instance.collection('friends').add(
-      {'userDocId':widget.argumentUserData["userDocId"] ,
-        'friendUserDocId': friendUserDocId,
-        'friendUserName': friendUserName ,
-        'profilePhotoPath': friendProfilePhotoPath ,
-        'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
-        'lastMessageContent': "",
-        'lastMessageDocId': "",
-        'lastTime': DateTime.now().toString(),
-        'insertUserDocId':widget.argumentUserData["userDocId"],
-        'insertProgramId': "search_route",
-        'insertTime': DateTime.now().toString(),
-      },
-    ).then((value){
-      insertedDocId=value.id;
-    });
-
-    var friendBox = await Hive.openBox('friend');
-    await friendBox.put(friendUserDocId,{
-      'friendUserDocId': insertedDocId,
-      'friendUserName': friendUserName,
-      'profilePhotoPath': friendProfilePhotoPath ,
-      'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
-      'lastMessageContent': "",
-      'lastMessageDocId': "",
-      'lastTime': DateTime.now().toString(),
-    });
-    await friendBox.close();
-
-    widget.argumentFriendData[friendUserDocId]={
-      'friendUserDocId': insertedDocId,
-      'friendUserName': friendUserName,
-      'profilePhotoPath': friendProfilePhotoPath ,
-      'profilePhotoUpdateCnt': friendProfilePhotoUpdateCnt,
-      'lastMessageContent': "",
-      'lastMessageDocId': "",
-      'lastTime': DateTime.now().toString(),
-    };
-
-  }
-
-
 }

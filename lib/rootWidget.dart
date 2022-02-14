@@ -53,17 +53,9 @@ class RootWidget extends ConsumerWidget {
       case 0:
         return Now();
       case 1:
-        return Talk(
-        );
-        break;
+        return Talk();
       case 2:
-        return Search(
-          argumentUserData: ref.watch(userDataProvider.notifier).userData,
-          argumentMasterData: ref.watch(masterDataProvider.notifier).masterData,
-          argumentFriendData: ref.watch(friendDataProvider.notifier).friendData,
-          argumentMainPhotoData:
-              ref.watch(mainPhotoDataProvider.notifier).mainPhotoData,
-        );
+        return Search();
       case 3:
         return Topic(
           argumentUserData: ref.watch(userDataProvider.notifier).userData,

@@ -2,33 +2,23 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../chat.dart';
+import '../commonEntity.dart';
 
-class FriendProfile extends StatefulWidget {
-  Map<String, String> argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String, Map<String, String>> argumentFriendData;
-  Image argumentMainPhotoData;
+class FriendProfile extends ConsumerWidget {
+  FriendProfile({
+    required this.argumentFriendUserDocId,
+    Key? key,
+  }) : super(key: key);
   String argumentFriendUserDocId;
 
   //TODO 前画面からFriendのアイコンデータ（写真データを受け渡すようにする。）
   //TODO 引数は一つの構造体にまとめよう→GetterとSetterはどうするか（必須にするか）検討が必要
 
-  FriendProfile(
-      {required this.argumentUserData,
-      required this.argumentMasterData,
-      required this.argumentFriendData,
-      required this.argumentFriendUserDocId,
-      required this.argumentMainPhotoData});
-
-  @override
-  _FriendProfile createState() => _FriendProfile();
-}
-
-class _FriendProfile extends State<FriendProfile> {
   bool initialProcessFlg = true;
 
   var box;
@@ -36,35 +26,35 @@ class _FriendProfile extends State<FriendProfile> {
   Image? friendImage;
 
 
-  Future<void> InsertFriend() async{
+  Future<void> InsertFriend(WidgetRef ref) async{
     String insertedDocId="";
 
     //相手側のFriendデータもFirebaseのみに作成する
     FirebaseFirestore.instance.collection('friends').add(
-      {'userDocId':widget.argumentFriendUserDocId,
-        'friendUserDocId': widget.argumentUserData["userDocId"],
-        'friendUserName': widget.argumentUserData["name"],
-        'profilePhotoPath':widget.argumentUserData["profilePhotoPath"] ,
-        'profilePhotoUpdateCnt': widget.argumentUserData["profilePhotoUpdateCnt"] ,
+      {'userDocId':argumentFriendUserDocId,
+        'friendUserDocId': ref.watch(userDataProvider).userData["userDocId"],
+        'friendUserName': ref.watch(userDataProvider).userData["name"],
+        'profilePhotoPath':ref.watch(userDataProvider).userData["profilePhotoPath"] ,
+        'profilePhotoUpdateCnt': ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"] ,
         'lastMessageContent': "",
         'lastMessageDocId': "",
         'lastTime': DateTime.now().toString(),
-        'insertUserDocId':widget.argumentUserData["userDocId"],
+        'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
         'insertProgramId': "friendProfile",
         'insertTime': DateTime.now().toString(),
       },
     );
 
     FirebaseFirestore.instance.collection('friends').add(
-      {'userDocId':widget.argumentUserData["userDocId"] ,
-        'friendUserDocId': widget.argumentFriendUserDocId,
+      {'userDocId':ref.watch(userDataProvider).userData["userDocId"] ,
+        'friendUserDocId': argumentFriendUserDocId,
         'friendUserName': firebaseUserData["name"] ,
         'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
         'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"] ,
         'lastMessageContent': "",
         'lastMessageDocId': "",
         'lastTime': DateTime.now().toString(),
-        'insertUserDocId':widget.argumentUserData["userDocId"],
+        'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
         'insertProgramId': "friendProfile",
         'insertTime': DateTime.now().toString(),
       },
@@ -73,7 +63,7 @@ class _FriendProfile extends State<FriendProfile> {
     });
 
     var friendBox = await Hive.openBox('friend');
-    await friendBox.put(widget.argumentFriendUserDocId,{
+    await friendBox.put(argumentFriendUserDocId,{
       'friendUserDocId': insertedDocId,
       'friendUserName': firebaseUserData["name"],
       'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
@@ -84,7 +74,7 @@ class _FriendProfile extends State<FriendProfile> {
     });
     await friendBox.close();
 
-    widget.argumentFriendData[widget.argumentFriendUserDocId]={
+    ref.watch(friendDataProvider).friendData[argumentFriendUserDocId]={
       'friendUserDocId': insertedDocId,
       'friendUserName': firebaseUserData["name"],
       'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
@@ -144,16 +134,16 @@ class _FriendProfile extends State<FriendProfile> {
   //
   //     await FirebaseFirestore.instance
   //         .collection('users')
-  //         .doc(widget.argumentUserData["userDocId"])
+  //         .doc(ref.watch(userDataProvider).userData["userDocId"])
   //         .update({
   //       "profilePhotoUpdateCnt":
-  //           (int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!) + 1)
+  //           (int.parse(ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"]!) + 1)
   //               .toString(),
   //       "profilePhotoPath": "profile/" + userDocId + "/mainPhoto.png"
   //     });
   //
-  //     widget.argumentUserData["profilePhotoUpdateCnt"] =
-  //         (int.parse(widget.argumentUserData["profilePhotoUpdateCnt"]!) + 1)
+  //     ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"] =
+  //         (int.parse(ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"]!) + 1)
   //             .toString();
   //     await box.put(
   //         "profilePhotoPath", "profile/" + userDocId + "/mainPhoto.png");
@@ -177,14 +167,14 @@ class _FriendProfile extends State<FriendProfile> {
   Future<void> getFirebaseData() async {
     firebaseUserData = await FirebaseFirestore.instance
         .collection('users')
-        .doc(widget.argumentFriendUserDocId)
+        .doc(argumentFriendUserDocId)
         .get();
 
-    await _download(widget.argumentFriendUserDocId);
+    await _download(argumentFriendUserDocId);
     //box = await Hive.openBox('record');
 
-    //if(firebaseUserData.get("profilePhotoUpdateCnt")!=widget.argumentUserData["profilePhotoUpdateCnt"]){
-    //  await _download(widget.argumentUserData["userDocId"]!);
+    //if(firebaseUserData.get("profilePhotoUpdateCnt")!=ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"]){
+    //  await _download(ref.watch(userDataProvider).userData["userDocId"]!);
 
     //}
     //FirebaseのデータをHiveに取得
@@ -208,16 +198,15 @@ class _FriendProfile extends State<FriendProfile> {
     //
     // await box.close();
 
-    setState(() {});
   }
 
   // Future<void> arrangeUserDataUnit(String item) async {
   //   await box.put(item,firebaseUserData.get(item));
-  //   widget.argumentUserData[item]=await firebaseUserData.get(item);
+  //   ref.watch(userDataProvider).userData[item]=await firebaseUserData.get(item);
   // }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (initialProcessFlg) {
       initialProcessFlg = false;
       //_showLocalPhoto();
@@ -252,81 +241,81 @@ class _FriendProfile extends State<FriendProfile> {
                 ),
               ),
               //TODO Firebaseからデータがとってこれていない1回目の処理は、前の検索画面で取得していた情報を受け渡して、表示できる情報は初回から表示してやる
-              linePadding(
+              linePadding(ref,
                   "Name",
                   "name",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["name"]),
-              linePadding(
+              linePadding(ref,
                   "E-mail",
                   "email",
                   firebaseUserData== null
                       ? ""
                       : firebaseUserData["email"]),
-              linePadding("Age", "age",
+              linePadding(ref,"Age", "age",
                   firebaseUserData == null ? "" : firebaseUserData["age"]),
-              linePadding(
+              linePadding(ref,
                   "English Level",
                   "level",
                   firebaseUserData== null
                       ? ""
                       : firebaseUserData["level"]),
-              linePadding(
+              linePadding(ref,
                   "Occupation",
                   "occupation",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["occupation"]),
-              linePadding(
+              linePadding(ref,
                   "mother Tongue",
                   "nativeLang",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["nativeLang"]),
-              linePadding(
+              linePadding(ref,
                   "Country",
                   "country",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["country"]),
-              linePadding(
+              linePadding(ref,
                   "Town",
                   "town",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["town"]),
-              linePadding(
+              linePadding(ref,
                   "Home Country",
                   "homeCountry",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["homeCountry"]),
-              linePadding(
+              linePadding(ref,
                   "Home Town",
                   "homeTown",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["homeTown"]),
-              linePadding(
+              linePadding(ref,
                   "gender",
                   "gender",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["gender"]),
-              linePadding(
+              linePadding(ref,
                   "Place I wanna go",
                   "placeWannaGo",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["placeWannaGo"]),
-              linePadding(
+              linePadding(ref,
                   "Greeting",
                   "greeting",
                   firebaseUserData == null
                       ? ""
                       : firebaseUserData["greeting"]),
-              linePadding(
+              linePadding(ref,
                   "Description",
                   "description",
                   firebaseUserData == null
@@ -339,13 +328,13 @@ class _FriendProfile extends State<FriendProfile> {
               child:
               ElevatedButton(
                 onPressed: () async{
-                  await InsertFriend();
+                  await InsertFriend(ref);
 
                   //TODO　すでにFriendの場合は押下できないように修正する
                   await Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) {
                       return Chat(
-                          argumentFriendUserDocId:widget.argumentFriendUserDocId
+                          argumentFriendUserDocId:argumentFriendUserDocId
                       );
                     }),
                   );
@@ -363,11 +352,11 @@ class _FriendProfile extends State<FriendProfile> {
             ]));
   }
 
-  Padding linePadding(String displayedItem, String databaseItem, String value) {
+  Padding linePadding(WidgetRef ref,String displayedItem, String databaseItem, String value) {
     //valueType:String or int or selectString(セグメント)
     String displayedValue;
     if ((databaseItem == "gender" || databaseItem == "level")&&value!="" ){
-      displayedValue = widget.argumentMasterData[databaseItem + "_" + value]!;
+      displayedValue = ref.watch(masterDataProvider).masterData[databaseItem + "_" + value]!;
     } else {
       displayedValue = value;
     }

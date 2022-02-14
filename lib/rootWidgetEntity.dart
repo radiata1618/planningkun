@@ -31,7 +31,7 @@ class BottomNavigationBarItems extends ChangeNotifier {
 
   static const List _footerIcons = [
     Icons.access_time,
-    Icons.textsms,
+    Icons.message_outlined,
     Icons.search,
     Icons.wallpaper_sharp,
     Icons.work_outline,
