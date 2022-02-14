@@ -1,61 +1,47 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'firebase_config.dart';
+import 'commonEntity.dart';
 import 'join_channel_video.dart';
 import 'confirmCall.dart';
 
-class Chat extends StatefulWidget {
-  Map<String, String> argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String, Map<String, String>> argumentFriendData;
-  String argumentFriendUserDocId;
+class Chat extends ConsumerWidget {
+  var argumentFriendUserDocId;
 
-  Chat(
-      {required this.argumentUserData,
-      required this.argumentMasterData,
-      required this.argumentFriendData,
-      required this.argumentFriendUserDocId});
-
-  @override
-  _Chat createState() => _Chat();
-}
-
-class _Chat extends State<Chat> {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
+  Chat({
+    required this.argumentFriendUserDocId,
+    Key? key,
+  }) : super(key: key);
 
 
-  Future<void> _insertMessage(
+  Future<void> _insertMessage(WidgetRef ref,
       String messageContent) async {
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userDocId': widget.argumentUserData["userDocId"],
-      'oppositeUserDocId':widget.argumentFriendUserDocId ,
+      'userDocId': ref.watch(userDataProvider).userData["userDocId"]!,
+      'oppositeUserDocId':argumentFriendUserDocId ,
       'receiveSend': "send",
       'sendTime': DateTime.now().toString(),
       'messageType':"chat",
       'callChannelId':"",
-    'insertUserDocId':widget.argumentUserData["userDocId"],
+    'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"]!,
     'insertProgramId': "Chat",
     'insertTime': DateTime.now().toString(),
     });
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userDocId': widget.argumentFriendUserDocId,
-      'oppositeUserDocId': widget.argumentUserData["userDocId"],
+      'userDocId': argumentFriendUserDocId,
+      'oppositeUserDocId': ref.watch(userDataProvider).userData["userDocId"]!,
       'receiveSend': "receive",
       'sendTime': DateTime.now().toString(),
       'messageType':"chat",
       'callChannelId':"",
-      'insertUserDocId':widget.argumentUserData["userDocId"],
+      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"]!,
       'insertProgramId': "Chat",
       'insertTime': DateTime.now().toString(),
     });
@@ -68,12 +54,12 @@ class _Chat extends State<Chat> {
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final Stream<QuerySnapshot> _callStream = FirebaseFirestore.instance
         .collection('calls')
-        .where('sender', isEqualTo: widget.argumentFriendUserDocId)
-        .where('receiver', isEqualTo: widget.argumentUserData["userDocId"])
+        .where('sender', isEqualTo: argumentFriendUserDocId)
+        .where('receiver', isEqualTo: ref.watch(userDataProvider).userData["userDocId"]!)
         .where('status', isEqualTo: "yet")
         .snapshots();
 
@@ -83,10 +69,7 @@ class _Chat extends State<Chat> {
         await Navigator.of(context).push(
           MaterialPageRoute(builder: (context) {
             return confirmCall(
-              argumentFriendData: widget.argumentFriendData,
-              argumentMasterData: widget.argumentMasterData,
-              argumentUserData: widget.argumentUserData,
-              argumentFriendUserDocId: widget.argumentFriendUserDocId,
+              argumentFriendUserDocId: argumentFriendUserDocId,
               argumentChannelId: snapshot.docs[0].id,
             );
           }),
@@ -104,7 +87,7 @@ class _Chat extends State<Chat> {
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                widget.argumentFriendData[widget.argumentFriendUserDocId]![
+                ref.watch(friendDataProvider).friendData[argumentFriendUserDocId]![
                     "friendUserName"]!,
                 style: TextStyle(color: Colors.black87),
               ),
@@ -120,12 +103,8 @@ class _Chat extends State<Chat> {
                             await Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) {
                                 return JoinChannelVideo(
-                                  argumentUserData: widget.argumentUserData,
-                                  argumentMasterData:widget.argumentMasterData,
-                                  argumentFriendData:widget.argumentFriendData,
                                   argumentChannelId: "",
-                                  argumentFriendUserDocId: widget.argumentFriendUserDocId,
-
+                                  argumentFriendUserDocId: argumentFriendUserDocId,
                                 );
                               }),
                             );
@@ -146,13 +125,13 @@ class _Chat extends State<Chat> {
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
             child: Column(
               children: <Widget>[
-                buildMessageList(widget.argumentUserData["userDocId"]!,
-                    widget.argumentFriendUserDocId),
+                buildMessageList(ref.watch(userDataProvider).userData["userDocId"]!,
+                    argumentFriendUserDocId),
               ],
             ),
           ),
         ),
-        textInputWidget(),
+        textInputWidget(ref),
       ])),
     );
   }
@@ -219,7 +198,7 @@ class _Chat extends State<Chat> {
     );
   }
 
-  Container textInputWidget() {
+  Container textInputWidget(WidgetRef ref) {
     return Container(
       height: 68,
       child: Row(children: [
@@ -245,9 +224,7 @@ class _Chat extends State<Chat> {
             autofocus: true,
             decoration: InputDecoration(border: InputBorder.none),
             onChanged: (String value) {
-              setState(() {
                 content = value;
-              });
             },
           ),
         )),
@@ -256,7 +233,7 @@ class _Chat extends State<Chat> {
           iconSize: 28,
           color: Colors.black54,
           onPressed: () {
-            _insertMessage(content);
+            _insertMessage(ref,content);
           },
         ),
         IconButton(

@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../chat.dart';
+import '../commonUI.dart';
 import 'friendProfile.dart';
 import '../commonEntity.dart';
 import 'SearchConditionPage.dart';
@@ -113,16 +114,7 @@ class _Search extends State<Search> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white10,
-          elevation: 0.0,
-          title: Text("Search",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 21,
-              color: Colors.black87,
-            ),),
-        ),
+        appBar: whiteAppbar(text: 'Search'),
         body: SafeArea(
             child:Padding(padding:const EdgeInsets.only(top:14,left:14,right:14,bottom:10),
               child:Column(
@@ -305,9 +297,6 @@ class _Search extends State<Search> {
                     await Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) {
                         return Chat(
-                       argumentUserData: widget.argumentUserData,
-                          argumentMasterData:widget.argumentMasterData,
-                            argumentFriendData:widget.argumentFriendData,
                           argumentFriendUserDocId:userData.data["objectID"]
                         );
                       }),

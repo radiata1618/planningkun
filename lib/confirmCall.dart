@@ -7,13 +7,10 @@ import 'join_channel_video.dart';
 
 
 class confirmCall extends StatefulWidget {
-  Map<String, String>  argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String,Map<String,String>>  argumentFriendData;
   String argumentFriendUserDocId;
   String argumentChannelId;
 
-  confirmCall({required this.argumentUserData,required this.argumentMasterData,required this.argumentFriendData,required this.argumentFriendUserDocId,required this.argumentChannelId});
+  confirmCall({required this.argumentFriendUserDocId,required this.argumentChannelId});
 
   @override
   _confirmCall createState() => _confirmCall();
@@ -36,9 +33,6 @@ class _confirmCall extends State<confirmCall> {
                   await Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) {
                       return JoinChannelVideo(
-                        argumentUserData: widget.argumentUserData,
-                        argumentMasterData:widget.argumentMasterData,
-                        argumentFriendData:widget.argumentFriendData,
                         argumentChannelId: widget.argumentChannelId,
                         argumentFriendUserDocId: widget.argumentFriendUserDocId,
 

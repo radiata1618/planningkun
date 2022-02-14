@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'commonUI.dart';
@@ -128,7 +127,7 @@ class LoginPage extends ConsumerWidget {
     await ref
         .read(friendDataProvider.notifier)
         .readFriendDataFromFirebaseToHiveAndMemory(
-            ref.watch(userDataProvider.notifier).userData["userDocId"]!);
+            ref.watch(userDataProvider).userData["userDocId"]!);
     await ref
         .read(masterDataProvider.notifier)
         .readMasterDataFromFirebaseToHiveAndMemory();

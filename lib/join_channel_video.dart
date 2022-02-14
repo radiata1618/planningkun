@@ -4,8 +4,10 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //import 'package:agora_rtc_engine_example/config/agora.config.dart' as config;
+import 'commonEntity.dart';
 import 'config/agora.config.dart' as config;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -13,24 +15,18 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// MultiChannel Example
-class JoinChannelVideo extends StatefulWidget {
-  Map<String, String> argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String, Map<String, String>> argumentFriendData;
+class JoinChannelVideo extends ConsumerWidget {
   String argumentFriendUserDocId;
   String argumentChannelId;//Sender側の場合は値が""、Receiverのときのみ値が入っている
-
-  JoinChannelVideo({required this.argumentUserData,
-    required this.argumentMasterData,
-    required this.argumentFriendData,
+  JoinChannelVideo({
     required this.argumentFriendUserDocId,
-    required this.argumentChannelId});
+    required this.argumentChannelId,
+    Key? key,
+  }) : super(key: key){
 
-  @override
-  State<StatefulWidget> createState() => _State();
-}
+    this._initEngine();
+  }
 
-class _State extends State<JoinChannelVideo> {
   late final RtcEngine _engine;
   String channelId = "";
   bool isJoined = false,
@@ -40,18 +36,18 @@ class _State extends State<JoinChannelVideo> {
   bool initialProcessFlg=true;
 
 
-  Future<void> call()async{
+  Future<void> call(WidgetRef ref)async{
 
-    if(widget.argumentChannelId==""){
+    if(argumentChannelId==""){
 
 
     await FirebaseFirestore.instance.collection('calls').add({
-      'sender':widget.argumentUserData["userDocId"],
-      'receiver':widget.argumentFriendUserDocId,
+      'sender':ref.watch(userDataProvider).userData["userDocId"],
+      'receiver':argumentFriendUserDocId,
       'startTime': DateTime.now().toString(),
       'status':'yet',
       'endTime': "",
-      'insertUserDocId':widget.argumentUserData["userDocId"],
+      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
       'insertProgramId': "join_channel_video",
       'insertTime': DateTime.now().toString(),
     }).then((value){
@@ -61,33 +57,33 @@ class _State extends State<JoinChannelVideo> {
 
     await FirebaseFirestore.instance.collection('messages').add({
       'content': "",
-      'userDocId': widget.argumentUserData["userDocId"],
-      'oppositeUserDocId': widget.argumentFriendUserDocId,
+      'userDocId': ref.watch(userDataProvider).userData["userDocId"],
+      'oppositeUserDocId': argumentFriendUserDocId,
       'receiveSend': "send",
       'sendTime': DateTime.now().toString(),
       'messageType':"call",
       'callChannelId':channelId,
-      'insertUserDocId':widget.argumentUserData["userDocId"],
+      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
       'insertProgramId': "join_channel_video",
       'insertTime': DateTime.now().toString(),
     });
 
     await FirebaseFirestore.instance.collection('messages').add({
       'content': "",
-      'userDocId': widget.argumentFriendUserDocId,
-      'oppositeUserDocId': widget.argumentUserData["userDocId"],
+      'userDocId': argumentFriendUserDocId,
+      'oppositeUserDocId': ref.watch(userDataProvider).userData["userDocId"],
       'receiveSend': "receive",
       'sendTime': DateTime.now().toString(),
       'messageType':"call",
       'callChannelId':channelId,
-      'insertUserDocId':widget.argumentUserData["userDocId"],
+      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
       'insertProgramId': "join_channel_video",
       'insertTime': DateTime.now().toString(),
     });
 
     }else{
 
-      channelId=widget.argumentChannelId;
+      channelId=argumentChannelId;
 
     }
 
@@ -97,16 +93,9 @@ class _State extends State<JoinChannelVideo> {
 
   //TextEditingController? _controller;
 
-  @override
-  void initState() {
-    super.initState();
-    // _controller = TextEditingController(text: channelId);
-    this._initEngine();
-  }
 
   @override
   void dispose() {
-    super.dispose();
     _engine.destroy();
   }
 
@@ -123,28 +112,20 @@ class _State extends State<JoinChannelVideo> {
     _engine.setEventHandler(RtcEngineEventHandler(
       joinChannelSuccess: (channel, uid, elapsed) {
         log('joinChannelSuccess ${channel} ${uid} ${elapsed}');
-        setState(() {
           isJoined = true;
-        });
       },
       userJoined: (uid, elapsed) {
         log('userJoined  ${uid} ${elapsed}');
-        setState(() {
           remoteUid.add(uid);
-        });
       },
       userOffline: (uid, reason) {
         log('userOffline  ${uid} ${reason}');
-        setState(() {
           remoteUid.removeWhere((element) => element == uid);
-        });
       },
       leaveChannel: (stats) {
         log('leaveChannel ${stats.toJson()}');
-        setState(() {
           isJoined = false;
           remoteUid.clear();
-        });
       },
     ));
   }
@@ -156,46 +137,38 @@ class _State extends State<JoinChannelVideo> {
     }
     await _engine.joinChannel("", channelId, null, 0);
 
-    setState(() {
-    });
   }
 
-  _leaveChannel() async {
+  _leaveChannel(WidgetRef ref) async {
     await _engine.leaveChannel();
     await FirebaseFirestore.instance.collection('calls').doc(channelId)
         .update({"status": "already",
-      'updateUserDocId':widget.argumentUserData["userDocId"],
+      'updateUserDocId':ref.watch(userDataProvider).userData["userDocId"],
       'updateProgramId': "join_channel_video",
       'updateTime': DateTime.now().toString(),
     });
 
-    setState(() {
-    });
   }
 
   _switchCamera() {
     _engine.switchCamera().then((value) {
-      setState(() {
         switchCamera = !switchCamera;
-      });
     }).catchError((err) {
       log('switchCamera $err');
     });
   }
 
   _switchRender() {
-    setState(() {
       switchRender = !switchRender;
       remoteUid = List.of(remoteUid.reversed);
-    });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     if (initialProcessFlg){
       initialProcessFlg=false;
-      call();
+      call(ref);
     }
 
     return Scaffold(
@@ -203,7 +176,7 @@ class _State extends State<JoinChannelVideo> {
           child:Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children:[
-                Text(widget.argumentFriendData[widget.argumentFriendUserDocId]![
+                Text(ref.watch(friendDataProvider).friendData[argumentFriendUserDocId]![
                 "friendUserName"]!,
                   style: TextStyle(color: Colors.black87),),
                 Container(
@@ -229,7 +202,7 @@ class _State extends State<JoinChannelVideo> {
                   Container(
                     height: 40,
                     child: ElevatedButton(
-                      onPressed: isJoined ? this._leaveChannel : this
+                      onPressed: isJoined ? this._leaveChannel(ref) : this
                           ._joinChannel,
                       child: Text('${isJoined ? 'Leave' : 'Join'} channel'),
                     ),

@@ -23,6 +23,7 @@ class RootWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     ref.read(bottomNavigationBarItemsProvider.notifier).initialize();
     final _selectedIndex = ref.watch(_selectedIndexProvider);
 
@@ -53,9 +54,6 @@ class RootWidget extends ConsumerWidget {
         return Now();
       case 1:
         return Talk(
-          argumentUserData: ref.watch(userDataProvider.notifier).userData,
-          argumentMasterData: ref.watch(masterDataProvider.notifier).masterData,
-          argumentFriendData: ref.watch(friendDataProvider.notifier).friendData,
         );
         break;
       case 2:

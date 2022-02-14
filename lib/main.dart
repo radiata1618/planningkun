@@ -17,6 +17,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'commonEntity.dart';
 import 'firebase_config.dart';
 import 'autoLoginPage.dart';
 import 'database.dart';
@@ -54,16 +55,13 @@ class MyApp extends StatelessWidget {
 
 
 // 新たに追加
-class _LoginCheck extends StatelessWidget {
-
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
+class _LoginCheck extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // ログイン状態に応じて、画面を切り替える
     final FirebaseAuth _auth = FirebaseAuth.instance;
     final User? _currentUser = _auth.currentUser;
+
 
     if(_currentUser==null){
       return LoginPage(

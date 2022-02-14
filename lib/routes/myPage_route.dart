@@ -29,7 +29,7 @@ class MyPage extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
             child: Column(children: [
               Text(
-                ref.watch(userDataProvider.notifier).userData["name"]!,
+                ref.watch(userDataProvider).userData["name"]!,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -70,11 +70,11 @@ class MyPage extends ConsumerWidget {
               radius: 40,
               backgroundColor: Colors.white,
               backgroundImage:
-                  ref.watch(mainPhotoDataProvider.notifier).mainPhotoData ==
+                  ref.watch(mainPhotoDataProvider).mainPhotoData ==
                           null
                       ? null
                       : ref
-                          .watch(mainPhotoDataProvider.notifier)
+                          .watch(mainPhotoDataProvider)
                           .mainPhotoData!
                           .image,
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 Widget borderedTextBox({required String text, Function(String)? onChanged}) {
   return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -26,7 +27,8 @@ Text GrayText(String txt) {
   );
 }
 
-Widget orangeRoundButton({required String text,required  Function()? onPressed}) {
+Widget orangeRoundButton(
+    {required String text, required Function()? onPressed}) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 30.0),
     child: Container(
@@ -46,13 +48,15 @@ Widget orangeRoundButton({required String text,required  Function()? onPressed})
           backgroundColor: Colors.orange,
           shape: const StadiumBorder(),
           side: const BorderSide(color: Colors.white, width: 0),
-        ), onPressed:onPressed,
+        ),
+        onPressed: onPressed,
       ),
     ),
   );
 }
 
-Widget whiteBorderRoundButton({required String text,required  Function()? onPressed}) {
+Widget whiteBorderRoundButton(
+    {required String text, required Function()? onPressed}) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 30.0),
     child: Container(
@@ -72,7 +76,23 @@ Widget whiteBorderRoundButton({required String text,required  Function()? onPres
           backgroundColor: Colors.white,
           shape: const StadiumBorder(),
           side: const BorderSide(color: Colors.orange, width: 1),
-        ), onPressed:onPressed,
+        ),
+        onPressed: onPressed,
+      ),
+    ),
+  );
+}
+
+AppBar whiteAppbar({required String text}) {
+  return AppBar(
+    backgroundColor: Colors.white10,
+    elevation: 0.0,
+    title: Text(
+      text,
+      style: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 21,
+        color: Colors.black87,
       ),
     ),
   );

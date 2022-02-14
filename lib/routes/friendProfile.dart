@@ -1,27 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:planningkun/routes/settingEditPage.dart';
-import 'package:video_player/video_player.dart';
-
 import 'package:firebase_storage/firebase_storage.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../chat.dart';
-import '../firebase_config.dart';
-import '../commonEntity.dart';
 
 class FriendProfile extends StatefulWidget {
   Map<String, String> argumentUserData;
@@ -361,9 +345,6 @@ class _FriendProfile extends State<FriendProfile> {
                   await Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) {
                       return Chat(
-                          argumentUserData: widget.argumentUserData,
-                          argumentMasterData:widget.argumentMasterData,
-                          argumentFriendData:widget.argumentFriendData,
                           argumentFriendUserDocId:widget.argumentFriendUserDocId
                       );
                     }),

@@ -27,6 +27,7 @@ List<String> FromTextToList(String txt) {
   return outputList;
 }
 
+
 //Firebase ログ・イン情報を保持するためのProviderクラス
 //https://www.flutter-study.dev/firebase-app/riverpod
 // ユーザー情報の受け渡しを行うためのProvider
