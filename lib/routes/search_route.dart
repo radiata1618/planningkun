@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:algolia/algolia.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:planningkun/routes/search_routeEntity.dart';
 
+import '../commonEntity.dart';
 import '../commonUI.dart';
 import 'friendProfile.dart';
-import '../commonAlgoria.dart';
 import 'SearchConditionPage.dart';
 
 
@@ -16,17 +17,16 @@ class Search extends ConsumerWidget {
     Key? key,
   }) : super(key: key);
 
-  bool searchProcessFlg=true;//検索を実行するかどうか、条件画面から検索ボタンで戻ってきたときにONになっている
-  List<AlgoliaObjectSnapshot> objectList=[];
+  bool searchProcessFlg=true;
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    Algolia algolia = Application.algolia;
-    if(searchProcessFlg==true){
-
+    if(searchProcessFlg==true) {
       searchProcessFlg=false;
-      userSearch(ref,algolia);
+      ref.watch(SearchResultProvider.notifier).userSearch(ref);
     }
 
     return Scaffold(
@@ -67,7 +67,7 @@ class Search extends ConsumerWidget {
                                         }),
                                       );
 
-                                      userSearch(ref,algolia);
+                                      ref.watch(SearchResultProvider.notifier).userSearch(ref);
                                     },
                                     child: Icon(
                                         Icons.view_headline_sharp,
@@ -90,7 +90,7 @@ class Search extends ConsumerWidget {
                               child:GestureDetector(
                                   onTap: () async{
 
-                                    userSearch( ref,algolia);
+                                    ref.watch(SearchResultProvider.notifier).userSearch(ref);
                                   },
                                   child: Icon(
                                       Icons.search,
@@ -105,9 +105,9 @@ class Search extends ConsumerWidget {
                   ),
                 Expanded(
                     child:ListView.builder(
-                        itemCount:objectList.length,
+                        itemCount:ref.watch(SearchResultProvider).searchResultList.length,
                         itemBuilder:(BuildContext context,int index){
-                          return userResultList( context,  ref,objectList[index]);
+                          return userResultList( context,  ref,ref.watch(SearchResultProvider).searchResultList[index]);
                         }
                 ))
                 ]

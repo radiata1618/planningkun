@@ -14,7 +14,7 @@ import 'package:path_provider/path_provider.dart';
 //TODO Main モジュールでFirebaseからデータが取得できないとき、Hiveのデータをメモリに読み出すように処理をCOMMONに追加する。
 
 
-List<String> FromTextToList(String txt) {
+List<String> fromTextToList(String txt) {
   String workText = txt;
   List<String> outputList = [];
 
@@ -198,7 +198,6 @@ Future<void> getFirebaseUserData(WidgetRef ref) async {
   var box = await Hive.openBox('record');
   await ref.read(userDataProvider.notifier).readUserDataFirebaseToHiveAndMemory(await box.get("userDocId"));
   box.close();
-  //TODO 本来はUserDocIdをキーにデータを持ってくる。
 }
 
 Future<void> setImage(WidgetRef ref) async {
@@ -218,7 +217,7 @@ final userDataProvider = ChangeNotifierProvider(
       (ref) => UserDataProvider(),
 );
 
-class FriendDataProvider extends ChangeNotifier {
+class FriendDataNotifier extends ChangeNotifier {
   Map<String, Map<String, String>> _friendData = {};
   Map<String, Map<String, String>> get friendData => _friendData;
 
@@ -257,6 +256,75 @@ class FriendDataProvider extends ChangeNotifier {
     });
     notifyListeners();
   }
+
+  Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
+
+    String insertedDocId="";
+      DocumentSnapshot<Map<String, dynamic>>firebaseUserData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friendUserDocId)
+          .get();
+
+      //await _download(friendUserDocId);
+      //TODO 写真をDLする
+
+    //相手側のFriendデータもFirebaseのみに作成する
+    FirebaseFirestore.instance.collection('friends').add(
+      {'userDocId':friendUserDocId,
+        'friendUserDocId': ref.watch(userDataProvider).userData["userDocId"],
+        'friendUserName': ref.watch(userDataProvider).userData["name"],
+        'profilePhotoPath':ref.watch(userDataProvider).userData["profilePhotoPath"] ,
+        'profilePhotoUpdateCnt': ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"] ,
+        'lastMessageContent': "",
+        'lastMessageDocId': "",
+        'lastTime': DateTime.now().toString(),
+        'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
+        'insertProgramId': "friendProfile",
+        'insertTime': DateTime.now().toString(),
+      },
+    );
+
+    FirebaseFirestore.instance.collection('friends').add(
+      {'userDocId':ref.watch(userDataProvider).userData["userDocId"] ,
+        'friendUserDocId': friendUserDocId,
+        'friendUserName': firebaseUserData["name"] ,
+        'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
+        'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"] ,
+        'lastMessageContent': "",
+        'lastMessageDocId': "",
+        'lastTime': DateTime.now().toString(),
+        'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
+        'insertProgramId': "friendProfile",
+        'insertTime': DateTime.now().toString(),
+      },
+    ).then((value){
+      insertedDocId=value.id;
+    });
+
+    var friendBox = await Hive.openBox('friend');
+    await friendBox.put(friendUserDocId,{
+      'friendUserDocId': insertedDocId,
+      'friendUserName': firebaseUserData["name"],
+      'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
+      'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"] ,
+      'lastMessageContent': "",
+      'lastMessageDocId': "",
+      'lastTime': DateTime.now().toString(),
+    });
+    await friendBox.close();
+
+    ref.watch(friendDataProvider).friendData[friendUserDocId]={
+      'friendUserDocId': insertedDocId,
+      'friendUserName': firebaseUserData["name"],
+      'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
+      'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"],
+      'lastMessageContent': "",
+      'lastMessageDocId': "",
+      'lastTime': DateTime.now().toString(),
+    };
+
+  }
+
 }
 
 final masterDataProvider = ChangeNotifierProvider(
@@ -290,7 +358,7 @@ class MasterDataProvider extends ChangeNotifier {
 }
 
 final friendDataProvider = ChangeNotifierProvider(
-      (ref) => FriendDataProvider(),
+      (ref) => FriendDataNotifier(),
 );
 
 
