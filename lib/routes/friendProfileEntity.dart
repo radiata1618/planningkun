@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +15,20 @@ class FriendProfileDataNotifier extends ChangeNotifier {
   Map<String, String> _friendProfileData = {};
   get friendProfileData => _friendProfileData;
 
+  Image? _friendProfilePhotoData;
+  Image? get friendProfilePhotoData => _friendProfilePhotoData;
+
+  Future<void> readFriendProfilePhotoDataFromFirebaseToMemory(WidgetRef ref,String friendUserDocId) async {
+
+    FirebaseStorage storage =  FirebaseStorage.instance;
+        Reference imageRef =  storage.ref().child("profile").child(friendProfileData["userDocId"]!).child("mainPhoto.png");
+    //TODO filenameがPNG出なかったときの対応→ファイル名をUserDataに持つ
+    String imageUrl = await imageRef.getDownloadURL();
+
+    _friendProfilePhotoData = Image.network(imageUrl,width:90);
+  }
+
+
   Future<void> readFriendProfileDataFromFirebase(WidgetRef ref,String friendUserDocId)async {
     DocumentSnapshot docSnapShot = await FirebaseFirestore.instance
         .collection('users')
@@ -21,7 +36,7 @@ class FriendProfileDataNotifier extends ChangeNotifier {
         .get();
 
     //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
-    _friendProfileData["userDocId"] = docSnapShot.id;
+    _friendProfileData["userDocId"] = friendUserDocId;
     _friendProfileData["name"] = docSnapShot["name"];
     _friendProfileData["email"] = docSnapShot["email"];
     _friendProfileData["age"] = docSnapShot["age"];
@@ -37,22 +52,9 @@ class FriendProfileDataNotifier extends ChangeNotifier {
     _friendProfileData["greeting"] = docSnapShot["greeting"];
     _friendProfileData["description"] = docSnapShot["description"];
     _friendProfileData["profilePhotoPath"] = docSnapShot["profilePhotoPath"];
+    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId);
     notifyListeners();
+
   }
 
 }
-
-class FriendProfilePhotoDataNotifier extends ChangeNotifier {
-  Image? _img;
-  Image? get friendProfilePhotoData => _img;
-
-  Future<void> readFriendProfilePhotoDataFromDirectoryToMemory() async {
-
-  }
-}
-
-
-final friendProfilePhotoDataProvider = ChangeNotifierProvider(
-      (ref) => FriendProfilePhotoDataNotifier(),
-);
-
