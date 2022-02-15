@@ -34,6 +34,9 @@ class AutoLoginPage extends ConsumerWidget  {
     //TODO 本来はUserDocIdをキーにデータを持ってくる。
     await ref.read(friendDataProvider.notifier).readFriendDataFromFirebaseToHiveAndMemory(ref.watch(userDataProvider.notifier).userData["userDocId"]!);
     await ref.read(masterDataProvider.notifier).readMasterDataFromFirebaseToHiveAndMemory();
+    await ref
+        .read(mainPhotoDataProvider.notifier)
+        .readMainPhotoDataFromDirectoryToMemory(ref);
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄
     await Navigator.of(context).pushReplacement(

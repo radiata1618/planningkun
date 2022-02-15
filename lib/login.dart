@@ -131,6 +131,9 @@ class LoginPage extends ConsumerWidget {
     await ref
         .read(masterDataProvider.notifier)
         .readMasterDataFromFirebaseToHiveAndMemory();
+    await ref
+        .read(mainPhotoDataProvider.notifier)
+    .readMainPhotoDataFromDirectoryToMemory(ref);
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄
     await Navigator.of(context).pushReplacement(

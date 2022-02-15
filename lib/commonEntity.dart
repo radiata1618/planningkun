@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
@@ -364,28 +365,33 @@ final friendDataProvider = ChangeNotifierProvider(
 
 
 class MainPhotoDataNotifier extends ChangeNotifier {
-  Image? _img;
-  Image? get mainPhotoData => _img ;
+  Image? _mainPhotoData;
+  Image? get mainPhotoData => _mainPhotoData ;
 
-  Future<void> readMainPhotoDataFromDirectoryToMemory() async {
+  Future<void> readMainPhotoDataFromDirectoryToMemory(WidgetRef ref) async {
+
+    String photoPath = ref.watch(userDataProvider.notifier).userData["profilePhotoPath"]!;
+    String photoFileName=photoPath.substring(photoPath.lastIndexOf('/')+1,);
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    File localFile = File("${appDocDir.path}/mainPhoto.png");
-    //TODO filenameがPNG出なかったときの対応→ファイル名をUserDataに持つ
-    _img = Image.file(localFile,width:90);
+    File localFile = File("${appDocDir.path}/"+photoFileName);
+
+    _mainPhotoData = Image.file(localFile,width:90);
   }
 
   Future<void> readMainPhotoFromFirebaseToDirectoryAndMemory(WidgetRef ref) async {
 
+    String photoPath = ref.watch(userDataProvider.notifier).userData["profilePhotoPath"]!;
+    String photoFileName=photoPath.substring(photoPath.lastIndexOf('/')+1,);
+
     FirebaseStorage storage =  FirebaseStorage.instance;
-    Reference imageRef =  storage.ref().child("profile").child(ref.watch(userDataProvider.notifier).userData["userDocId"]!).child("mainPhoto.png");
-    //TODO filenameがPNG出なかったときの対応→ファイル名をUserDataに持つ
+    Reference imageRef =  storage.ref().child("profile").child(ref.watch(userDataProvider.notifier).userData["userDocId"]!).child(photoFileName);
     String imageUrl = await imageRef.getDownloadURL();
 
-    _img = Image.network(imageUrl,width:90);
+    _mainPhotoData = Image.network(imageUrl,width:90);
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File("${appDocDir.path}/mainPhoto.png");
+    File downloadToFile = File("${appDocDir.path}/"+photoFileName);
     notifyListeners();
     try {
       await imageRef.writeToFile(downloadToFile);
@@ -394,31 +400,49 @@ class MainPhotoDataNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> uploadAndInsertPhoto(File? imageFile,WidgetRef ref) async{
+  Future<void> uploadAndInsertPhoto(File imageFile,WidgetRef ref) async{
 
-    _img=Image.file(imageFile!);
+    _mainPhotoData=Image.file(imageFile);
 
+    //TODO  　圧縮版の画像を別で持つ
+    String pathStr= imageFile.path;
+    String pathStrEx=pathStr.substring(pathStr.lastIndexOf('.'),);
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
-      await storage.ref("profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png").putFile(imageFile);
-      //TODO 拡張子はPNGとは限らない。
+      await storage.ref("profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto"+pathStrEx).putFile(imageFile);
+
+      //ローカルに保存
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      File downloadToFile = File("${appDocDir.path}/"+"mainPhoto"+pathStrEx);
+      await downloadToFile.writeAsBytes(await imageFile.readAsBytes());
 
       await FirebaseFirestore.instance.collection('users').doc(ref.watch(userDataProvider.notifier).userData["userDocId"]!)
           .update({"profilePhotoUpdateCnt": (int.parse(ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]!)+1).toString(),
-        "profilePhotoPath": "profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png"
+        "profilePhotoPath": "profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto"+pathStrEx
       });
 
 
       var box = await Hive.openBox('record');
       ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]=(int.parse(ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]!)+1).toString();
-      ref.watch(userDataProvider.notifier).userData["profilePhotoPath"]="profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png";
+      ref.watch(userDataProvider.notifier).userData["profilePhotoPath"]="profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto"+pathStrEx;
       await box.put("profilePhotoUpdateCnt",(int.parse(ref.watch(userDataProvider.notifier).userData["profilePhotoUpdateCnt"]!)+1).toString());
-      await box.put("profilePhotoPath","profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto.png");
+      await box.put("profilePhotoPath","profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto"+pathStrEx);
 
       box.close();
+
+    var result = await FlutterImageCompress.compressAndGetFile(
+      "${appDocDir.path}/"+"mainPhoto"+pathStrEx,
+      "${appDocDir.path}/"+"mainPhoto_small"+pathStrEx,
+    quality: 40,
+    );
+
+      File localSmallFile = File("${appDocDir.path}/"+"mainPhoto_small"+pathStrEx);
+      await storage.ref("profile/" + ref.watch(userDataProvider.notifier).userData["userDocId"]! + "/mainPhoto_small"+pathStrEx).putFile(localSmallFile);
+
     } catch (e) {
       print(e);
     }
+
 
     notifyListeners();
   }
