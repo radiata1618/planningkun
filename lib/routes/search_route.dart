@@ -134,7 +134,10 @@ class Search extends ConsumerWidget {
         child:Row(
           children:[
             Container(
-              child:CircleAvatar(radius:32),
+              child:CircleAvatar(radius:32,
+            backgroundImage:ref.watch(SearchResultProvider).friendImage[userData.data["objectID"]] ==null
+            ? null
+            : ref.watch(SearchResultProvider).friendImage[userData.data["objectID"]]!.image,),
                   width:80
             ),
             Expanded(

@@ -87,7 +87,8 @@ class FriendProfile extends ConsumerWidget {
 
   Padding linePadding(WidgetRef ref,String displayedItem, String databaseItem) {
 
-    String value=(ref.watch(friendProfileDataProvider).friendProfileData == null)
+    //TODO プロフィールを見た後、すぐに他のユーザのプロフィールを見ると前のデータが残っている。→フレンドプロフィールをクリアする処理が必要というか、Riverpodで持つべきでない？
+    String value=(ref.watch(friendProfileDataProvider).friendProfileData[databaseItem] == null)
         ? ""
         : ref.watch(friendProfileDataProvider).friendProfileData[databaseItem];
     //valueType:String or int or selectString(セグメント)

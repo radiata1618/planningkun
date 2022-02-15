@@ -1,4 +1,5 @@
 import 'package:algolia/algolia.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,7 +16,11 @@ final SearchResultProvider = ChangeNotifierProvider(
 
 class SearchResultNotifier extends ChangeNotifier {
   List<AlgoliaObjectSnapshot> _searchResultList=[];
-  List<AlgoliaObjectSnapshot> get searchResultList => _searchResultList;
+  get searchResultList => _searchResultList;
+
+
+  Map<String,Image?> _friendImage={};
+  get friendImage => _friendImage;
 
   Future<void> userSearch(WidgetRef ref)async {
 
@@ -49,8 +54,34 @@ class SearchResultNotifier extends ChangeNotifier {
     snap = await query.getObjects();
 
     _searchResultList=snap.hits;
+    await setFriendPhoto();
     notifyListeners();
 
   }
+
+  Future<void> setFriendPhoto()async {
+    _friendImage.clear();
+    FirebaseStorage storage =  FirebaseStorage.instance;
+
+    for(int i=0;i<_searchResultList.length;i++){
+      String photoPath=_searchResultList[i].data["profilePhotoPath"];
+
+      try {
+
+        Reference imageRef = storage.ref().child("profile").child(
+            _searchResultList[i].data["objectID"]!).child("mainPhoto_small."+photoPath.substring(photoPath.lastIndexOf('.') + 1,));
+        String imageUrl = await imageRef.getDownloadURL();
+
+
+          _friendImage[_searchResultList[i].data["objectID"]!] =Image.network(imageUrl, width: 90);
+
+      }catch(e){
+        _friendImage[_searchResultList[i].data["objectID"]!] =null;
+
+      }
+
+    }
+
+}
 
 }
