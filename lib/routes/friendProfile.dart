@@ -86,7 +86,7 @@ class FriendProfile extends ConsumerWidget {
                           await Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) {
                               return Chat(
-                                  argumentFriendUserDocId:
+                                  friendUserDocId:
                                       argumentFriendUserDocId);
                             }),
                           );
@@ -110,7 +110,7 @@ class FriendProfile extends ConsumerWidget {
                           await Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) {
                               return Chat(
-                                  argumentFriendUserDocId:
+                                  friendUserDocId:
                                       argumentFriendUserDocId);
                             }),
                           );

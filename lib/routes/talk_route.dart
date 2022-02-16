@@ -28,7 +28,7 @@ class Talk extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Chat(argumentFriendUserDocId:friendUserDocId),
+        builder: (context) => Chat(friendUserDocId:friendUserDocId),
       ),
     );
   }
@@ -39,6 +39,7 @@ class Talk extends ConsumerWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenAdjustSizeH = MediaQuery.of(context).size.height * 0.0011;
 
+    //TODO firebase からではなく、メモリから読み出すように修正
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('friends')
@@ -67,7 +68,16 @@ class Talk extends ConsumerWidget {
                       children: [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 15*screenAdjustSizeH),
-                          child: CircleAvatar(radius: 35*screenAdjustSizeH),
+                          child: CircleAvatar(radius: 35*screenAdjustSizeH,
+                              backgroundImage: ref
+                              .watch(friendDataProvider)
+                              .friendPhotoData[data['friendUserDocId']] ==
+                              null
+                              ? null
+                              : ref
+                                  .watch(friendDataProvider)
+                                  .friendPhotoData[data['friendUserDocId']]!
+                              .image),
                         ),
                         Column(children: [
                           Container(

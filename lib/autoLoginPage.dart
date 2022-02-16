@@ -58,7 +58,7 @@ class AutoLoginPage extends ConsumerWidget  {
     var box = await Hive.openBox('record');
     await ref.read(userDataProvider.notifier).readUserDataFirebaseToHiveAndMemoryByEmail(await box.get("email"));
     //TODO 本来はUserDocIdをキーにデータを持ってくる。
-    await ref.read(friendDataProvider.notifier).readFriendDataFromFirebaseToHiveAndMemory(ref.watch(userDataProvider.notifier).userData["userDocId"]!);
+    await ref.read(friendDataProvider.notifier).readFriendDataFromFirebaseToHiveAndMemory(ref,ref.watch(userDataProvider.notifier).userData["userDocId"]!);
     await ref.read(masterDataProvider.notifier).readMasterDataFromFirebaseToHiveAndMemory();
     await ref
         .read(mainPhotoDataProvider.notifier)

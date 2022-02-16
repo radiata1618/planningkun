@@ -3,16 +3,17 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:planningkun/routes/friendProfile.dart';
 
 import 'commonEntity.dart';
 import 'join_channel_video.dart';
 import 'confirmCall.dart';
 
 class Chat extends ConsumerWidget {
-  var argumentFriendUserDocId;
+  var friendUserDocId;
 
   Chat({
-    required this.argumentFriendUserDocId,
+    required this.friendUserDocId,
     Key? key,
   }) : super(key: key);
 
@@ -23,7 +24,7 @@ class Chat extends ConsumerWidget {
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
       'userDocId': ref.watch(userDataProvider).userData["userDocId"]!,
-      'oppositeUserDocId':argumentFriendUserDocId ,
+      'oppositeUserDocId':friendUserDocId ,
       'receiveSend': "send",
       'sendTime': DateTime.now().toString(),
       'messageType':"chat",
@@ -35,7 +36,7 @@ class Chat extends ConsumerWidget {
 
     FirebaseFirestore.instance.collection('messages').add({
       'content': messageContent,
-      'userDocId': argumentFriendUserDocId,
+      'userDocId': friendUserDocId,
       'oppositeUserDocId': ref.watch(userDataProvider).userData["userDocId"]!,
       'receiveSend': "receive",
       'sendTime': DateTime.now().toString(),
@@ -58,7 +59,7 @@ class Chat extends ConsumerWidget {
 
     final Stream<QuerySnapshot> _callStream = FirebaseFirestore.instance
         .collection('calls')
-        .where('sender', isEqualTo: argumentFriendUserDocId)
+        .where('sender', isEqualTo: friendUserDocId)
         .where('receiver', isEqualTo: ref.watch(userDataProvider).userData["userDocId"]!)
         .where('status', isEqualTo: "yet")
         .snapshots();
@@ -69,7 +70,7 @@ class Chat extends ConsumerWidget {
         await Navigator.of(context).push(
           MaterialPageRoute(builder: (context) {
             return confirmCall(
-              argumentFriendUserDocId: argumentFriendUserDocId,
+              argumentFriendUserDocId: friendUserDocId,
               argumentChannelId: snapshot.docs[0].id,
             );
           }),
@@ -81,13 +82,31 @@ class Chat extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+          leading: IconButton(
+            icon: CircleAvatar(
+              backgroundImage: ref.watch(friendDataProvider).friendPhotoData[friendUserDocId] ==null
+                  ? null
+                  : ref.watch(friendDataProvider).friendPhotoData[friendUserDocId]!.image,
+              backgroundColor: Colors.transparent, // 背景色
+              radius: 16, // 表示したいサイズの半径を指定
+            ),
+            onPressed:()async{
+              await Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return FriendProfile(
+                    argumentFriendUserDocId:friendUserDocId,
+                  );
+                }),
+              );
+            },
+          ),
         backgroundColor: Theme.of(context).canvasColor,
         elevation: .6,
         title: Container(
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                ref.watch(friendDataProvider).friendData[argumentFriendUserDocId]![
+                ref.watch(friendDataProvider).friendData[friendUserDocId]![
                     "friendUserName"]!,
                 style: TextStyle(color: Colors.black87),
               ),
@@ -104,7 +123,7 @@ class Chat extends ConsumerWidget {
                               MaterialPageRoute(builder: (context) {
                                 return JoinChannelVideo(
                                   argumentChannelId: "",
-                                  argumentFriendUserDocId: argumentFriendUserDocId,
+                                  argumentFriendUserDocId: friendUserDocId,
                                 );
                               }),
                             );
@@ -126,7 +145,7 @@ class Chat extends ConsumerWidget {
             child: Column(
               children: <Widget>[
                 buildMessageList(ref.watch(userDataProvider).userData["userDocId"]!,
-                    argumentFriendUserDocId),
+                    friendUserDocId),
               ],
             ),
           ),

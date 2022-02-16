@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'commonLogic.dart';
 import 'commonUI.dart';
 import 'rootWidget.dart';
 import 'commonEntity.dart';
@@ -124,12 +125,13 @@ class LoginPage extends ConsumerWidget {
 
   Future<void> loginCommonProcess(
       BuildContext context, WidgetRef ref, String email) async {
+    await initialProcessLogic();
     await ref
         .read(userDataProvider.notifier)
         .readUserDataFirebaseToHiveAndMemoryByEmail(email);
     await ref
         .read(friendDataProvider.notifier)
-        .readFriendDataFromFirebaseToHiveAndMemory(
+        .readFriendDataFromFirebaseToHiveAndMemory(ref,
             ref.watch(userDataProvider).userData["userDocId"]!);
     await ref
         .read(masterDataProvider.notifier)
