@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 
 import '../firebase_config.dart';
-import '../commonEntity.dart';
+import '../commonEntity/commonEntity.dart';
 
 class SearchConditionValueEdit extends StatefulWidget {
   Map<String, String>  argumentUserData;

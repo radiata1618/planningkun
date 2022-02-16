@@ -6,8 +6,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'commonEntity/friendEntity.dart';
+import 'commonEntity/masterEntity.dart';
+import 'commonEntity/userData.dart';
 import 'rootWidget.dart';
-import 'commonEntity.dart';
+import 'commonEntity/commonEntity.dart';
 
 
 class AutoLoginPage extends ConsumerWidget  {

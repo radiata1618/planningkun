@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/myPage_route.dart';
 
+import 'commonEntity/friendEntity.dart';
+import 'commonEntity/masterEntity.dart';
+import 'commonEntity/userData.dart';
 import 'routes/myPage_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/search_route.dart';
 import 'routes/topic_route.dart';
 import 'routes/now_route.dart';
-import 'commonEntity.dart';
+import 'commonEntity/commonEntity.dart';
 import 'rootWidgetEntity.dart';
 import 'dart:core';
 

@@ -3,10 +3,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'commonLogic.dart';
+import 'commonEntity/friendEntity.dart';
+import 'commonEntity/masterEntity.dart';
+import 'commonEntity/userData.dart';
+import 'commonLogic/commonLogic.dart';
 import 'commonUI.dart';
 import 'rootWidget.dart';
-import 'commonEntity.dart';
+import 'commonEntity/commonEntity.dart';
 
 class LoginPage extends ConsumerWidget {
   LoginPage({

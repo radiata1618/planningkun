@@ -7,7 +7,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //import 'package:agora_rtc_engine_example/config/agora.config.dart' as config;
-import 'commonEntity.dart';
+import 'commonEntity/commonEntity.dart';
+import 'commonEntity/friendEntity.dart';
+import 'commonEntity/userData.dart';
 import 'config/agora.config.dart' as config;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

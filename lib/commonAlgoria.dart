@@ -1,7 +1,7 @@
 import 'package:algolia/algolia.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'commonEntity.dart';
+import 'commonEntity/userData.dart';
+import 'commonLogic/commonLogic.dart';
 
 class Application {
   static final Algolia algolia = Algolia.init(

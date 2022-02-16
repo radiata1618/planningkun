@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/friendProfile.dart';
 
-import 'commonEntity.dart';
+import 'commonEntity/commonEntity.dart';
+import 'commonEntity/friendEntity.dart';
+import 'commonEntity/userData.dart';
 import 'join_channel_video.dart';
 import 'confirmCall.dart';
 

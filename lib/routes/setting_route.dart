@@ -1,9 +1,11 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:planningkun/commonEntity/masterEntity.dart';
+import 'package:planningkun/commonEntity/userData.dart';
 import 'package:planningkun/routes/settingEditPage.dart';
 import 'package:flutter/material.dart';
 
-import '../commonEntity.dart';
+import '../commonEntity/commonEntity.dart';
 
 
 class Setting extends ConsumerWidget {

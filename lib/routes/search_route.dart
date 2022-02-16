@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/search_routeEntity.dart';
 
-import '../commonEntity.dart';
+import '../commonEntity/commonEntity.dart';
 import '../commonUI.dart';
 import 'friendProfile.dart';
 import 'SearchConditionPage.dart';
