@@ -22,6 +22,10 @@ class SearchResultNotifier extends ChangeNotifier {
   Map<String,Image?> _friendImage={};
   get friendImage => _friendImage;
 
+  void clear(){
+    _searchResultList=[];
+    _friendImage={};
+  }
   Future<void> userSearch(WidgetRef ref)async {
 
     Algolia algolia = Application.algolia;

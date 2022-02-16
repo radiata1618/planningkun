@@ -24,13 +24,10 @@ class Search extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    if(searchProcessFlg==true) {
-      searchProcessFlg=false;
-      ref.watch(SearchResultProvider.notifier).userSearch(ref);
-    }
+
 
     return Scaffold(
-        appBar: whiteAppbar(text:'Search'),
+        appBar: whiteAppbar(text:(ref.watch(SearchResultProvider).searchResultList==null)?"Search":"Search"),//
         body: SafeArea(
             child:Padding(padding:const EdgeInsets.only(top:14,left:14,right:14,bottom:10),
               child:Column(
@@ -89,7 +86,6 @@ class Search extends ConsumerWidget {
                               alignment:Alignment.center,
                               child:GestureDetector(
                                   onTap: () async{
-
                                     ref.watch(SearchResultProvider.notifier).userSearch(ref);
                                   },
                                   child: Icon(
@@ -103,13 +99,7 @@ class Search extends ConsumerWidget {
                       )
                     ),
                   ),
-                Expanded(
-                    child:ListView.builder(
-                        itemCount:ref.watch(SearchResultProvider).searchResultList.length,
-                        itemBuilder:(BuildContext context,int index){
-                          return userResultList( context,  ref,ref.watch(SearchResultProvider).searchResultList[index]);
-                        }
-                ))
+                  resultBody(ref)
                 ]
               )
             )
@@ -117,7 +107,32 @@ class Search extends ConsumerWidget {
     );
   }
 
+  Widget resultBody(WidgetRef ref){
+
+    if(searchProcessFlg==true) {
+      searchProcessFlg=false;
+      ref.watch(SearchResultProvider.notifier).clear();
+      ref.watch(SearchResultProvider.notifier).userSearch(ref);
+      return Expanded(
+          child:Center(
+          child:
+      CircularProgressIndicator()
+      )
+      );
+    }else {
+
+      return Expanded(
+          child:ListView.builder(
+              itemCount:ref.watch(SearchResultProvider).searchResultList.length,
+              itemBuilder:(BuildContext context,int index){
+                return userResultList( context,  ref,ref.watch(SearchResultProvider).searchResultList[index]);
+              }
+          ));
+    }
+  }
+
   Widget userResultList(BuildContext context, WidgetRef ref,AlgoliaObjectSnapshot userData){
+
     return GestureDetector(
       onTap:()async{
         await Navigator.of(context).push(

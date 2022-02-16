@@ -3,6 +3,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../commonEntity.dart';
+
 Future<void> getFireBaseData()async {
 
 }
@@ -55,7 +57,6 @@ class FriendProfileDataNotifier extends ChangeNotifier {
         .doc(friendUserDocId)
         .get();
 
-    //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
     _friendProfileData["userDocId"] = friendUserDocId;
     _friendProfileData["name"] = docSnapShot["name"];
     _friendProfileData["email"] = docSnapShot["email"];
@@ -72,7 +73,13 @@ class FriendProfileDataNotifier extends ChangeNotifier {
     _friendProfileData["greeting"] = docSnapShot["greeting"];
     _friendProfileData["description"] = docSnapShot["description"];
     _friendProfileData["profilePhotoPath"] = docSnapShot["profilePhotoPath"];
-    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId,_friendProfileData["profilePhotoPath"]!);
+    if(ref.watch(friendDataProvider).friendData[friendUserDocId]==null){
+      _friendProfileData["friendFlg"] = "false";
+    }else{
+      _friendProfileData["friendFlg"] = "true";
+
+    }
+    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId,docSnapShot["profilePhotoPath"]);
     notifyListeners();
 
   }

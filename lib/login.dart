@@ -21,99 +21,102 @@ class LoginPage extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: <Widget>[
-                const SizedBox(height: 20),
-                Container(
-                    child: Text(
-                  "Logo",
-                  style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 90,
-                    color: Colors.black87,
-                  ),
-                )),
-                const SizedBox(height: 200),
-                borderedTextBox(
-                  text: "E-Mail",
-                  onChanged: (String value) {
-                    ref.read(emailProvider.state).update((state) => value);
-                  },
-                ),
-                const SizedBox(height: 20),
-                borderedTextBox(
-                    text: "Password(more than 6 letters)",
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: <Widget>[
+                  const SizedBox(height: 20),
+                  Container(
+                      child: Text(
+                    "Logo",
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 90,
+                      color: Colors.black87,
+                    ),
+                  )),
+                  const SizedBox(height: 200),
+                  borderedTextBox(
+                    text: "E-Mail",
                     onChanged: (String value) {
-                      ref.read(passwordProvider.state).update((state) => value);
-                    }),
-              ],
-            ),
+                      ref.read(emailProvider.state).update((state) => value);
+                    },
+                    passwordSecure:false
+                  ),
+                  const SizedBox(height: 20),
+                  borderedTextBox(
+                      text: "Password(more than 6 letters)",
+                      onChanged: (String value) {
+                        ref.read(passwordProvider.state).update((state) => value);
+                      }, passwordSecure: true),
+                ],
+              ),
 
-            Column(
-              children: <Widget>[
-                Text(infoText),
-                orangeRoundButton(
-                  text: "Sign Up",
-                  onPressed: () async {
-                    try {
-                      // メール/パスワードでユーザー登録
-                      final FirebaseAuth auth = FirebaseAuth.instance;
-                      final UserCredential result =
-                      await auth.createUserWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
+              Column(
+                children: <Widget>[
+                  Text(infoText),
+                  orangeRoundButton(
+                    text: "Sign Up",
+                    onPressed: () async {
+                      try {
+                        // メール/パスワードでユーザー登録
+                        final FirebaseAuth auth = FirebaseAuth.instance;
+                        final UserCredential result =
+                        await auth.createUserWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
 
-                      // 登録したユーザー情報
-                      ref.read(userProvider.state).update((state) => result.user);
+                        // 登録したユーザー情報
+                        ref.read(userProvider.state).update((state) => result.user);
 
-                      ref
-                          .read(infoTextProvider.state)
-                          .update((state) => "登録OK:" + ref.watch(emailProvider));
+                        ref
+                            .read(infoTextProvider.state)
+                            .update((state) => "登録OK:" + ref.watch(emailProvider));
 
-                      await ref
-                          .read(userDataProvider.notifier)
-                          .insertAndReadUserData(email);
-                      loginCommonProcess(context, ref, email);
-                    } catch (e) {
-                      // 登録に失敗した場合
+                        await ref
+                            .read(userDataProvider.notifier)
+                            .insertAndReadUserData(email);
+                        loginCommonProcess(context, ref, email);
+                      } catch (e) {
+                        // 登録に失敗した場合
 
-                      ref
-                          .read(infoTextProvider.state)
-                          .update((state) => "登録NG:${e.toString()}");
-                    }
-                  },
-                ),
-                const SizedBox(height: 8),
-                whiteBorderRoundButton(
-                  text: "Log In",
-                  onPressed: () async {
-                    try {
-                      // メール/パスワードでログイン
-                      final FirebaseAuth auth = FirebaseAuth.instance;
-                      final UserCredential result =
-                      await auth.signInWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
+                        ref
+                            .read(infoTextProvider.state)
+                            .update((state) => "登録NG:${e.toString()}");
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  whiteBorderRoundButton(
+                    text: "Log In",
+                    onPressed: () async {
+                      try {
+                        // メール/パスワードでログイン
+                        final FirebaseAuth auth = FirebaseAuth.instance;
+                        final UserCredential result =
+                        await auth.signInWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
 
-                      // ログインしたユーザー情報
-                      ref.read(userProvider.state).update((state) => result.user);
-                      loginCommonProcess(context, ref, email);
-                    } catch (e) {
-                      // ログインに失敗した場合
-                      ref
-                          .read(infoTextProvider.state)
-                          .update((state) => "ログインに失敗しました:${e.toString()}");
-                    }
-                  },
-                ),
-              ],
-            ),
-          ],
+                        // ログインしたユーザー情報
+                        ref.read(userProvider.state).update((state) => result.user);
+                        loginCommonProcess(context, ref, email);
+                      } catch (e) {
+                        // ログインに失敗した場合
+                        ref
+                            .read(infoTextProvider.state)
+                            .update((state) => "ログインに失敗しました:${e.toString()}");
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

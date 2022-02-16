@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 
-Widget borderedTextBox({required String text, Function(String)? onChanged}) {
+Widget borderedTextBox({required String text, Function(String)? onChanged,required bool passwordSecure}) {
   return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30.0),
       child: Column(children: [
@@ -10,6 +10,7 @@ Widget borderedTextBox({required String text, Function(String)? onChanged}) {
               labelText: text,
               border: OutlineInputBorder(),
             ),
+            obscureText: passwordSecure,
             onChanged: onChanged)
       ]));
 }
