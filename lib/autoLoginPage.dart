@@ -22,7 +22,33 @@ class AutoLoginPage extends ConsumerWidget  {
 
     return Scaffold(
       body: SafeArea(
-        child:Text("オートログイン")
+        child:Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children:[
+          Center(
+            child: Container(
+                child: Text(
+                  "Logo",
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 90,
+                    color: Colors.black87,
+                  ),
+                ),),
+          ),
+          const SizedBox(height: 30),
+          Center(
+            child: Container(
+              child: Text(
+                "logging in",
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 20,
+                  color: Colors.black87,
+                ),
+              ),),
+          ),
+        ])
       ),
     );
   }

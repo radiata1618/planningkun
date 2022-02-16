@@ -12,12 +12,17 @@ class FriendProfile extends ConsumerWidget {
   }) : super(key: key);
   String argumentFriendUserDocId;
   bool initialProcessFlg = true;
-  Image? friendImage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (initialProcessFlg) {
+
       initialProcessFlg = false;
+
+//一旦前回データをクリア
+      ref.read(friendProfileDataProvider.notifier)
+          .clearFriendProfileData();
+
       ref.read(friendProfileDataProvider.notifier)
           .readFriendProfileDataFromFirebase(ref,argumentFriendUserDocId);
       //TODO フレンドの場合はローカルからデータを取得
@@ -34,7 +39,7 @@ class FriendProfile extends ConsumerWidget {
                 child: CircleAvatar(
                   radius: 80,
                   backgroundColor: Colors.white,
-                  backgroundImage: friendImage==null?null:friendImage!.image
+                  backgroundImage: ref.watch(friendProfileDataProvider).friendProfilePhotoData==null?null:ref.watch(friendProfileDataProvider).friendProfilePhotoData!.image
                 ),
               ),
               SizedBox(height:10),

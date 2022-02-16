@@ -339,9 +339,9 @@ class MasterDataProvider extends ChangeNotifier {
 
   Future<void> readMasterDataFromFirebaseToHiveAndMemory() async {
 
+    var boxMaster = await Hive.openBox('master');
     await FirebaseFirestore.instance.collection('masters').get().then((QuerySnapshot snapshot)async {
 
-      var boxMaster = await Hive.openBox('master');
       await boxMaster.clear();
       masterData.clear();
 
@@ -352,8 +352,8 @@ class MasterDataProvider extends ChangeNotifier {
         masterData[doc.get('item')+"_"+doc.get('selectedValue')]=doc.get('displayedValue');
       });
 
-      await boxMaster.close();
     });
+    await boxMaster.close();
     notifyListeners();
   }
 }

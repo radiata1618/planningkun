@@ -18,14 +18,34 @@ class FriendProfileDataNotifier extends ChangeNotifier {
   Image? _friendProfilePhotoData;
   Image? get friendProfilePhotoData => _friendProfilePhotoData;
 
-  Future<void> readFriendProfilePhotoDataFromFirebaseToMemory(WidgetRef ref,String friendUserDocId) async {
+  Future<void> clearFriendProfileData() async {
+    _friendProfileData = {};
+    _friendProfilePhotoData=null;
+  }
 
-    FirebaseStorage storage =  FirebaseStorage.instance;
-        Reference imageRef =  storage.ref().child("profile").child(friendProfileData["userDocId"]!).child("mainPhoto.png");
-    //TODO filenameがPNG出なかったときの対応→ファイル名をUserDataに持つ
-    String imageUrl = await imageRef.getDownloadURL();
+  Future<void> readFriendProfilePhotoDataFromFirebaseToMemory(WidgetRef ref,String userDocId,String photoPath) async {
 
-    _friendProfilePhotoData = Image.network(imageUrl,width:90);
+    if(photoPath.contains("mainPhoto")){
+      //写真が登録されている場合
+
+      FirebaseStorage storage =  FirebaseStorage.instance;
+      try {
+
+        Reference imageRef = storage.ref().child("profile").child(userDocId).child("mainPhoto."+photoPath.substring(photoPath.lastIndexOf('.') + 1,));
+        String imageUrl =await imageRef.getDownloadURL();
+         _friendProfilePhotoData =  Image.network(imageUrl, width: 90);
+
+
+      }catch(e){
+        //写真があるはずなのになぜかエラーだった
+        _friendProfilePhotoData =null;
+
+      }
+
+    }else{
+      //写真が登録されていない場合
+      _friendProfilePhotoData =null;
+    }
   }
 
 
@@ -52,7 +72,7 @@ class FriendProfileDataNotifier extends ChangeNotifier {
     _friendProfileData["greeting"] = docSnapShot["greeting"];
     _friendProfileData["description"] = docSnapShot["description"];
     _friendProfileData["profilePhotoPath"] = docSnapShot["profilePhotoPath"];
-    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId);
+    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId,_friendProfileData["profilePhotoPath"]!);
     notifyListeners();
 
   }

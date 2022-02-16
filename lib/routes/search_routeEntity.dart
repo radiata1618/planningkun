@@ -66,19 +66,30 @@ class SearchResultNotifier extends ChangeNotifier {
     for(int i=0;i<_searchResultList.length;i++){
       String photoPath=_searchResultList[i].data["profilePhotoPath"];
 
-      try {
+      if(photoPath.contains("mainPhoto")){
+        //写真が登録されている場合
 
-        Reference imageRef = storage.ref().child("profile").child(
-            _searchResultList[i].data["objectID"]!).child("mainPhoto_small."+photoPath.substring(photoPath.lastIndexOf('.') + 1,));
-        String imageUrl = await imageRef.getDownloadURL();
+        try {
+
+          Reference imageRef = storage.ref().child("profile").child(
+              _searchResultList[i].data["objectID"]!).child("mainPhoto_small."+photoPath.substring(photoPath.lastIndexOf('.') + 1,));
+          await imageRef.getDownloadURL().then((imageUrl){
+            _friendImage[_searchResultList[i].data["objectID"]!] =Image.network(imageUrl, width: 90);
+          });
 
 
-          _friendImage[_searchResultList[i].data["objectID"]!] =Image.network(imageUrl, width: 90);
+        }catch(e){
+          //写真があるはずなのになぜかエラーだった
+          _friendImage[_searchResultList[i].data["objectID"]!] =null;
 
-      }catch(e){
+        }
+
+      }else{
+        //写真が登録されていない場合
+
         _friendImage[_searchResultList[i].data["objectID"]!] =null;
-
       }
+
 
     }
 
