@@ -1,33 +1,23 @@
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-import 'dart:io';
 
-import 'package:algolia/algolia.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-
-import 'commonEntity/commonEntity.dart';
-import 'firebase_config.dart';
+import 'config/firebase_config.dart';
 import 'autoLoginPage.dart';
-import 'database.dart';
 import 'login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
   await Hive.initFlutter();
-  Hive.registerAdapter(UserDataAdapter());
   runApp(
     ProviderScope(
       child: MyApp(),

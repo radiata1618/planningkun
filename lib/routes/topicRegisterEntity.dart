@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/userData.dart';
-import '../commonEntity/commonEntity.dart';
 
 final topicNameProvider = StateProvider.autoDispose((ref) {
   return '';
@@ -61,6 +60,8 @@ class CategoryItemsNotifier extends ChangeNotifier {
 
     notifyListeners();
   }
+
+
 }
 
 final categoryItemsProvider = ChangeNotifierProvider(
@@ -107,7 +108,11 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
         'topicName':topicName,
         'insertUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
         'insertProgramId': "topicRegister",
-        'insertTime': DateTime.now().toString(),
+        'insertTime': FieldValue.serverTimestamp().toString(),
+        'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
+        'updateProgramId': "topicRegister",
+        'updateTime': FieldValue.serverTimestamp(),
+        'deleteFlg': "false",
 
       },
     ).then((value){
@@ -124,7 +129,7 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
       "photoPath": "topics/" + insertedDocId + pathStr.substring(pathStr.lastIndexOf('.'),),
       'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
       'updateProgramId': "topicRegister",
-      'updateTime': DateTime.now().toString(),
+      'updateTime': FieldValue.serverTimestamp().toString(),
     });
 
     //TODO Hive,メモリへのデータ登録
@@ -133,3 +138,4 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
     print(e);
   }
 }
+

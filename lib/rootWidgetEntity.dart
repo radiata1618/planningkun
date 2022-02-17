@@ -43,11 +43,9 @@ class BottomNavigationBarItems extends ChangeNotifier {
         icon: Icon(
           _footerIcons[index],
         ),
-        title: Text(
+        label:
           _footerItemNames[index],
-          style: TextStyle(
-          ),
-        ));
+        );
   }
 
   BottomNavigationBarItem _UpdateDeactiveState(int index) {
@@ -55,11 +53,8 @@ class BottomNavigationBarItems extends ChangeNotifier {
         icon: Icon(
           _footerIcons[index],
         ),
-        title: Text(
-          _footerItemNames[index],
-          style: TextStyle(
-          ),
-        ));
+        label:
+          _footerItemNames[index],);
   }
 
   void activateButton(int beforeSelectedIndex, int newSelectedIndex) {

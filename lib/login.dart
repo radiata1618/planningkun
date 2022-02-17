@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/masterEntity.dart';
+import 'commonEntity/topicEntity.dart';
 import 'commonEntity/userData.dart';
 import 'commonLogic/commonLogic.dart';
 import 'commonUI.dart';
@@ -142,6 +143,11 @@ class LoginPage extends ConsumerWidget {
     await ref
         .read(mainPhotoDataProvider.notifier)
     .readMainPhotoDataFromDirectoryToMemory(ref);
+
+    await ref
+        .read(topicDataProvider.notifier)
+        .readTopicNewDataFromFirebaseToHiveAndMemory();
+
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄
     await Navigator.of(context).pushReplacement(

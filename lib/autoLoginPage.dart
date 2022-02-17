@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/masterEntity.dart';
+import 'commonEntity/topicEntity.dart';
 import 'commonEntity/userData.dart';
+import 'commonLogic/commonLogic.dart';
 import 'rootWidget.dart';
 import 'commonEntity/commonEntity.dart';
 
@@ -57,6 +59,7 @@ class AutoLoginPage extends ConsumerWidget  {
   }
 
   Future<void> autoLoginProcess(BuildContext context, WidgetRef ref)async{
+    await initialProcessLogic();
 
     var box = await Hive.openBox('record');
     await ref.read(userDataProvider.notifier).readUserDataFirebaseToHiveAndMemoryByEmail(await box.get("email"));
@@ -66,6 +69,11 @@ class AutoLoginPage extends ConsumerWidget  {
     await ref
         .read(mainPhotoDataProvider.notifier)
         .readMainPhotoDataFromDirectoryToMemory(ref);
+
+    await ref
+        .read(topicDataProvider.notifier)
+        .readTopicNewDataFromFirebaseToHiveAndMemory();
+
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄
     await Navigator.of(context).pushReplacement(
