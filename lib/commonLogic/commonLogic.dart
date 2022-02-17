@@ -7,13 +7,13 @@ import 'package:path_provider/path_provider.dart';
 
 Future<void> initialProcessLogic () async {
 
-  await makeDir("friend");
-  await makeDir("topic");
-  await makeDir("category");
-  await makeDir("chat");
+  await makeDir("friends");
+  await makeDir("topics");
+  await makeDir("categories");
+  await makeDir("chats");
 
   var boxSetting = await Hive.openBox('setting');
-  updateTimeCheck("topic",boxSetting);
+  await updateTimeCheck("topics",boxSetting);
 
   boxSetting.close();
 

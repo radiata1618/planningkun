@@ -95,6 +95,10 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
 
 
   try {
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    String pathStr= ref.watch(topicImagePhotoFileProvider.notifier).topicImagePhotoFile!.path;
+
     var firebaseUserData = await FirebaseFirestore.instance
         .collection('categories')
         .doc(ref.watch(categoryItemsProvider).selectedCategoryItem)
@@ -103,8 +107,8 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
     await FirebaseFirestore.instance.collection('topics').add(
       {'categoryDocId':ref.watch(categoryItemsProvider).selectedCategoryItem ,
         'categoryName':firebaseUserData.get("categoryName"),
-        'photoPath':'',
-        'photoUpdateCnt':'0',
+        'photoNameSuffix':pathStr.substring(pathStr.lastIndexOf('.')),
+        'photoUpdateCnt':0,
         'topicName':topicName,
         'insertUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
         'insertProgramId': "topicRegister",
@@ -112,25 +116,16 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
         'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
         'updateProgramId': "topicRegister",
         'updateTime': FieldValue.serverTimestamp(),
-        'deleteFlg': "false",
+        'deleteFlg': false,
 
       },
     ).then((value){
       insertedDocId=value.id;
     });
 
-    FirebaseStorage storage = FirebaseStorage.instance;
-    String pathStr= ref.watch(topicImagePhotoFileProvider.notifier).topicImagePhotoFile!.path;
     await storage.ref("topics/" + insertedDocId + pathStr.substring(pathStr.lastIndexOf('.'),))
         .putFile(ref.watch(topicImagePhotoFileProvider.notifier).topicImagePhotoFile!);
 
-    await FirebaseFirestore.instance.collection('topics').doc(insertedDocId)
-        .update({"photoUpdateCnt":"1",
-      "photoPath": "topics/" + insertedDocId + pathStr.substring(pathStr.lastIndexOf('.'),),
-      'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
-      'updateProgramId': "topicRegister",
-      'updateTime': FieldValue.serverTimestamp().toString(),
-    });
 
     //TODO Hive,メモリへのデータ登録
 
