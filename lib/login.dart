@@ -3,13 +3,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'commonEntity/friendEntity.dart';
-import 'commonEntity/masterEntity.dart';
-import 'commonEntity/topicEntity.dart';
-import 'commonEntity/userData.dart';
 import 'commonLogic/commonLogic.dart';
 import 'commonUI.dart';
 import 'rootWidget.dart';
+import 'loginLogic.dart';
 import 'commonEntity/commonEntity.dart';
 
 class LoginPage extends ConsumerWidget {
@@ -81,9 +78,7 @@ class LoginPage extends ConsumerWidget {
                             .read(infoTextProvider.state)
                             .update((state) => "登録OK:" + ref.watch(emailProvider));
 
-                        await ref
-                            .read(userDataProvider.notifier)
-                            .insertAndReadUserData(email);
+                        await insertUserToFirebase(email);
                         loginCommonProcess(context, ref, email);
                       } catch (e) {
                         // 登録に失敗した場合

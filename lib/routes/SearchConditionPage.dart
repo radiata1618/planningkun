@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:planningkun/commonEntity/masterEntity.dart';
-import 'package:planningkun/commonEntity/userData.dart';
+import 'package:planningkun/commonEntity/userEntity.dart';
 import '../commonEntity/commonEntity.dart';
 import 'SearchConditionValueEdit.dart';
 class SearchConditionPage extends ConsumerWidget {

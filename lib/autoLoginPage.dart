@@ -9,7 +9,7 @@ import 'package:hive/hive.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/masterEntity.dart';
 import 'commonEntity/topicEntity.dart';
-import 'commonEntity/userData.dart';
+import 'commonEntity/userEntity.dart';
 import 'commonLogic/commonLogic.dart';
 import 'rootWidget.dart';
 import 'commonEntity/commonEntity.dart';

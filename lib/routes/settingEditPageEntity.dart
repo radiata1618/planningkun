@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:core';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:planningkun/commonEntity/userData.dart';
+import 'package:planningkun/commonEntity/userEntity.dart';
 
 import '../commonEntity/commonEntity.dart';
 

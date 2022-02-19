@@ -7,7 +7,7 @@ import 'package:planningkun/routes/friendProfile.dart';
 
 import 'commonEntity/commonEntity.dart';
 import 'commonEntity/friendEntity.dart';
-import 'commonEntity/userData.dart';
+import 'commonEntity/userEntity.dart';
 import 'join_channel_video.dart';
 import 'confirmCall.dart';
 

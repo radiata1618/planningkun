@@ -1,6 +1,6 @@
 import 'package:algolia/algolia.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'commonEntity/userData.dart';
+import 'commonEntity/userEntity.dart';
 import 'commonLogic/commonLogic.dart';
 
 class Application {

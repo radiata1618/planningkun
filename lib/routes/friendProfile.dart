@@ -6,6 +6,7 @@ import '../chat.dart';
 import '../commonEntity/commonEntity.dart';
 import '../commonUI.dart';
 import 'friendProfileEntity.dart';
+import 'friendProfileLogic.dart';
 
 class FriendProfile extends ConsumerWidget {
   FriendProfile({
@@ -105,9 +106,7 @@ class FriendProfile extends ConsumerWidget {
                       )
                     : ElevatedButton(
                         onPressed: () async {
-                          await ref
-                              .read(friendDataProvider.notifier)
-                              .insertFriend(ref, argumentFriendUserDocId);
+                          await insertFriend(ref, argumentFriendUserDocId);
 
                           await Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) {

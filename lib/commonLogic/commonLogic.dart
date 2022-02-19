@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../commonEntity/friendEntity.dart';
 import '../commonEntity/masterEntity.dart';
 import '../commonEntity/topicEntity.dart';
-import '../commonEntity/userData.dart';
+import '../commonEntity/userEntity.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await makeDir("friends");
@@ -20,6 +20,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   var boxSetting = Hive.box('setting');
   await updateTimeCheck("topics", boxSetting);
   await updateTimeCheck("friends", boxSetting);
+  await updateTimeCheck("user", boxSetting);
 
   //TODO　Hive→メモリは同期処理でやる。
   //TODO Firebase→メモリは非同期処理で良いと思う
@@ -84,6 +85,12 @@ Future<void> openHiveBoxes() async {
     Hive.box("friends");
   } catch (e) {
     await Hive.openBox("friends");
+  }
+
+  try {
+    Hive.box("user");
+  } catch (e) {
+    await Hive.openBox("user");
   }
 }
 

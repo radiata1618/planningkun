@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:planningkun/commonEntity/userData.dart';
+import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/routes/setting_route.dart';
 import '../commonEntity/commonEntity.dart';
 import '../commonEntity/topicEntity.dart';

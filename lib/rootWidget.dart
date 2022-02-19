@@ -5,7 +5,7 @@ import 'package:planningkun/routes/myPage_route.dart';
 
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/masterEntity.dart';
-import 'commonEntity/userData.dart';
+import 'commonEntity/userEntity.dart';
 import 'routes/myPage_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/search_route.dart';

@@ -6,7 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:planningkun/commonEntity/friendEntity.dart';
 
 import '../commonEntity/commonEntity.dart';
-import '../commonEntity/userData.dart';
+import '../commonEntity/userEntity.dart';
 
 Future<void> getFireBaseData()async {
 
@@ -89,71 +89,3 @@ class FriendProfileDataNotifier extends ChangeNotifier {
 
 }
 
-
-Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
-
-  String insertedDocId="";
-  DocumentSnapshot<Map<String, dynamic>>firebaseUserData = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(friendUserDocId)
-      .get();
-
-  //相手側のFriendデータもFirebaseのみに作成する
-  FirebaseFirestore.instance.collection('friends').add(
-    {'userDocId':friendUserDocId,
-      'friendUserDocId': ref.watch(userDataProvider).userData["userDocId"],
-      'friendUserName': ref.watch(userDataProvider).userData["name"],
-      'profilePhotoPath':ref.watch(userDataProvider).userData["profilePhotoPath"] ,
-      'profilePhotoUpdateCnt': ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"] ,
-      'lastMessageContent': "",
-      'lastMessageDocId': "",
-      'lastTime': DateTime.now().toString(),
-      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
-      'insertProgramId': "friendProfile",
-      'insertTime': DateTime.now().toString(),
-    },
-  );
-
-  FirebaseFirestore.instance.collection('friends').add(
-    {'userDocId':ref.watch(userDataProvider).userData["userDocId"] ,
-      'friendUserDocId': friendUserDocId,
-      'friendUserName': firebaseUserData["name"] ,
-      'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
-      'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"] ,
-      'lastMessageContent': "",
-      'lastMessageDocId': "",
-      'lastTime': DateTime.now().toString(),
-      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
-      'insertProgramId': "friendProfile",
-      'insertTime': DateTime.now().toString(),
-    },
-  ).then((value){
-    insertedDocId=value.id;
-  });
-
-  var friendBox = await Hive.openBox('friend');
-  await friendBox.put(friendUserDocId,{
-    'friendUserDocId': insertedDocId,
-    'friendUserName': firebaseUserData["name"],
-    'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
-    'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"] ,
-    'lastMessageContent': "",
-    'lastMessageDocId': "",
-    'lastTime': DateTime.now().toString(),
-  });
-  await friendBox.close();
-
-  ref.watch(friendDataProvider).friendData[friendUserDocId]={
-    'friendUserDocId': insertedDocId,
-    'friendUserName': firebaseUserData["name"],
-    'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
-    'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"],
-    'lastMessageContent': "",
-    'lastMessageDocId': "",
-    'lastTime': DateTime.now().toString(),
-  };
-
-
-  await readFriendPhotoFromFirebaseToDirectoryAndMemory(ref,friendUserDocId);
-
-}

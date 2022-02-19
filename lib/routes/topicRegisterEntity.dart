@@ -4,7 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:planningkun/commonEntity/userData.dart';
+import 'package:planningkun/commonEntity/userEntity.dart';
 
 final topicNameProvider = StateProvider.autoDispose((ref) {
   return '';
