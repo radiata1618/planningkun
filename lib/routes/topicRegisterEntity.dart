@@ -96,7 +96,7 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
 
   try {
 
-    FirebaseStorage storage = FirebaseStorage.instance;
+    FirebaseStorage storage =FirebaseStorage.instance;
     String pathStr= ref.watch(topicImagePhotoFileProvider.notifier).topicImagePhotoFile!.path;
 
     var firebaseUserData = await FirebaseFirestore.instance
@@ -116,6 +116,7 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
         'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
         'updateProgramId': "topicRegister",
         'updateTime': FieldValue.serverTimestamp(),
+        'readableFlg': false,
         'deleteFlg': false,
 
       },
@@ -126,8 +127,17 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
     await storage.ref("topics/" + insertedDocId + pathStr.substring(pathStr.lastIndexOf('.'),))
         .putFile(ref.watch(topicImagePhotoFileProvider.notifier).topicImagePhotoFile!);
 
+    await FirebaseFirestore.instance
+        .collection('topics')
+        .doc(insertedDocId)
+        .update({
+      'readableFlg': true,
+      'photoUpdateCnt':1,
+      'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
+      'updateProgramId': "topicRegister",
+      'updateTime': FieldValue.serverTimestamp(),
+    });
 
-    //TODO Hive,メモリへのデータ登録
 
   } catch (e) {
     print(e);
