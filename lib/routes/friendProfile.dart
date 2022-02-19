@@ -89,8 +89,9 @@ class FriendProfile extends ConsumerWidget {
                           await Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) {
                               return Chat(
-                                  friendUserDocId:
-                                      argumentFriendUserDocId);
+                                  friendUserDocId:argumentFriendUserDocId
+                                  ,friendUserName:ref.watch(friendProfileDataProvider).friendProfileData["name"]
+                              );
                             }),
                           );
                         },
@@ -111,8 +112,8 @@ class FriendProfile extends ConsumerWidget {
                           await Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) {
                               return Chat(
-                                  friendUserDocId:
-                                      argumentFriendUserDocId);
+                                  friendUserDocId:argumentFriendUserDocId
+                                  ,friendUserName:ref.watch(friendProfileDataProvider).friendProfileData["name"]);
                             }),
                           );
                         },

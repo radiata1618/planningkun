@@ -4,18 +4,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/friendProfile.dart';
-
-import 'commonEntity/commonEntity.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/userEntity.dart';
 import 'join_channel_video.dart';
 import 'confirmCall.dart';
 
 class Chat extends ConsumerWidget {
-  var friendUserDocId;
+  String friendUserDocId;
+  String friendUserName;
+  Image? friendPhoto;
 
   Chat({
     required this.friendUserDocId,
+    required this.friendUserName,
+    this.friendPhoto,
     Key? key,
   }) : super(key: key);
 
@@ -108,7 +110,9 @@ class Chat extends ConsumerWidget {
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                ref.watch(friendDataProvider).friendData[friendUserDocId]![
+              ref.watch(friendDataProvider).friendData[friendUserDocId]==null
+            ?friendUserName
+          :ref.watch(friendDataProvider).friendData[friendUserDocId]![
                     "friendUserName"]!,
                 style: TextStyle(color: Colors.black87),
               ),

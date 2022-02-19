@@ -9,7 +9,7 @@ Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
       .collection('users')
       .doc(friendUserDocId)
       .get();
-
+//TODO データ登録直前にすでにフレンドデータがないかチェックする。
   //相手側のFriendデータもFirebaseのみに作成する
   FirebaseFirestore.instance.collection('friends').add(
     {'userDocId':friendUserDocId,

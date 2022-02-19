@@ -7,7 +7,6 @@ import 'package:planningkun/commonEntity/friendEntity.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
 
 import '../chat.dart';
-import '../commonEntity/commonEntity.dart';
 import '../commonUI.dart';
 
 class Talk extends ConsumerWidget {
@@ -30,7 +29,8 @@ class Talk extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Chat(friendUserDocId:friendUserDocId),
+        builder: (context) => Chat(friendUserDocId:friendUserDocId
+            ,friendUserName:""),
       ),
     );
   }

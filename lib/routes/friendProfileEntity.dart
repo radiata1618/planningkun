@@ -18,7 +18,7 @@ class FriendProfileDataNotifier extends ChangeNotifier {
   get friendProfileData => _friendProfileData;
 
   Image? _friendProfilePhotoData;
-  Image? get friendProfilePhotoData => _friendProfilePhotoData;
+  get friendProfilePhotoData => _friendProfilePhotoData;
 
   Future<void> clearFriendProfileData() async {
     _friendProfileData = {};
