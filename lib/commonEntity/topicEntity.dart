@@ -55,11 +55,19 @@ class TopicDataNotifier extends ChangeNotifier {
   }
 
   Future<void> readTopicFromHiveToMemory() async {
+    //データリセット
+    _topicData ={};
+    _topicPhotoData = {};
 
     var boxTopic = Hive.box('topics');
-    List list = boxTopic.values.toList();
-    log(list.toString());
-    //TODO 作成中
+    Map <dynamic,dynamic> tmpBoxTopicData= boxTopic.toMap();
+    for (var key in tmpBoxTopicData.keys) {
+    _topicData[key]=new Map<String,dynamic>.from(tmpBoxTopicData[key]);
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+      _topicPhotoData[key] = Image.file(File("${appDocDir.path}/topics/" + key + _topicData[key]!["photoNameSuffix"]));
+
+    }
+    log("XXXXXX after cast Map data");
 
   }
 
