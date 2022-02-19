@@ -24,7 +24,6 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
   //TODO　Hive→メモリは同期処理でやる。
   //TODO Firebase→メモリは非同期処理で良いと思う
-  //TODO 本来はUserDocIdをキーにデータを持ってくる。
 
   await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
@@ -39,7 +38,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
       .readMasterDataFromFirebaseToHiveAndMemory();
 
   ref.read(userDataProvider.notifier)
-      .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("userDocId"));
+      .controlStreamOfReadUserDataFirebaseToHiveAndMemory("haruki.u@gmail.com");//boxSetting.get("email")
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();

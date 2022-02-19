@@ -49,7 +49,7 @@ Future<void> insertUserToFirebase(String email) async {
       });
 
     var box= await Hive.openBox("setting");
-    box.put("userDocId",insertedDocId);
+    box.put("email",email);
 
   }
 }

@@ -52,9 +52,9 @@ class UserDataProviderNotifier extends ChangeNotifier {
     ];
 
 
-  Stream<DocumentSnapshot>? _callStream;
+  Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
-  StreamSubscription<DocumentSnapshot>? streamSub;
+  StreamSubscription<QuerySnapshot>? streamSub;
 
   Future<void> readMainPhotoDataFromDirectoryToMemory() async {
 
@@ -119,6 +119,7 @@ class UserDataProviderNotifier extends ChangeNotifier {
     }else{
       //2回目以降は新しいデータを更新するたびに起動
       controller.stream.listen((value)  async{
+        log("XXXXXXXXXXXXXCANCELする");
         streamSub!.cancel();
         streamSub=await readUserDataFirebaseToHiveAndMemory(userDocId);
       });
@@ -126,37 +127,58 @@ class UserDataProviderNotifier extends ChangeNotifier {
 
   }
 
-  Future<StreamSubscription<DocumentSnapshot>> readUserDataFirebaseToHiveAndMemory(String userDocId) async {
-    _callStream =  (FirebaseFirestore.instance
+  Future<StreamSubscription<QuerySnapshot>> readUserDataFirebaseToHiveAndMemory(String email) async {
+    var boxSetting = Hive.box('setting');
+    var boxUser = Hive.box('user');
+    DateTime userUpdatedTime = await boxSetting.get("userUpdateCheck");
+
+    log("XXXXXXXXXXXXXXXXXXXXXXXXクエリ用日付"+userUpdatedTime.toString());
+    _callStream = FirebaseFirestore.instance
         .collection('users')
-        .doc(userDocId).snapshots());
+        .where('email',isEqualTo: email)
+        .where('updateTime',
+        isGreaterThan: Timestamp.fromDate(userUpdatedTime))
+        .where('readableFlg', isEqualTo: true)
+        .snapshots();
 
-    streamSub=_callStream!.listen((DocumentSnapshot documentSnapshot) async {
-      var box = Hive.box('setting');
-      DateTime userUpdatedTime = box.get("userUpdateCheck");
+    StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
 
-      if (documentSnapshot.get("updateTime").toDate().isAfter(userUpdatedTime)) {
+      log("XXXXXXXXXXXXXXXXXXXXXXXXListen処理開始　Size"+snapshot.size.toString());
+      if (snapshot.size != 0) {
 
-        if(_userData["profilePhotoUpdateCnt"]<documentSnapshot.get("profilePhotoUpdateCnt")) { //自デバイス以外で写真が更新された場合は写真をDL
+        log("XXXXXXXXXXXXXXXXXXXXXXXXUserDataprofilePhotoUpdateCnt"+_userData["profilePhotoUpdateCnt"].toString());
+        log("XXXXXXXXXXXXXXXXXXXXXXXXUserFFprofilePhotoUpdateCnt"+snapshot.docs[0].get("profilePhotoUpdateCnt").toString());
+        if (_userData["profilePhotoUpdateCnt"] < snapshot.docs[0].get(
+            "profilePhotoUpdateCnt")) { //自デバイス以外で写真が更新された場合は写真をDL
           await readMainPhotoFromFirebaseToDirectoryAndMemory();
         }
-        await box.put("userDocId", userDocId);
-        _userData["userDocId"] = userDocId;
+        await boxUser.put("userDocId", snapshot.docs[0].id);
+        _userData["userDocId"] = snapshot.docs[0].id;
 
-        for(int i=0;i<itemNameList.length;i++){
-          _userData[itemNameList[i]] = documentSnapshot.get(itemNameList[i]);
-          await box.put(itemNameList[i], documentSnapshot.get(itemNameList[i]));
+        for (int i = 0; i < itemNameList.length; i++) {
+          if (itemNameList[i] == "updateTime" ||
+              itemNameList[i] == "insertTime") {
+            _userData[itemNameList[i]] = snapshot.docs[0].get(itemNameList[i]).toDate();
+            await boxUser.put(
+                itemNameList[i], snapshot.docs[0].get(itemNameList[i]).toDate());
+          } else {
+            _userData[itemNameList[i]] = snapshot.docs[0].get(itemNameList[i]);
+            await boxUser.put(itemNameList[i], snapshot.docs[0].get(itemNameList[i]));
+          }
         }
-        await box.put("topicsUpdateCheck", documentSnapshot.get("updateTime").toDate());
-      }
 
-      log("XXXXXXXXXXXXXADDするUSER用");
-      controller.sink.add(true);
-      log("XXXXXXXXXXXXXADDしたUSER用");
-      notifyListeners();
+        log("XXXXXXXXXXXXXXXXXXXXXXXX日付セット前　ID"+snapshot.docs[0].id);
+        log("XXXXXXXXXXXXXXXXXXXXXXXX日付セット　SnapshotDocsDate"+snapshot.docs[0].get("updateTime").toDate().toString());
+        await boxSetting.put("userUpdateCheck", snapshot.docs[0].get("updateTime").toDate());
+
+        log("XXXXXXXXXXXXXADDするUSER用");
+        controller.sink.add(true);
+        log("XXXXXXXXXXXXXADDしたUSER用");
+        notifyListeners();
+      }
     });
 
-    return streamSub!;
+    return streamSub;
 
   }
 

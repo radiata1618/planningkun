@@ -130,7 +130,7 @@ class TopicDataNotifier extends ChangeNotifier {
         .snapshots();
 
 
-    streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
+    StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
       if (snapshot.size != 0) {
         log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
 
@@ -187,7 +187,7 @@ class TopicDataNotifier extends ChangeNotifier {
       }
 
     });
-    return streamSub!;
+    return streamSub;
 
   }
 
