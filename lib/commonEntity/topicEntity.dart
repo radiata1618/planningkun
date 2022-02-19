@@ -29,7 +29,6 @@ class TopicDataNotifier extends ChangeNotifier {
 
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
-      log("XXXXXX before Reference");
       Reference imageRef =
           storage.ref().child("topics").child(topicDocId + photoNameSuffix);
       log("XXXXXX before getdownloadurl");
@@ -130,8 +129,8 @@ class TopicDataNotifier extends ChangeNotifier {
         .orderBy('updateTime', descending: false)
         .snapshots();
 
-    //.asBroadcastStream()をなくした
-    StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
+
+    streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
       if (snapshot.size != 0) {
         log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
 
@@ -188,7 +187,7 @@ class TopicDataNotifier extends ChangeNotifier {
       }
 
     });
-    return streamSub;
+    return streamSub!;
 
   }
 

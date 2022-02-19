@@ -20,8 +20,6 @@ class Setting extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (initialProcessFlg){
       initialProcessFlg=false;
-      //_showLocalPhoto();
-      getFirebaseUserData(ref);
     }
 
     return Scaffold(
@@ -42,14 +40,14 @@ class Setting extends ConsumerWidget {
                   child: CircleAvatar(
                     radius: 80,
                     backgroundColor: Colors.white,
-                    backgroundImage:ref.watch(mainPhotoDataProvider).mainPhotoData ==null
+                    backgroundImage:ref.watch(userDataProvider).mainPhotoData ==null
                         ? null
-                        : ref.watch(mainPhotoDataProvider).mainPhotoData!.image,
+                        : ref.watch(userDataProvider).mainPhotoData!.image,
                   ),
                 ),
                 MaterialButton(
                     onPressed: () async{
-                      await setImage(ref);
+                      await ref.watch(userDataProvider).setImage(ref);
                     },
                     child: const Text('写真アップロード') //,
                 ),

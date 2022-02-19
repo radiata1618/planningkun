@@ -27,10 +27,8 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   //TODO 本来はUserDocIdをキーにデータを持ってくる。
 
   await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
+  await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
 
-  await ref
-      .read(userDataProvider.notifier)
-      .readUserDataFirebaseToHiveAndMemoryByEmail(email);
   // await ref
   //     .read(friendDataProvider.notifier)
   //     .readFriendDataFromFirebaseToHiveAndMemory(ref,
@@ -39,10 +37,9 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await ref
       .read(masterDataProvider.notifier)
       .readMasterDataFromFirebaseToHiveAndMemory();
-  await ref
-      .read(mainPhotoDataProvider.notifier)
-      .readMainPhotoDataFromDirectoryToMemory(ref);
 
+  ref.read(userDataProvider.notifier)
+      .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("userDocId"));
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
@@ -50,6 +47,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
 Future<void> closeStreams(WidgetRef ref) async {
   ref.read(topicDataProvider.notifier).closeStream();
+  ref.read(userDataProvider.notifier).closeStream();
 }
 
 Future<void> updateTimeCheck(String itemName, var box) async {

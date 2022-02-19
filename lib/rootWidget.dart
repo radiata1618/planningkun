@@ -61,11 +61,6 @@ class RootWidget extends ConsumerWidget {
         return Search();
       case 3:
         return Topic(
-          argumentUserData: ref.watch(userDataProvider.notifier).userData,
-          argumentMasterData: ref.watch(masterDataProvider.notifier).masterData,
-          argumentFriendData: ref.watch(friendDataProvider.notifier).friendData,
-          argumentMainPhotoData:
-              ref.watch(mainPhotoDataProvider.notifier).mainPhotoData,
         );
       default:
         return MyPage();

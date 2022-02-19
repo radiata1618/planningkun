@@ -1,38 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'topicRegister.dart';
-import 'categoryRegister.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Topic extends StatefulWidget {
-  Map<String, String> argumentUserData;
-  Map<String, String> argumentMasterData;
-  Map<String, Map<String, String>> argumentFriendData;
-  Image? argumentMainPhotoData;
 
-  Topic(
-      {required this.argumentUserData,
-      required this.argumentMasterData,
-      required this.argumentFriendData,
-      required this.argumentMainPhotoData});
-
-  @override
-  _Topic createState() => _Topic();
-}
-
-class _Topic extends State<Topic> {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
-
+class Topic extends ConsumerWidget {
+  Topic({
+    Key? key,
+  }) : super(key: key) {
+    //コンストラクタ
+  }
   List<Widget> workCategoryList = [];
   bool initialProcessflg = true;
 
   FirebaseStorage storage = FirebaseStorage.instance;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+
+
     if (initialProcessflg) {
       initialProcessflg = false;
       setCategoryLines();
@@ -86,7 +72,6 @@ class _Topic extends State<Topic> {
     //TODO どのカテゴリを表示するか、DBから設定値を取得
     // await setCategoryUnit("religion");
 
-    setState(() {});
   }
 
   Future<void> setCategoryUnit(String categoryName) async {

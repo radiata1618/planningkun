@@ -73,11 +73,11 @@ class MyPage extends ConsumerWidget {
               radius: 40,
               backgroundColor: Colors.white,
               backgroundImage:
-                  ref.watch(mainPhotoDataProvider).mainPhotoData ==
+                  ref.watch(userDataProvider).mainPhotoData ==
                           null
                       ? null
                       : ref
-                          .watch(mainPhotoDataProvider)
+                          .watch(userDataProvider)
                           .mainPhotoData!
                           .image,
             ),
