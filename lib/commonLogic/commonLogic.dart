@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,32 +9,30 @@ import '../commonEntity/masterEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userData.dart';
 
-Future<void> initialProcessLogic (WidgetRef ref, String email) async {
-
+Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await makeDir("friends");
   await makeDir("topics");
   await makeDir("categories");
   await makeDir("chats");
 
-  var boxSetting = await Hive.openBox('setting');
-  await updateTimeCheck("topics",boxSetting);
+  await openHiveBoxes();
 
-  boxSetting.close();
+  var boxSetting = Hive.box('setting');
+  await updateTimeCheck("topics", boxSetting);
 
   //TODO　Hive→メモリは同期処理でやる。
   //TODO Firebase→メモリは非同期処理で良いと思う
   //TODO 本来はUserDocIdをキーにデータを持ってくる。
 
-  await ref.read(topicDataProvider.notifier)
-      .readTopicFromHiveToMemory();
+  await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
 
   await ref
       .read(userDataProvider.notifier)
       .readUserDataFirebaseToHiveAndMemoryByEmail(email);
-  await ref
-      .read(friendDataProvider.notifier)
-      .readFriendDataFromFirebaseToHiveAndMemory(ref,
-      ref.watch(userDataProvider).userData["userDocId"]!);
+  // await ref
+  //     .read(friendDataProvider.notifier)
+  //     .readFriendDataFromFirebaseToHiveAndMemory(ref,
+  //     ref.watch(userDataProvider).userData["userDocId"]!);
   //TODO エラー発生中のため　コメントアウト
   await ref
       .read(masterDataProvider.notifier)
@@ -48,38 +44,41 @@ Future<void> initialProcessLogic (WidgetRef ref, String email) async {
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
-
 }
 
-Future<void> closeStreams(WidgetRef ref)async {
-  ref.read(topicDataProvider.notifier)
-      .closeStream();
-
+Future<void> closeStreams(WidgetRef ref) async {
+  ref.read(topicDataProvider.notifier).closeStream();
 }
 
-Future <void> updateTimeCheck(String itemName,var box)async {
-
-  var updateTimeCheck= await box.get(itemName+"UpdateCheck");
-  if(updateTimeCheck==null){
-    await box.put(itemName+"UpdateCheck",DateTime(2022, 1, 1, 0, 0));
+Future<void> updateTimeCheck(String itemName, var box) async {
+  var updateTimeCheck = await box.get(itemName + "UpdateCheck");
+  if (updateTimeCheck == null) {
+    await box.put(itemName + "UpdateCheck", DateTime(2022, 1, 1, 0, 0));
   }
-  
 }
 
-Future <void> makeDir(String dirName) async {
-
+Future<void> makeDir(String dirName) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
-  final Directory appDocDirFolder = Directory("${appDocDir.path}/"+dirName);
-  if(await appDocDirFolder.exists()){
-
-  }else{
-    new Directory(appDocDirFolder.path).createSync(recursive:true);
-
+  final Directory appDocDirFolder = Directory("${appDocDir.path}/" + dirName);
+  if (await appDocDirFolder.exists()) {
+  } else {
+    new Directory(appDocDirFolder.path).createSync(recursive: true);
   }
-
 }
 
+Future<void> openHiveBoxes() async {
+  try {
+    Hive.box("setting");
+  } catch (e) {
+    await Hive.openBox("setting");
+  }
 
+  try {
+    Hive.box("topics");
+  } catch (e) {
+    await Hive.openBox("topics");
+  }
+}
 
 List<String> fromTextToList(String txt) {
   String workText = txt;

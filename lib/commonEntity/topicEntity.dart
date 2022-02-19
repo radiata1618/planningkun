@@ -51,14 +51,15 @@ class TopicDataNotifier extends ChangeNotifier {
   void closeStream() async {
     streamSub!.cancel();
     log("XXXXXX before controllerClose");
-    controller.close();
+    // controller.close();
   }
 
   Future<void> readTopicFromHiveToMemory() async {
 
-    var boxTopic = await Hive.openBox('topics');
+    var boxTopic = Hive.box('topics');
     List list = boxTopic.values.toList();
     log(list.toString());
+    //TODO 作成中
 
   }
 
@@ -67,11 +68,10 @@ class TopicDataNotifier extends ChangeNotifier {
     _topicData = {};
     _topicPhotoData = {};
 
-    var boxSetting = await Hive.openBox('setting');
+    var boxSetting = Hive.box('setting');
     await boxSetting.put("topicsUpdateCheck",DateTime(2022, 1, 1, 0, 0));
-    boxSetting.close();
 
-    var boxTopics = await Hive.openBox('topics');
+    var boxTopics = Hive.box('topics');
     await boxTopics.deleteFromDisk();
 
     final topicsDir = Directory((await getApplicationDocumentsDirectory()).path+"/topics");
@@ -93,7 +93,10 @@ class TopicDataNotifier extends ChangeNotifier {
     streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
     log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
 
-    if(controller.isClosed){
+    if(controller.hasListener){
+
+    }else{
+      log("XXXXXXXXXXXXXControlListener開始");
       //2回目以降は新しいデータを更新するたびに起動
       controller.stream.listen((value)  async{
         streamSub!.cancel();
@@ -101,13 +104,12 @@ class TopicDataNotifier extends ChangeNotifier {
         streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
         log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
       });
-
     }
 
   }
 
   Future<StreamSubscription<QuerySnapshot>> readTopicNewDataFromFirebaseToHiveAndMemory() async {
-    var boxSetting = await Hive.openBox('setting');
+    var boxSetting = Hive.box('setting');
     DateTime topicUpdatedTime = await boxSetting.get("topicsUpdateCheck");
 
     log("XXXXXXXXXXXXXQueryする"+topicUpdatedTime.toString());
@@ -125,29 +127,40 @@ class TopicDataNotifier extends ChangeNotifier {
         log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
 
         Map<String, dynamic> tmpData={};
-        var boxTopic = await Hive.openBox('topics');
+        var boxTopic = Hive.box('topics');
         for(int i=0;i<snapshot.size;i++){
-          tmpData = {
-            'categoryDocId': snapshot.docs[i].get("categoryDocId"),
-            'categoryName': snapshot.docs[i].get("categoryName"),
-            'photoNameSuffix': snapshot.docs[i].get("photoNameSuffix"),
-            'photoUpdateCnt': snapshot.docs[i].get("photoUpdateCnt"),
-            'topicName': snapshot.docs[i].get("topicName"),
-            'insertUserDocId': snapshot.docs[i].get("insertUserDocId"),
-            'insertProgramId': snapshot.docs[i].get("insertProgramId"),
-            'insertTime': snapshot.docs[i].get("insertTime"),
-            'updateUserDocId': snapshot.docs[i].get("updateUserDocId"),
-            'updateProgramId': snapshot.docs[i].get("updateProgramId"),
-            'updateTime': snapshot.docs[i].get("updateTime").toDate(),
-            'readableFlg': snapshot.docs[i].get("readableFlg"),
-            'deleteFlg': snapshot.docs[i].get("deleteFlg"),
-          };
 
-          await boxTopic.put(snapshot.docs[i].id, tmpData);
-          _topicData[snapshot.docs[i].id] = tmpData;
+          if(snapshot.docs[i].get("deleteFlg")){
 
-          await readTopicPhotoFromFirebaseToDirectoryAndMemory(snapshot.docs[i].id);
+            deleteTopicPhotoFroDirectoryAndMemory(snapshot.docs[i].id+snapshot.docs[i].get("photoNameSuffix"));
+            await boxTopic.delete(snapshot.docs[i].id);
+            log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].id);
 
+          }else{
+
+            tmpData = {
+              'categoryDocId': snapshot.docs[i].get("categoryDocId"),
+              'categoryName': snapshot.docs[i].get("categoryName"),
+              'photoNameSuffix': snapshot.docs[i].get("photoNameSuffix"),
+              'photoUpdateCnt': snapshot.docs[i].get("photoUpdateCnt"),
+              'topicName': snapshot.docs[i].get("topicName"),
+              'insertUserDocId': snapshot.docs[i].get("insertUserDocId"),
+              'insertProgramId': snapshot.docs[i].get("insertProgramId"),
+              'insertTime': snapshot.docs[i].get("insertTime"),
+              'updateUserDocId': snapshot.docs[i].get("updateUserDocId"),
+              'updateProgramId': snapshot.docs[i].get("updateProgramId"),
+              'updateTime': snapshot.docs[i].get("updateTime").toDate(),
+              'readableFlg': snapshot.docs[i].get("readableFlg"),
+              'deleteFlg': snapshot.docs[i].get("deleteFlg"),
+            };
+
+            await boxTopic.put(snapshot.docs[i].id, tmpData);
+            _topicData[snapshot.docs[i].id] = tmpData;
+
+            await readTopicPhotoFromFirebaseToDirectoryAndMemory(snapshot.docs[i].id);
+
+
+          }
           log("XXXXXXXXXXXXXDateリセットする"+topicUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
           if (snapshot.docs[i].get("updateTime").toDate().isAfter(topicUpdatedTime)) {
             topicUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
@@ -155,7 +168,6 @@ class TopicDataNotifier extends ChangeNotifier {
           }
 
         }
-        await boxTopic.close();
         notifyListeners();
 
         log("XXXXXXXXXXXXXADDする");
@@ -165,6 +177,14 @@ class TopicDataNotifier extends ChangeNotifier {
 
     });
     return streamSub;
+
+  }
+
+  void deleteTopicPhotoFroDirectoryAndMemory(String fileName)async{
+
+    final topicsPhotoFile = File((await getApplicationDocumentsDirectory()).path+"/topics/"+fileName);
+    topicsPhotoFile.deleteSync(recursive: true);
+    log("filedeletefinish"+fileName);
 
   }
 }
