@@ -32,9 +32,8 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   //     .readFriendDataFromFirebaseToHiveAndMemory(ref,
   //     ref.watch(userDataProvider).userData["userDocId"]!);
   //TODO エラー発生中のため　コメントアウト
-  await ref
-      .read(masterDataProvider.notifier)
-      .readMasterDataFromFirebaseToHiveAndMemory();
+
+  //TODO　本来はマスタの差分をFirebaseから取得する
 
   ref.read(userDataProvider.notifier)
       .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("email"));//

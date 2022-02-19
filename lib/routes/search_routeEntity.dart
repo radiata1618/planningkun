@@ -6,7 +6,6 @@ import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/commonLogic/commonLogic.dart';
 
 import '../commonAlgoria.dart';
-import '../commonEntity/commonEntity.dart';
 
 final SearchResultProvider = ChangeNotifierProvider(
   (ref) => SearchResultNotifier(),

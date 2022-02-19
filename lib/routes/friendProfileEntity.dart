@@ -2,11 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:planningkun/commonEntity/friendEntity.dart';
 
-import '../commonEntity/commonEntity.dart';
-import '../commonEntity/userEntity.dart';
 
 Future<void> getFireBaseData()async {
 
@@ -28,23 +25,20 @@ class FriendProfileDataNotifier extends ChangeNotifier {
     _friendProfilePhotoData=null;
   }
 
-  Future<void> readFriendProfilePhotoDataFromFirebaseToMemory(WidgetRef ref,String userDocId,String photoPath) async {
+  Future<void> readFriendProfilePhotoDataFromFirebaseToMemory(WidgetRef ref,String userDocId,String profilePhotoNameSuffix) async {
 
-    if(photoPath.contains("mainPhoto")){
+    if(profilePhotoNameSuffix!=""){
       //写真が登録されている場合
 
       FirebaseStorage storage =  FirebaseStorage.instance;
       try {
 
-        Reference imageRef = storage.ref().child("profile").child(userDocId).child("mainPhoto."+photoPath.substring(photoPath.lastIndexOf('.') + 1,));
+        Reference imageRef = storage.ref().child("profile").child(userDocId).child("mainPhoto"+profilePhotoNameSuffix);
         String imageUrl =await imageRef.getDownloadURL();
          _friendProfilePhotoData =  Image.network(imageUrl, width: 90);
-
-
       }catch(e){
         //写真があるはずなのになぜかエラーだった
         _friendProfilePhotoData =null;
-
       }
 
     }else{
@@ -75,14 +69,13 @@ class FriendProfileDataNotifier extends ChangeNotifier {
     _friendProfileData["placeWannaGo"] = docSnapShot["placeWannaGo"];
     _friendProfileData["greeting"] = docSnapShot["greeting"];
     _friendProfileData["description"] = docSnapShot["description"];
-    _friendProfileData["profilePhotoPath"] = docSnapShot["profilePhotoPath"];
+    _friendProfileData["profilePhotoPath"] = docSnapShot["profilePhotoNameSuffix"];
     if(ref.watch(friendDataProvider).friendData[friendUserDocId]==null){
       _friendProfileData["friendFlg"] = "false";
     }else{
       _friendProfileData["friendFlg"] = "true";
-
     }
-    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId,docSnapShot["profilePhotoPath"]);
+    await readFriendProfilePhotoDataFromFirebaseToMemory(ref,friendUserDocId,docSnapShot["profilePhotoNameSuffix"]);
     notifyListeners();
 
   }
