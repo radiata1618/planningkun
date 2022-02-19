@@ -73,6 +73,7 @@ class TopicDataNotifier extends ChangeNotifier {
 
     var boxTopics = Hive.box('topics');
     await boxTopics.deleteFromDisk();
+    await Hive.openBox('topics');
 
     final topicsDir = Directory((await getApplicationDocumentsDirectory()).path+"/topics");
 
@@ -132,9 +133,12 @@ class TopicDataNotifier extends ChangeNotifier {
 
           if(snapshot.docs[i].get("deleteFlg")){
 
-            deleteTopicPhotoFroDirectoryAndMemory(snapshot.docs[i].id+snapshot.docs[i].get("photoNameSuffix"));
-            await boxTopic.delete(snapshot.docs[i].id);
-            log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].id);
+            if(boxTopic.get(snapshot.docs[i].id)!=null){
+              deleteTopicPhotoFroDirectoryAndMemory(snapshot.docs[i].id+snapshot.docs[i].get("photoNameSuffix"));
+              await boxTopic.delete(snapshot.docs[i].id);
+              log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].id);
+
+            }
 
           }else{
 
