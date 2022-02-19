@@ -12,19 +12,22 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-
 class UserDataProviderNotifier extends ChangeNotifier {
   Map<String, dynamic> _userData = {};
+
   get userData => _userData;
 
   Image? _mainPhotoData;
-  get mainPhotoData => _mainPhotoData ;
 
-  List<String> itemNameList=[
+  get mainPhotoData => _mainPhotoData;
+
+  List<String> itemNameList = [
+    "name",
     "email",
     "age",
     "ageNumber",
     "level",
+    "occupation",
     "nativeLang",
     "country",
     "town",
@@ -49,107 +52,117 @@ class UserDataProviderNotifier extends ChangeNotifier {
     "updateTime",
     "readableFlg",
     "deleteFlg"
-    ];
-
+  ];
 
   Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
   StreamSubscription<QuerySnapshot>? streamSub;
 
   Future<void> readMainPhotoDataFromDirectoryToMemory() async {
-
-    String profilePhotoNameSuffix = _userData["profilePhotoNameSuffix"]!;
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    File localFile = File("${appDocDir.path}/mainPhoto"+profilePhotoNameSuffix);
-    _mainPhotoData = Image.file(localFile,width:90);
+    if (_userData["profilePhotoNameSuffix"] == "") {
+      _mainPhotoData = null;
+    } else {
+      String profilePhotoNameSuffix = _userData["profilePhotoNameSuffix"]!;
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      File localFile =
+          File("${appDocDir.path}/mainPhoto" + profilePhotoNameSuffix);
+      _mainPhotoData = Image.file(localFile, width: 90);
+    }
   }
 
   Future<void> readMainPhotoFromFirebaseToDirectoryAndMemory() async {
+    if (_userData["profilePhotoNameSuffix"] == "") {
+      _mainPhotoData = null;
+    } else {
+      String profilePhotoNameSuffix = _userData["profilePhotoNameSuffix"]!;
 
-    String profilePhotoNameSuffix = _userData["profilePhotoNameSuffix"]!;
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference imageRef = storage
+          .ref()
+          .child("profile")
+          .child(_userData["userDocId"]!)
+          .child("mainPhoto" + profilePhotoNameSuffix);
+      String imageUrl = await imageRef.getDownloadURL();
 
-    FirebaseStorage storage =  FirebaseStorage.instance;
-    Reference imageRef =  storage.ref().child("profile").child(_userData["userDocId"]!).child("mainPhoto"+profilePhotoNameSuffix);
-    String imageUrl = await imageRef.getDownloadURL();
+      _mainPhotoData = Image.network(imageUrl, width: 90);
 
-    _mainPhotoData = Image.network(imageUrl,width:90);
-
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File("${appDocDir.path}/mainPhoto"+profilePhotoNameSuffix);
-    try {
-      await imageRef.writeToFile(downloadToFile);
-    } catch (e) {
-      _mainPhotoData=null;
-      log("写真データが取れなかった");
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      File downloadToFile =
+          File("${appDocDir.path}/mainPhoto" + profilePhotoNameSuffix);
+      try {
+        await imageRef.writeToFile(downloadToFile);
+      } catch (e) {
+        _mainPhotoData = null;
+        log("写真データが取れなかった");
+      }
     }
   }
+
   void closeStream() async {
     streamSub!.cancel();
     log("XXXXXX before controllerClose");
     // controller.close();
   }
 
-  void setUnitItem(String itemName,String value){
+  void setUnitItem(String itemName, String value) {
     _userData[itemName] = value;
     notifyListeners();
   }
-  Future<void> readUserDataFromHiveToMemory() async {
 
+  Future<void> readUserDataFromHiveToMemory() async {
     var boxUser = Hive.box('user');
 
-    _userData["userDocId"]=boxUser.get("userDocId");
+    _userData["userDocId"] = boxUser.get("userDocId");
 
-    for(int i=0;i<itemNameList.length;i++){
-      _userData[itemNameList[i]]=boxUser.get(itemNameList[i]);
+    for (int i = 0; i < itemNameList.length; i++) {
+      _userData[itemNameList[i]] = boxUser.get(itemNameList[i]);
     }
 
     await readMainPhotoDataFromDirectoryToMemory();
     log("XXXXXX after read user");
-
   }
 
-  void controlStreamOfReadUserDataFirebaseToHiveAndMemory(String userDocId)async {
-
+  void controlStreamOfReadUserDataFirebaseToHiveAndMemory(
+      String userDocId) async {
     //最初は必ず呼び出し
-    streamSub=await readUserDataFirebaseToHiveAndMemory(userDocId);
+    streamSub = await readUserDataFirebaseToHiveAndMemory(userDocId);
 
-    if(controller.hasListener){
-
-    }else{
+    if (controller.hasListener) {
+    } else {
       //2回目以降は新しいデータを更新するたびに起動
-      controller.stream.listen((value)  async{
+      controller.stream.listen((value) async {
         log("XXXXXXXXXXXXXCANCELする");
         streamSub!.cancel();
-        streamSub=await readUserDataFirebaseToHiveAndMemory(userDocId);
+        streamSub = await readUserDataFirebaseToHiveAndMemory(userDocId);
       });
     }
-
   }
 
-  Future<StreamSubscription<QuerySnapshot>> readUserDataFirebaseToHiveAndMemory(String email) async {
+  Future<StreamSubscription<QuerySnapshot>> readUserDataFirebaseToHiveAndMemory(
+      String email) async {
     var boxSetting = Hive.box('setting');
     var boxUser = Hive.box('user');
     DateTime userUpdatedTime = await boxSetting.get("userUpdateCheck");
 
-    log("XXXXXXXXXXXXXXXXXXXXXXXXクエリ用日付"+userUpdatedTime.toString());
+    log("XXXXXXXXXXXXXXXXXXXXXXXXクエリ用日付" + userUpdatedTime.toString());
     _callStream = FirebaseFirestore.instance
         .collection('users')
-        .where('email',isEqualTo: email)
-        .where('updateTime',
-        isGreaterThan: Timestamp.fromDate(userUpdatedTime))
+        .where('email', isEqualTo: email)
+        .where('updateTime', isGreaterThan: Timestamp.fromDate(userUpdatedTime))
         .where('readableFlg', isEqualTo: true)
         .snapshots();
 
-    StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
-
-      log("XXXXXXXXXXXXXXXXXXXXXXXXListen処理開始　Size"+snapshot.size.toString());
+    StreamSubscription<QuerySnapshot> streamSub =
+        _callStream!.listen((QuerySnapshot snapshot) async {
+      log("XXXXXXXXXXXXXXXXXXXXXXXXListen処理開始　Size" + snapshot.size.toString());
       if (snapshot.size != 0) {
-
-        log("XXXXXXXXXXXXXXXXXXXXXXXXUserDataprofilePhotoUpdateCnt"+_userData["profilePhotoUpdateCnt"].toString());
-        log("XXXXXXXXXXXXXXXXXXXXXXXXUserFFprofilePhotoUpdateCnt"+snapshot.docs[0].get("profilePhotoUpdateCnt").toString());
-        if (_userData["profilePhotoUpdateCnt"] < snapshot.docs[0].get(
-            "profilePhotoUpdateCnt")) { //自デバイス以外で写真が更新された場合は写真をDL
+        log("XXXXXXXXXXXXXXXXXXXXXXXXUserDataprofilePhotoUpdateCnt" +
+            _userData["profilePhotoUpdateCnt"].toString());
+        log("XXXXXXXXXXXXXXXXXXXXXXXXUserFFprofilePhotoUpdateCnt" +
+            snapshot.docs[0].get("profilePhotoUpdateCnt").toString());
+        if (_userData["profilePhotoUpdateCnt"] <
+            snapshot.docs[0].get("profilePhotoUpdateCnt")) {
+          //自デバイス以外で写真が更新された場合は写真をDL
           await readMainPhotoFromFirebaseToDirectoryAndMemory();
         }
         await boxUser.put("userDocId", snapshot.docs[0].id);
@@ -158,18 +171,22 @@ class UserDataProviderNotifier extends ChangeNotifier {
         for (int i = 0; i < itemNameList.length; i++) {
           if (itemNameList[i] == "updateTime" ||
               itemNameList[i] == "insertTime") {
-            _userData[itemNameList[i]] = snapshot.docs[0].get(itemNameList[i]).toDate();
-            await boxUser.put(
-                itemNameList[i], snapshot.docs[0].get(itemNameList[i]).toDate());
+            _userData[itemNameList[i]] =
+                snapshot.docs[0].get(itemNameList[i]).toDate();
+            await boxUser.put(itemNameList[i],
+                snapshot.docs[0].get(itemNameList[i]).toDate());
           } else {
             _userData[itemNameList[i]] = snapshot.docs[0].get(itemNameList[i]);
-            await boxUser.put(itemNameList[i], snapshot.docs[0].get(itemNameList[i]));
+            await boxUser.put(
+                itemNameList[i], snapshot.docs[0].get(itemNameList[i]));
           }
         }
 
-        log("XXXXXXXXXXXXXXXXXXXXXXXX日付セット前　ID"+snapshot.docs[0].id);
-        log("XXXXXXXXXXXXXXXXXXXXXXXX日付セット　SnapshotDocsDate"+snapshot.docs[0].get("updateTime").toDate().toString());
-        await boxSetting.put("userUpdateCheck", snapshot.docs[0].get("updateTime").toDate());
+        log("XXXXXXXXXXXXXXXXXXXXXXXX日付セット前　ID" + snapshot.docs[0].id);
+        log("XXXXXXXXXXXXXXXXXXXXXXXX日付セット　SnapshotDocsDate" +
+            snapshot.docs[0].get("updateTime").toDate().toString());
+        await boxSetting.put(
+            "userUpdateCheck", snapshot.docs[0].get("updateTime").toDate());
 
         log("XXXXXXXXXXXXXADDするUSER用");
         controller.sink.add(true);
@@ -179,51 +196,64 @@ class UserDataProviderNotifier extends ChangeNotifier {
     });
 
     return streamSub;
-
   }
 
+  Future<void> uploadAndInsertPhoto(File imageFile, WidgetRef ref) async {
+    _mainPhotoData = Image.file(imageFile);
 
-  Future<void> uploadAndInsertPhoto(File imageFile,WidgetRef ref) async{
-
-    _mainPhotoData=Image.file(imageFile);
-
-    String pathStr= imageFile.path;
-    String pathStrEx=pathStr.substring(pathStr.lastIndexOf('.'),);
+    String pathStr = imageFile.path;
+    String pathStrEx = pathStr.substring(
+      pathStr.lastIndexOf('.'),
+    );
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
-      await storage.ref("profile/" + _userData["userDocId"]! + "/mainPhoto"+pathStrEx).putFile(imageFile);
+      await storage
+          .ref("profile/" + _userData["userDocId"]! + "/mainPhoto" + pathStrEx)
+          .putFile(imageFile);
 
       //ローカルに保存
       Directory appDocDir = await getApplicationDocumentsDirectory();
-      File downloadToFile = File("${appDocDir.path}/"+"mainPhoto"+pathStrEx);
+      File downloadToFile =
+          File("${appDocDir.path}/" + "mainPhoto" + pathStrEx);
       await downloadToFile.writeAsBytes(await imageFile.readAsBytes());
 
       var box = Hive.box('user');
-      _userData["profilePhotoUpdateCnt"]=_userData["profilePhotoUpdateCnt"]!+1;
-      _userData["profilePhotoNameSuffix"]=pathStrEx;
-      await box.put("profilePhotoUpdateCnt",_userData["profilePhotoUpdateCnt"]!+1);
-      await box.put("profilePhotoNameSuffix",pathStrEx);
+      _userData["profilePhotoUpdateCnt"] =
+          _userData["profilePhotoUpdateCnt"]! + 1;
+      _userData["profilePhotoNameSuffix"] = pathStrEx;
+      await box.put(
+          "profilePhotoUpdateCnt", _userData["profilePhotoUpdateCnt"]! + 1);
+      await box.put("profilePhotoNameSuffix", pathStrEx);
 
-      await FirebaseFirestore.instance.collection('users').doc(_userData["userDocId"]!)
-          .update({"profilePhotoUpdateCnt": _userData["profilePhotoUpdateCnt"]!+1,
-        "profilePhotoNameSuffix":pathStrEx
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userData["userDocId"]!)
+          .update({
+        "profilePhotoUpdateCnt": _userData["profilePhotoUpdateCnt"]! + 1,
+        "profilePhotoNameSuffix": pathStrEx
       });
 
       var result = await FlutterImageCompress.compressAndGetFile(
-        "${appDocDir.path}/"+"mainPhoto"+pathStrEx,
-        "${appDocDir.path}/"+"mainPhoto_small"+pathStrEx,
+        "${appDocDir.path}/" + "mainPhoto" + pathStrEx,
+        "${appDocDir.path}/" + "mainPhoto_small" + pathStrEx,
         quality: 20,
       );
 
-      File localSmallFile = File("${appDocDir.path}/"+"mainPhoto_small"+pathStrEx);
-      await storage.ref("profile/" + _userData["userDocId"]! + "/mainPhoto_small"+pathStrEx).putFile(localSmallFile);
-
+      File localSmallFile =
+          File("${appDocDir.path}/" + "mainPhoto_small" + pathStrEx);
+      await storage
+          .ref("profile/" +
+              _userData["userDocId"]! +
+              "/mainPhoto_small" +
+              pathStrEx)
+          .putFile(localSmallFile);
     } catch (e) {
       print(e);
     }
 
     notifyListeners();
   }
+
   Future<void> setImage(WidgetRef ref) async {
     XFile? pickerFile = await ImagePicker().pickImage(
         source: ImageSource.gallery,
@@ -231,13 +261,12 @@ class UserDataProviderNotifier extends ChangeNotifier {
         maxHeight: 800,
         imageQuality: 40);
     if (pickerFile != null) {
-      uploadAndInsertPhoto(File(pickerFile.path),ref);
+      uploadAndInsertPhoto(File(pickerFile.path), ref);
       //TODO 圧縮率などは調整
     }
   }
-
 }
 
 final userDataProvider = ChangeNotifierProvider(
-      (ref) => UserDataProviderNotifier(),
+  (ref) => UserDataProviderNotifier(),
 );

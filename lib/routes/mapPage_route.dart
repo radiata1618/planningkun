@@ -1,24 +1,15 @@
 import 'dart:developer';
 
-import 'dart:io';
 import "package:flutter/src/foundation/platform.dart";
 import 'package:permission_handler/permission_handler.dart';
-//import 'package:../config/agora.config.dart' as config;
 
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 
 import '../config/agora.config.dart' as config;
 import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-class MapPage extends StatefulWidget { // <- (※1)
+class MapPage extends StatefulWidget {
 
   @override
   _MapPage createState() => _MapPage();

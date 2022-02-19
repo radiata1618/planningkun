@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../commonEntity/friendEntity.dart';
 import '../commonEntity/masterEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
@@ -38,7 +37,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
       .readMasterDataFromFirebaseToHiveAndMemory();
 
   ref.read(userDataProvider.notifier)
-      .controlStreamOfReadUserDataFirebaseToHiveAndMemory("haruki.u@gmail.com");//boxSetting.get("email")
+      .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("email"));//
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();

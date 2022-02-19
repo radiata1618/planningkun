@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/routes/setting_route.dart';
-import '../commonEntity/commonEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonLogic/commonLogic.dart';
 import '../insertTestData.dart';
@@ -31,8 +30,7 @@ class MyPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
             child: Column(children: [
-              Text(
-                ref.watch(userDataProvider).userData["name"]!,
+              Text(ref.watch(userDataProvider).userData["name"]!,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,

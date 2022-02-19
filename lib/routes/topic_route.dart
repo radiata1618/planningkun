@@ -17,8 +17,6 @@ class Topic extends ConsumerWidget {
 
   Widget build(BuildContext context, WidgetRef ref) {
 
-
-
     if (initialProcessflg) {
       initialProcessflg = false;
       setCategoryLines();

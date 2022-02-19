@@ -1,11 +1,12 @@
 
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/masterEntity.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/routes/settingEditPage.dart';
 import 'package:flutter/material.dart';
 
-import '../commonEntity/commonEntity.dart';
 
 
 class Setting extends ConsumerWidget {
@@ -21,6 +22,7 @@ class Setting extends ConsumerWidget {
     if (initialProcessFlg){
       initialProcessFlg=false;
     }
+
 
     return Scaffold(
         appBar: AppBar(
