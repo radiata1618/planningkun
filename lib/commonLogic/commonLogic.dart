@@ -19,6 +19,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
   var boxSetting = Hive.box('setting');
   await updateTimeCheck("topics", boxSetting);
+  await updateTimeCheck("friends", boxSetting);
 
   //TODO　Hive→メモリは同期処理でやる。
   //TODO Firebase→メモリは非同期処理で良いと思う
@@ -77,6 +78,12 @@ Future<void> openHiveBoxes() async {
     Hive.box("topics");
   } catch (e) {
     await Hive.openBox("topics");
+  }
+
+  try {
+    Hive.box("friends");
+  } catch (e) {
+    await Hive.openBox("friends");
   }
 }
 
