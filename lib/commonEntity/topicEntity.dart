@@ -21,6 +21,7 @@ class TopicDataNotifier extends ChangeNotifier {
 
   Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
+  StreamSubscription<QuerySnapshot>? streamSub;
 
   Future<void> readTopicPhotoFromFirebaseToDirectoryAndMemory(
       String topicDocId) async {
@@ -28,11 +29,15 @@ class TopicDataNotifier extends ChangeNotifier {
 
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
+      log("XXXXXX before Reference");
       Reference imageRef =
           storage.ref().child("topics").child(topicDocId + photoNameSuffix);
+      log("XXXXXX before getdownloadurl");
       String imageUrl = await imageRef.getDownloadURL();
+      log("XXXXXX before network");
       _topicPhotoData[topicDocId] = Image.network(imageUrl, width: 90);
 
+      log("XXXXXX before appdocdir");
       Directory appDocDir = await getApplicationDocumentsDirectory();
       File downloadToFile =
           File("${appDocDir.path}/topics/" + topicDocId + photoNameSuffix);
@@ -42,6 +47,19 @@ class TopicDataNotifier extends ChangeNotifier {
       //写真があるはずなのになぜかエラーだった
       _topicPhotoData[topicDocId] = null;
     }
+  }
+  void closeStream() async {
+    streamSub!.cancel();
+    log("XXXXXX before controllerClose");
+    controller.close();
+  }
+
+  Future<void> readTopicFromHiveToMemory() async {
+
+    var boxTopic = await Hive.openBox('topics');
+    List list = boxTopic.values.toList();
+    log(list.toString());
+
   }
 
   void clearHiveAndMemoryAndDirectory()async {
@@ -64,7 +82,7 @@ class TopicDataNotifier extends ChangeNotifier {
       file.deleteSync(recursive: true);
     }
 
-    log("finish data clear");
+    log("finish topics data clear");
 
   }
 
@@ -72,21 +90,25 @@ class TopicDataNotifier extends ChangeNotifier {
 
     //最初は必ず呼び出し
     log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallする");
-    StreamSubscription<QuerySnapshot> streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
+    streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
     log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
 
-    //2回目以降は新しいデータを更新するたびに起動
-     controller.stream.listen((value)  async{
-      streamSub.cancel();
-      log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
-      streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
-      log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
-    });
+    if(controller.isClosed){
+      //2回目以降は新しいデータを更新するたびに起動
+      controller.stream.listen((value)  async{
+        streamSub!.cancel();
+        log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
+        streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
+        log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
+      });
+
+    }
+
   }
 
   Future<StreamSubscription<QuerySnapshot>> readTopicNewDataFromFirebaseToHiveAndMemory() async {
     var boxSetting = await Hive.openBox('setting');
-    DateTime topicUpdatedTime = await boxSetting.get("topicUpdateCheck");
+    DateTime topicUpdatedTime = await boxSetting.get("topicsUpdateCheck");
 
     log("XXXXXXXXXXXXXQueryする"+topicUpdatedTime.toString());
     _callStream = FirebaseFirestore.instance
@@ -129,7 +151,7 @@ class TopicDataNotifier extends ChangeNotifier {
           log("XXXXXXXXXXXXXDateリセットする"+topicUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
           if (snapshot.docs[i].get("updateTime").toDate().isAfter(topicUpdatedTime)) {
             topicUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
-            await boxSetting.put("topicUpdateCheck", topicUpdatedTime);
+            await boxSetting.put("topicsUpdateCheck", topicUpdatedTime);
           }
 
         }
@@ -139,11 +161,9 @@ class TopicDataNotifier extends ChangeNotifier {
         log("XXXXXXXXXXXXXADDする");
         controller.sink.add(true);
         log("XXXXXXXXXXXXXADDした");
-
       }
 
     });
-
     return streamSub;
 
   }
