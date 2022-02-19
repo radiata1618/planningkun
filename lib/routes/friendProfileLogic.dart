@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,7 +15,7 @@ Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
     {'userDocId':friendUserDocId,
       'friendUserDocId': ref.watch(userDataProvider).userData["userDocId"],
       'friendUserName': ref.watch(userDataProvider).userData["name"],
-      'profilePhotoPath':ref.watch(userDataProvider).userData["profilePhotoPath"] ,
+      'profilePhotoNameSuffix':ref.watch(userDataProvider).userData["profilePhotoNameSuffix"] ,
       'profilePhotoUpdateCnt': ref.watch(userDataProvider).userData["profilePhotoUpdateCnt"] ,
       'lastMessageContent': "",
       'lastMessageDocId': null,
@@ -27,7 +26,7 @@ Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
       'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
       'updateProgramId': "friendProfile",
       'updateTime': FieldValue.serverTimestamp(),
-      'readableFlg': false,
+      'readableFlg': true,
       'deleteFlg': false,
     },
   );
@@ -36,7 +35,7 @@ Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
     {'userDocId':ref.watch(userDataProvider).userData["userDocId"] ,
       'friendUserDocId': friendUserDocId,
       'friendUserName': firebaseUserData["name"] ,
-      'profilePhotoPath': firebaseUserData["profilePhotoPath"] ,
+      'profilePhotoNameSuffix': firebaseUserData["profilePhotoNameSuffix"] ,
       'profilePhotoUpdateCnt': firebaseUserData["profilePhotoUpdateCnt"] ,
       'lastMessageContent': "",
       'lastMessageDocId': null,
@@ -47,7 +46,7 @@ Future<void> insertFriend(WidgetRef ref,String friendUserDocId) async{
       'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
       'updateProgramId': "friendProfile",
       'updateTime': FieldValue.serverTimestamp(),
-      'readableFlg': false,
+      'readableFlg': true,
       'deleteFlg': false,
     },
   );

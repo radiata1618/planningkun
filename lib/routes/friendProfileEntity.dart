@@ -69,7 +69,7 @@ class FriendProfileDataNotifier extends ChangeNotifier {
     _friendProfileData["placeWannaGo"] = docSnapShot["placeWannaGo"];
     _friendProfileData["greeting"] = docSnapShot["greeting"];
     _friendProfileData["description"] = docSnapShot["description"];
-    _friendProfileData["profilePhotoPath"] = docSnapShot["profilePhotoNameSuffix"];
+    _friendProfileData["profilePhotoNameSuffix"] = docSnapShot["profilePhotoNameSuffix"];
     if(ref.watch(friendDataProvider).friendData[friendUserDocId]==null){
       _friendProfileData["friendFlg"] = "false";
     }else{
