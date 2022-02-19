@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../commonEntity/friendEntity.dart';
 import '../commonEntity/masterEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
@@ -21,22 +22,14 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("friends", boxSetting);
   await updateTimeCheck("user", boxSetting);
 
-  //TODO　Hive→メモリは同期処理でやる。
-  //TODO Firebase→メモリは非同期処理で良いと思う
-
   await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
+  await ref.read(friendDataProvider.notifier).readNewFriendFromFirebaseToHiveAndMemory(ref);
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
-
-  // await ref
-  //     .read(friendDataProvider.notifier)
-  //     .readFriendDataFromFirebaseToHiveAndMemory(ref,
-  //     ref.watch(userDataProvider).userData["userDocId"]!);
-  //TODO エラー発生中のため　コメントアウト
-
-  //TODO　本来はマスタの差分をFirebaseから取得する
-
   ref.read(userDataProvider.notifier)
       .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("email"));//
+  ref
+      .read(friendDataProvider.notifier)
+      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(ref);
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
@@ -45,6 +38,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 Future<void> closeStreams(WidgetRef ref) async {
   ref.read(topicDataProvider.notifier).closeStream();
   ref.read(userDataProvider.notifier).closeStream();
+  ref.read(friendDataProvider.notifier).closeStream();
 }
 
 Future<void> updateTimeCheck(String itemName, var box) async {
