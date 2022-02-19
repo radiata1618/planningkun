@@ -2,10 +2,16 @@
 
 import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<void> initialProcessLogic () async {
+import '../commonEntity/friendEntity.dart';
+import '../commonEntity/masterEntity.dart';
+import '../commonEntity/topicEntity.dart';
+import '../commonEntity/userData.dart';
+
+Future<void> initialProcessLogic (WidgetRef ref, String email) async {
 
   await makeDir("friends");
   await makeDir("topics");
@@ -16,6 +22,27 @@ Future<void> initialProcessLogic () async {
   await updateTimeCheck("topics",boxSetting);
 
   boxSetting.close();
+
+  //TODO　Hive→メモリは同期処理でやる。
+  //TODO Firebase→メモリは非同期処理で良いと思う
+  //TODO 本来はUserDocIdをキーにデータを持ってくる。
+  await ref
+      .read(userDataProvider.notifier)
+      .readUserDataFirebaseToHiveAndMemoryByEmail(email);
+  await ref
+      .read(friendDataProvider.notifier)
+      .readFriendDataFromFirebaseToHiveAndMemory(ref,
+      ref.watch(userDataProvider).userData["userDocId"]!);
+  await ref
+      .read(masterDataProvider.notifier)
+      .readMasterDataFromFirebaseToHiveAndMemory();
+  await ref
+      .read(mainPhotoDataProvider.notifier)
+      .readMainPhotoDataFromDirectoryToMemory(ref);
+
+  ref
+      .read(topicDataProvider.notifier)
+      .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
 
 }
 

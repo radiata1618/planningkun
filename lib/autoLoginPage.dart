@@ -59,20 +59,10 @@ class AutoLoginPage extends ConsumerWidget  {
   }
 
   Future<void> autoLoginProcess(BuildContext context, WidgetRef ref)async{
-    await initialProcessLogic();
 
     var box = await Hive.openBox('record');
-    await ref.read(userDataProvider.notifier).readUserDataFirebaseToHiveAndMemoryByEmail(await box.get("email"));
-    //TODO 本来はUserDocIdをキーにデータを持ってくる。
-    await ref.read(friendDataProvider.notifier).readFriendDataFromFirebaseToHiveAndMemory(ref,ref.watch(userDataProvider.notifier).userData["userDocId"]!);
-    await ref.read(masterDataProvider.notifier).readMasterDataFromFirebaseToHiveAndMemory();
-    await ref
-        .read(mainPhotoDataProvider.notifier)
-        .readMainPhotoDataFromDirectoryToMemory(ref);
+    await initialProcessLogic(ref,await box.get("email"));
 
-    await ref
-        .read(topicDataProvider.notifier)
-        .readTopicNewDataFromFirebaseToHiveAndMemory();
 
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄

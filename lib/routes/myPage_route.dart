@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/userData.dart';
 import 'package:planningkun/routes/setting_route.dart';
 import '../commonEntity/commonEntity.dart';
+import '../commonEntity/topicEntity.dart';
 import '../insertTestData.dart';
 import '../login.dart';
 import 'topicRegister.dart';
@@ -145,6 +146,22 @@ class MyPage extends ConsumerWidget {
           },
           child: Text(
             "Logout",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            ref
+                .read(topicDataProvider.notifier)
+                .clearHiveAndMemoryAndDirectory();
+          },
+          child: Text(
+            "clearLocalTopicData",
             style: TextStyle(
               fontWeight: FontWeight.normal,
               fontSize: 16,

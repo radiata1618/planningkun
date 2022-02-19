@@ -10,112 +10,141 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 final topicDataProvider = ChangeNotifierProvider(
-      (ref) => TopicDataNotifier(),
+  (ref) => TopicDataNotifier(),
 );
 
-
 class TopicDataNotifier extends ChangeNotifier {
-  Map<String,Map<String,dynamic>> _topicData={};
-  get topicData => _topicData ;
-
+  Map<String, Map<String, dynamic>> _topicData = {};
+  get topicData => _topicData;
   Map<String, Image?> _topicPhotoData = {};
   get topicPhotoData => _topicPhotoData;
 
-  Future<void> readTopicPhotoFromFirebaseToDirectoryAndMemory(String topicDocId) async {
+  Stream<QuerySnapshot>? _callStream;
+  final controller = StreamController<bool>();
 
+  Future<void> readTopicPhotoFromFirebaseToDirectoryAndMemory(
+      String topicDocId) async {
     String photoNameSuffix = _topicData[topicDocId]!["photoNameSuffix"]!;
 
-      FirebaseStorage storage =  FirebaseStorage.instance;
-      try {
-        Reference imageRef =   storage.ref().child("topics").child(topicDocId+photoNameSuffix);
-        String imageUrl = await imageRef.getDownloadURL();
-        _topicPhotoData[topicDocId] = Image.network(imageUrl,width:90);
+    FirebaseStorage storage = FirebaseStorage.instance;
+    try {
+      Reference imageRef =
+          storage.ref().child("topics").child(topicDocId + photoNameSuffix);
+      String imageUrl = await imageRef.getDownloadURL();
+      _topicPhotoData[topicDocId] = Image.network(imageUrl, width: 90);
 
-        Directory appDocDir = await getApplicationDocumentsDirectory();
-        File downloadToFile = File("${appDocDir.path}/topics/"+topicDocId+photoNameSuffix);
-        log(imageUrl.toString());
-        await imageRef.writeToFile(downloadToFile);
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      File downloadToFile =
+          File("${appDocDir.path}/topics/" + topicDocId + photoNameSuffix);
+      log(imageUrl.toString());
+      await imageRef.writeToFile(downloadToFile);
+    } catch (e) {
+      //写真があるはずなのになぜかエラーだった
+      _topicPhotoData[topicDocId] = null;
+    }
+  }
 
-      }catch(e){
-        //写真があるはずなのになぜかエラーだった
-        _topicPhotoData[topicDocId] =null;
-      }
+  void clearHiveAndMemoryAndDirectory()async {
+
+    _topicData = {};
+    _topicPhotoData = {};
+
+    var boxSetting = await Hive.openBox('setting');
+    await boxSetting.put("topicsUpdateCheck",DateTime(2022, 1, 1, 0, 0));
+    boxSetting.close();
+
+    var boxTopics = await Hive.openBox('topics');
+    await boxTopics.deleteFromDisk();
+
+    final topicsDir = Directory((await getApplicationDocumentsDirectory()).path+"/topics");
+
+    List<FileSystemEntity> files;
+    files = topicsDir.listSync(recursive: true,followLinks: false);
+    for (var file in files) {
+      file.deleteSync(recursive: true);
+    }
+
+    log("finish data clear");
 
   }
 
+  void controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory()async {
 
-  // Future<void> callStreamReadTopicNewDataFromFirebaseToHiveAndMemory() async {
-  //
-  // }
+    //最初は必ず呼び出し
+    log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallする");
+    StreamSubscription<QuerySnapshot> streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
+    log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
 
-  Future<void> readTopicNewDataFromFirebaseToHiveAndMemory() async {
+    //2回目以降は新しいデータを更新するたびに起動
+     controller.stream.listen((value)  async{
+      streamSub.cancel();
+      log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
+      streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
+      log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
+    });
+  }
 
+  Future<StreamSubscription<QuerySnapshot>> readTopicNewDataFromFirebaseToHiveAndMemory() async {
     var boxSetting = await Hive.openBox('setting');
-    DateTime topicUpdatedTime=await boxSetting.get("topicUpdateCheck");
+    DateTime topicUpdatedTime = await boxSetting.get("topicUpdateCheck");
 
-
-    Stream<QuerySnapshot> _callStream = FirebaseFirestore.instance
+    log("XXXXXXXXXXXXXQueryする"+topicUpdatedTime.toString());
+    _callStream = FirebaseFirestore.instance
         .collection('topics')
-        .where('updateTime', isGreaterThan: Timestamp.fromDate(topicUpdatedTime))
+        .where('updateTime',
+            isGreaterThan: Timestamp.fromDate(topicUpdatedTime))
         .where('readableFlg', isEqualTo: true)
+        .orderBy('updateTime', descending: false)
         .snapshots();
 
+    //.asBroadcastStream()をなくした
+    StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
+      if (snapshot.size != 0) {
+        log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
 
-    _callStream.listen((QuerySnapshot snapshot) async{
-      if(snapshot.size!=0){
-
+        Map<String, dynamic> tmpData={};
         var boxTopic = await Hive.openBox('topics');
-
-        snapshot.docs.forEach((doc) async{
-
-          Map<String,dynamic> tmpData= {
-            'categoryDocId':doc.get("categoryDocId") ,
-            'categoryName':doc.get("categoryName"),
-            'photoNameSuffix':doc.get("photoNameSuffix"),
-            'photoUpdateCnt':doc.get("photoUpdateCnt"),
-            'topicName':doc.get("topicName"),
-            'insertUserDocId':doc.get("insertUserDocId"),
-            'insertProgramId': doc.get("insertProgramId"),
-            'insertTime': doc.get("insertTime"),
-            'updateUserDocId':doc.get("updateUserDocId"),
-            'updateProgramId': doc.get("updateProgramId"),
-            'updateTime': doc.get("updateTime").toDate(),
-            'readableFlg': doc.get("readableFlg"),
-            'deleteFlg': doc.get("deleteFlg"),
+        for(int i=0;i<snapshot.size;i++){
+          tmpData = {
+            'categoryDocId': snapshot.docs[i].get("categoryDocId"),
+            'categoryName': snapshot.docs[i].get("categoryName"),
+            'photoNameSuffix': snapshot.docs[i].get("photoNameSuffix"),
+            'photoUpdateCnt': snapshot.docs[i].get("photoUpdateCnt"),
+            'topicName': snapshot.docs[i].get("topicName"),
+            'insertUserDocId': snapshot.docs[i].get("insertUserDocId"),
+            'insertProgramId': snapshot.docs[i].get("insertProgramId"),
+            'insertTime': snapshot.docs[i].get("insertTime"),
+            'updateUserDocId': snapshot.docs[i].get("updateUserDocId"),
+            'updateProgramId': snapshot.docs[i].get("updateProgramId"),
+            'updateTime': snapshot.docs[i].get("updateTime").toDate(),
+            'readableFlg': snapshot.docs[i].get("readableFlg"),
+            'deleteFlg': snapshot.docs[i].get("deleteFlg"),
           };
 
-          await boxTopic.put(doc.id, tmpData);
-          _topicData[doc.id]=tmpData;
+          await boxTopic.put(snapshot.docs[i].id, tmpData);
+          _topicData[snapshot.docs[i].id] = tmpData;
 
-          await readTopicPhotoFromFirebaseToDirectoryAndMemory(doc.id);
+          await readTopicPhotoFromFirebaseToDirectoryAndMemory(snapshot.docs[i].id);
 
-          if(doc.get("updateTime").toDate().isAfter(topicUpdatedTime)){
-            topicUpdatedTime=doc.get("updateTime").toDate();
-            await boxSetting.put("topicUpdateCheck",topicUpdatedTime);
+          log("XXXXXXXXXXXXXDateリセットする"+topicUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
+          if (snapshot.docs[i].get("updateTime").toDate().isAfter(topicUpdatedTime)) {
+            topicUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
+            await boxSetting.put("topicUpdateCheck", topicUpdatedTime);
           }
-        });
 
-
+        }
         await boxTopic.close();
-        // _callStream.
-      // _callStream.
-      // // _callStream = FirebaseFirestore.instance
-      // //     .collection('topics')
-      // //     .where('updateTime', isGreaterThan: Timestamp.fromDate(topicUpdatedTime))
-      // //     .snapshots();
-      // なぜか画像DLでエラーになる
-      // 検索条件の日付を更新できない
+        notifyListeners();
+
+        log("XXXXXXXXXXXXXADDする");
+        controller.sink.add(true);
+        log("XXXXXXXXXXXXXADDした");
+
       }
 
-      notifyListeners();
-      // _callStream = FirebaseFirestore.instance
-      //     .collection('topics')
-      //     .where('updateTime', isGreaterThan: Timestamp.fromDate(topicUpdatedTime))
-      //     .where('readableFlg', isEqualTo: true)
-      //     .snapshots();
     });
 
+    return streamSub;
 
   }
 }
-

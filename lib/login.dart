@@ -129,24 +129,7 @@ class LoginPage extends ConsumerWidget {
 
   Future<void> loginCommonProcess(
       BuildContext context, WidgetRef ref, String email) async {
-    await initialProcessLogic();
-    await ref
-        .read(userDataProvider.notifier)
-        .readUserDataFirebaseToHiveAndMemoryByEmail(email);
-    await ref
-        .read(friendDataProvider.notifier)
-        .readFriendDataFromFirebaseToHiveAndMemory(ref,
-            ref.watch(userDataProvider).userData["userDocId"]!);
-    await ref
-        .read(masterDataProvider.notifier)
-        .readMasterDataFromFirebaseToHiveAndMemory();
-    await ref
-        .read(mainPhotoDataProvider.notifier)
-    .readMainPhotoDataFromDirectoryToMemory(ref);
-
-    await ref
-        .read(topicDataProvider.notifier)
-        .readTopicNewDataFromFirebaseToHiveAndMemory();
+    await initialProcessLogic(ref,email);
 
     // ログインに成功した場合
     // チャット画面に遷移＋ログイン画面を破棄
