@@ -153,7 +153,7 @@ class TopicDataNotifier extends ChangeNotifier {
               'topicName': snapshot.docs[i].get("topicName"),
               'insertUserDocId': snapshot.docs[i].get("insertUserDocId"),
               'insertProgramId': snapshot.docs[i].get("insertProgramId"),
-              'insertTime': snapshot.docs[i].get("insertTime"),
+              'insertTime': snapshot.docs[i].get("insertTime").toDate(),
               'updateUserDocId': snapshot.docs[i].get("updateUserDocId"),
               'updateProgramId': snapshot.docs[i].get("updateProgramId"),
               'updateTime': snapshot.docs[i].get("updateTime").toDate(),

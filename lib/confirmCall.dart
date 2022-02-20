@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'chat.dart';
+import 'chatPage.dart';
 import 'rootWidget.dart';
 import 'join_channel_video.dart';
 

@@ -161,6 +161,9 @@ class FriendDataNotifier extends ChangeNotifier {
         var boxFriend = Hive.box('friends');
         for (int i = 0; i < snapshot.size; i++) {
           if (snapshot.docs[i].get("deleteFlg")) {
+            //TODO　写真がなかったデータを削除しようとするとエラーになるのでは？
+            //TODO　Suffixが空なら削除処理しないと言う分岐が必要
+            //TODO メモリからデータを削除する処理が無い
             if (_friendData[snapshot.docs[i].get('friendUserDocId')] != null) {
               deleteFriendPhotoFroDirectoryAndMemory(snapshot.docs[i].get('friendUserDocId') +
                   snapshot.docs[i].get("profilePhotoNameSuffix"));

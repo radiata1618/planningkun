@@ -1,7 +1,3 @@
-// Copyright 2017 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,8 +9,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'config/firebase_config.dart';
 import 'autoLoginPage.dart';
 import 'login.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
+  await initializeDateFormatting('ja');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
   await Hive.initFlutter();

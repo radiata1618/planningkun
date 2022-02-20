@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/friendEntity.dart';
 import 'package:planningkun/commonEntity/masterEntity.dart';
-import '../chat.dart';
+import '../chatPage.dart';
 import '../commonEntity/commonEntity.dart';
 import '../commonUI.dart';
 import 'friendProfileEntity.dart';
@@ -88,7 +88,7 @@ class FriendProfile extends ConsumerWidget {
                         onPressed: () async {
                           await Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) {
-                              return Chat(
+                              return ChatPage(
                                   friendUserDocId:argumentFriendUserDocId
                                   ,friendUserName:ref.watch(friendProfileDataProvider).friendProfileData["name"]
                               );
@@ -111,7 +111,7 @@ class FriendProfile extends ConsumerWidget {
 
                           await Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) {
-                              return Chat(
+                              return ChatPage(
                                   friendUserDocId:argumentFriendUserDocId
                                   ,friendUserName:ref.watch(friendProfileDataProvider).friendProfileData["name"]);
                             }),

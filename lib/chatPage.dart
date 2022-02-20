@@ -7,14 +7,15 @@ import 'package:planningkun/routes/friendProfile.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/userEntity.dart';
 import 'join_channel_video.dart';
+import 'chatPageLogic.dart';
 import 'confirmCall.dart';
 
-class Chat extends ConsumerWidget {
+class ChatPage extends ConsumerWidget {
   String friendUserDocId;
   String friendUserName;
   Image? friendPhoto;
 
-  Chat({
+  ChatPage({
     required this.friendUserDocId,
     required this.friendUserName,
     this.friendPhoto,
@@ -22,67 +23,10 @@ class Chat extends ConsumerWidget {
   }) : super(key: key);
 
 
-  Future<void> _insertMessage(WidgetRef ref,
-      String messageContent) async {
-
-    FirebaseFirestore.instance.collection('messages').add({
-      'content': messageContent,
-      'userDocId': ref.watch(userDataProvider).userData["userDocId"]!,
-      'oppositeUserDocId':friendUserDocId ,
-      'receiveSend': "send",
-      'sendTime': DateTime.now().toString(),
-      'messageType':"chat",
-      'callChannelId':"",
-    'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"]!,
-    'insertProgramId': "Chat",
-    'insertTime': DateTime.now().toString(),
-    });
-
-    FirebaseFirestore.instance.collection('messages').add({
-      'content': messageContent,
-      'userDocId': friendUserDocId,
-      'oppositeUserDocId': ref.watch(userDataProvider).userData["userDocId"]!,
-      'receiveSend': "receive",
-      'sendTime': DateTime.now().toString(),
-      'messageType':"chat",
-      'callChannelId':"",
-      'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"]!,
-      'insertProgramId': "Chat",
-      'insertTime': DateTime.now().toString(),
-    });
-
-    //TODO トークデータを更新
-  }
-
-  String content = "";
-
-
+  String content="";
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    final Stream<QuerySnapshot> _callStream = FirebaseFirestore.instance
-        .collection('calls')
-        .where('sender', isEqualTo: friendUserDocId)
-        .where('receiver', isEqualTo: ref.watch(userDataProvider).userData["userDocId"]!)
-        .where('status', isEqualTo: "yet")
-        .snapshots();
-
-    _callStream.listen((QuerySnapshot snapshot) async{
-      if(snapshot.size!=0){
-
-        await Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) {
-            return confirmCall(
-              argumentFriendUserDocId: friendUserDocId,
-              argumentChannelId: snapshot.docs[0].id,
-            );
-          }),
-        );
-
-      }
-
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -105,7 +49,7 @@ class Chat extends ConsumerWidget {
             },
           ),
         backgroundColor: Theme.of(context).canvasColor,
-        elevation: .6,
+        elevation: 0.6,
         title: Container(
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -123,8 +67,6 @@ class Chat extends ConsumerWidget {
                       child: GestureDetector(
                           onTap: () async {
 
-                            //String channelId =await call();
-                            //userSearch(algolia);
                             await Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) {
                                 return JoinChannelVideo(
@@ -258,7 +200,7 @@ class Chat extends ConsumerWidget {
           iconSize: 28,
           color: Colors.black54,
           onPressed: () {
-            _insertMessage(ref,content);
+            insertChat(ref,content,friendUserDocId);
           },
         ),
         IconButton(

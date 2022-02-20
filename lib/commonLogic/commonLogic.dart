@@ -5,18 +5,17 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../commonEntity/friendEntity.dart';
+import '../commonEntity/messageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
-  await initializeDateFormatting('ja');
 
   await makeDir("friends");
   await makeDir("topics");
   await makeDir("categories");
-  await makeDir("chats");
+  await makeDir("messages");
   await makeDir("media");
 
   await openHiveBoxes();
@@ -25,6 +24,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("topics", boxSetting);
   await updateTimeCheck("friends", boxSetting);
   await updateTimeCheck("user", boxSetting);
+  await updateTimeCheck("messages", boxSetting);
 
   await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
   await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
@@ -37,12 +37,16 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
+  ref
+      .read(messageDataProvider.notifier)
+      .controlStreamOfReadMessageNewDataFromFirebaseToHive(ref,boxSetting.get("userDocId"));
 }
 
 Future<void> closeStreams(WidgetRef ref) async {
   ref.read(topicDataProvider.notifier).closeStream();
   ref.read(userDataProvider.notifier).closeStream();
   ref.read(friendDataProvider.notifier).closeStream();
+  ref.read(messageDataProvider.notifier).closeStream();
 }
 
 Future<void> updateTimeCheck(String itemName, var box) async {
@@ -68,6 +72,11 @@ Future<void> openHiveBoxes() async {
     await Hive.openBox("setting");
   }
 
+  try {
+    Hive.box("messages");
+  } catch (e) {
+    await Hive.openBox("messages");
+  }
   try {
     Hive.box("topics");
   } catch (e) {
