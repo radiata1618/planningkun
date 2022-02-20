@@ -17,6 +17,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await makeDir("topics");
   await makeDir("categories");
   await makeDir("chats");
+  await makeDir("media");
 
   await openHiveBoxes();
 
@@ -32,7 +33,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
       .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("email"));//
   ref
       .read(friendDataProvider.notifier)
-      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(ref,ref.watch(userDataProvider).userData["userDocId"]);
+      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(ref,boxSetting.get("userDocId"));
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();

@@ -72,9 +72,14 @@ class FriendDataNotifier extends ChangeNotifier {
     Map <dynamic,dynamic> tmpBoxFriendData= boxFriend.toMap();
     for (var key in tmpBoxFriendData.keys) {
       _friendData[key]=new Map<String,dynamic>.from(tmpBoxFriendData[key]);
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      _friendPhotoData[key] = Image.file(File("${appDocDir.path}/friends/" + key + _friendData[key]!["profilePhotoNameSuffix"]));
+      if(_friendData[key]!["profilePhotoNameSuffix"]!=""){
+        Directory appDocDir = await getApplicationDocumentsDirectory();
+        _friendPhotoData[key] = Image.file(File("${appDocDir.path}/friends/" + key + _friendData[key]!["profilePhotoNameSuffix"]));
 
+      }else{
+
+        _friendPhotoData[key] =null;
+      }
     }
     log("XXXXXX after cast Map data");
 

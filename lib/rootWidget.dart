@@ -33,8 +33,6 @@ class RootWidget extends ConsumerWidget {
     return Scaffold(
       body: routeElement(
           _selectedIndex,
-          ref.watch(userDataProvider.notifier).userData["email"]!,
-          ref.watch(userDataProvider.notifier).userData["userDocId"]!,
           ref),
       bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed, // これを書かないと3つまでしか表示されない
@@ -51,7 +49,7 @@ class RootWidget extends ConsumerWidget {
   }
 
   Widget routeElement(
-      int selectedIndex, String email, String userDocId, WidgetRef ref) {
+      int selectedIndex, WidgetRef ref) {
     switch (selectedIndex) {
       case 0:
         return Now();

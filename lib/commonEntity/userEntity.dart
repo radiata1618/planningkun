@@ -14,11 +14,8 @@ import 'package:path_provider/path_provider.dart';
 
 class UserDataProviderNotifier extends ChangeNotifier {
   Map<String, dynamic> _userData = {};
-
   get userData => _userData;
-
   Image? _mainPhotoData;
-
   get mainPhotoData => _mainPhotoData;
 
   List<String> itemNameList = [
@@ -59,22 +56,21 @@ class UserDataProviderNotifier extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? streamSub;
 
   Future<void> readMainPhotoDataFromDirectoryToMemory() async {
-    if (_userData["profilePhotoNameSuffix"] == "") {
+    if ((_userData["profilePhotoNameSuffix"] == null?"":_userData["profilePhotoNameSuffix"]) == "") {
       _mainPhotoData = null;
     } else {
       String profilePhotoNameSuffix = _userData["profilePhotoNameSuffix"]!;
       Directory appDocDir = await getApplicationDocumentsDirectory();
       File localFile =
-          File("${appDocDir.path}/mainPhoto" + profilePhotoNameSuffix);
+          File("${appDocDir.path}/media/mainPhoto" + profilePhotoNameSuffix);
       _mainPhotoData = Image.file(localFile, width: 90);
     }
   }
 
-  Future<void> readMainPhotoFromFirebaseToDirectoryAndMemory() async {
-    if (_userData["profilePhotoNameSuffix"] == "") {
+  Future<void> readMainPhotoFromFirebaseToDirectoryAndMemory(String profilePhotoNameSuffix) async {
+    if (profilePhotoNameSuffix == "") {
       _mainPhotoData = null;
     } else {
-      String profilePhotoNameSuffix = _userData["profilePhotoNameSuffix"]!;
 
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference imageRef = storage
@@ -88,7 +84,7 @@ class UserDataProviderNotifier extends ChangeNotifier {
 
       Directory appDocDir = await getApplicationDocumentsDirectory();
       File downloadToFile =
-          File("${appDocDir.path}/mainPhoto" + profilePhotoNameSuffix);
+          File("${appDocDir.path}/media/mainPhoto" + profilePhotoNameSuffix);
       try {
         await imageRef.writeToFile(downloadToFile);
       } catch (e) {
@@ -156,14 +152,12 @@ class UserDataProviderNotifier extends ChangeNotifier {
         _callStream!.listen((QuerySnapshot snapshot) async {
       log("XXXXXXXXXXXXXXXXXXXXXXXXListen処理開始　Size" + snapshot.size.toString());
       if (snapshot.size != 0) {
-        log("XXXXXXXXXXXXXXXXXXXXXXXXUserDataprofilePhotoUpdateCnt" +
-            _userData["profilePhotoUpdateCnt"].toString());
-        log("XXXXXXXXXXXXXXXXXXXXXXXXUserFFprofilePhotoUpdateCnt" +
-            snapshot.docs[0].get("profilePhotoUpdateCnt").toString());
-        if (_userData["profilePhotoUpdateCnt"] <
-            snapshot.docs[0].get("profilePhotoUpdateCnt")) {
-          //自デバイス以外で写真が更新された場合は写真をDL
-          await readMainPhotoFromFirebaseToDirectoryAndMemory();
+        if(_userData["profilePhotoUpdateCnt"]!=null){
+          if (_userData["profilePhotoUpdateCnt"]<
+              snapshot.docs[0].get("profilePhotoUpdateCnt")) {
+            //自デバイス以外で写真が更新された場合は写真をDL
+            await readMainPhotoFromFirebaseToDirectoryAndMemory(snapshot.docs[0].get("profilePhotoNameSuffix")==null?"":snapshot.docs[0].get("profilePhotoNameSuffix"));
+          }
         }
         await boxUser.put("userDocId", snapshot.docs[0].id);
         _userData["userDocId"] = snapshot.docs[0].id;
@@ -214,7 +208,7 @@ class UserDataProviderNotifier extends ChangeNotifier {
       //ローカルに保存
       Directory appDocDir = await getApplicationDocumentsDirectory();
       File downloadToFile =
-          File("${appDocDir.path}/" + "mainPhoto" + pathStrEx);
+          File("${appDocDir.path}/media/" + "mainPhoto" + pathStrEx);
       await downloadToFile.writeAsBytes(await imageFile.readAsBytes());
 
       var box = Hive.box('user');
@@ -234,13 +228,13 @@ class UserDataProviderNotifier extends ChangeNotifier {
       });
 
       var result = await FlutterImageCompress.compressAndGetFile(
-        "${appDocDir.path}/" + "mainPhoto" + pathStrEx,
-        "${appDocDir.path}/" + "mainPhoto_small" + pathStrEx,
+        "${appDocDir.path}/media/" + "mainPhoto" + pathStrEx,
+        "${appDocDir.path}/media/" + "mainPhoto_small" + pathStrEx,
         quality: 20,
       );
 
       File localSmallFile =
-          File("${appDocDir.path}/" + "mainPhoto_small" + pathStrEx);
+          File("${appDocDir.path}/media/" + "mainPhoto_small" + pathStrEx);
       await storage
           .ref("profile/" +
               _userData["userDocId"]! +
@@ -264,6 +258,30 @@ class UserDataProviderNotifier extends ChangeNotifier {
       uploadAndInsertPhoto(File(pickerFile.path), ref);
       //TODO 圧縮率などは調整
     }
+  }
+
+
+  void clearHiveAndMemoryAndDirectory()async {
+
+    _userData = {};
+    _mainPhotoData=null;
+
+    var boxSetting = Hive.box('setting');
+    await boxSetting.put("userUpdateCheck",DateTime(2022, 1, 1, 0, 0));
+    boxSetting.delete("email");
+    boxSetting.delete("userDocId");
+    var boxUser = Hive.box('user');
+    await boxUser.deleteFromDisk();
+    await Hive.openBox('user');
+    final userDir = Directory((await getApplicationDocumentsDirectory()).path+"/media");
+
+    List<FileSystemEntity> files;
+    files = userDir.listSync(recursive: true,followLinks: false);
+    for (var file in files) {
+      file.deleteSync(recursive: true);
+    }
+
+    log("XXXXXXXXfinishDelete");
   }
 }
 

@@ -182,6 +182,21 @@ class MyPage extends ConsumerWidget {
             ),
           ),
         ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            ref.read(userDataProvider.notifier)
+                .clearHiveAndMemoryAndDirectory();
+          },
+          child: Text(
+            "clearLocalUserData",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
         Text("カレンダ"),
         Text("本人認証")
       ])

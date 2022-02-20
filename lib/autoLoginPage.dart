@@ -6,13 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'commonEntity/friendEntity.dart';
-import 'commonEntity/masterEntity.dart';
-import 'commonEntity/topicEntity.dart';
-import 'commonEntity/userEntity.dart';
+import 'package:planningkun/login.dart';
 import 'commonLogic/commonLogic.dart';
 import 'rootWidget.dart';
-import 'commonEntity/commonEntity.dart';
 
 
 class AutoLoginPage extends ConsumerWidget  {
@@ -58,22 +54,23 @@ class AutoLoginPage extends ConsumerWidget  {
     );
   }
 
-  Future<void> autoLoginProcess(BuildContext context, WidgetRef ref)async{
-
-    var box = await Hive.openBox('record');
-    await initialProcessLogic(ref,await box.get("email"));
-
-
-    // ログインに成功した場合
-    // チャット画面に遷移＋ログイン画面を破棄
-    await Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) {
-        return RootWidget();
-      }),
-    );
-
+  Future<void> autoLoginProcess(BuildContext context, WidgetRef ref)async {
+    var box = await Hive.openBox('setting');
+    String? email = await box.get("email");
+    if (email != null) {
+      await initialProcessLogic(ref, email);
+      // ログインに成功した場合
+      // チャット画面に遷移＋ログイン画面を破棄
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) {
+          return RootWidget();
+        }),
+      );
+    } else {
+      await Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) {
+            return LoginPage();
+          }));
+    }
   }
-
-
-
 }

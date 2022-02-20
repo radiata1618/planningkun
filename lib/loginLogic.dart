@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 
 //TODO　もともとのユーザとことなるユーザがログインされたら、警告を出して、リセット
 Future<void> insertUserToFirebase(String email) async {
-  // String insertedDocId="";
+  String insertedDocId="";
   QuerySnapshot snapshot = await FirebaseFirestore.instance
       .collection('users')
       .where('email', isEqualTo: email)
@@ -44,13 +44,13 @@ Future<void> insertUserToFirebase(String email) async {
         'updateTime': FieldValue.serverTimestamp(),
         'readableFlg': true,
         'deleteFlg': false,
+      }).then((value){
+        insertedDocId=value.id;
       });
-      //   .then((value){
-      //   insertedDocId=value.id;
-      // });
 
     var box= await Hive.openBox("setting");
     box.put("email",email);
+    box.put("userDocId",insertedDocId);
 
   }
 }
