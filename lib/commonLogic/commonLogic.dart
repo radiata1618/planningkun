@@ -42,7 +42,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
   ref
       .read(messageDataProvider.notifier)
-      .controlStreamOfReadMessageNewDataFromFirebaseToHive(ref,boxSetting.get("userDocId"));
+      .controlStreamOfReadMessageNewDataFromFirebaseToIsar(ref,boxSetting.get("userDocId"));
 }
 
 Future<void> closeStreams(WidgetRef ref) async {
@@ -76,11 +76,6 @@ Future<void> openHiveBoxes() async {
   }
 
   try {
-    Hive.lazyBox("messages");
-  } catch (e) {
-    await Hive.openLazyBox("messages");
-  }
-  try {
     Hive.box("topics");
   } catch (e) {
     await Hive.openBox("topics");
@@ -100,15 +95,16 @@ Future<void> openHiveBoxes() async {
 
   final dir = await getApplicationSupportDirectory();
 
-  try {
-    Isar.getInstance();
-  } catch (e) {
+  var isarInstance=Isar.getInstance();
+  if(isarInstance?.isOpen==false){
     await Isar.open(
       schemas: [MessageSchema],
       directory: dir.path,
       inspector: true,
     );
+    log("opened");
   }
+  log("ssssss");
 
 }
 

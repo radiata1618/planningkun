@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/routes/setting_route.dart';
 import '../commonEntity/friendEntity.dart';
+import '../commonEntity/messageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonLogic/commonLogic.dart';
 import '../insertTestData.dart';
@@ -190,6 +191,21 @@ class MyPage extends ConsumerWidget {
           },
           child: Text(
             "clearLocalUserData",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            ref.read(messageDataProvider.notifier)
+                .clearIsarAndDirectory();
+          },
+          child: Text(
+            "clearMessageData",
             style: TextStyle(
               fontWeight: FontWeight.normal,
               fontSize: 16,
