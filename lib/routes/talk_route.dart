@@ -71,7 +71,7 @@ class Talk extends ConsumerWidget {
     String todayStr=new DateFormat('MM/dd', "ja_JP").format(DateTime.now());
 
     return  Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0*screenAdjustSizeH,horizontal:8.0*screenAdjustSizeH),
+              padding: EdgeInsets.symmetric(vertical: 8.0*screenAdjustSizeH),
               child: Container(
                 height: 70,
                 child: GestureDetector(
