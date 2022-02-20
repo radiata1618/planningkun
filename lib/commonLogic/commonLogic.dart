@@ -73,9 +73,9 @@ Future<void> openHiveBoxes() async {
   }
 
   try {
-    Hive.box("messages");
+    Hive.lazyBox("messages");
   } catch (e) {
-    await Hive.openBox("messages");
+    await Hive.openLazyBox("messages");
   }
   try {
     Hive.box("topics");

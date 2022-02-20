@@ -54,9 +54,9 @@ class MessageDataNotifier extends ChangeNotifier {
 
     var boxSetting = Hive.box('setting');
     await boxSetting.put("messagesUpdateCheck",DateTime(2022, 1, 1, 0, 0));
-    var boxMessages = Hive.box('messages');
+    var boxMessages = Hive.lazyBox('messages');
     await boxMessages.deleteFromDisk();
-    await Hive.openBox('messages');
+    await Hive.openLazyBox('messages');
     final messagesDir = Directory((await getApplicationDocumentsDirectory()).path+"/messages");
 
     List<FileSystemEntity> files;
@@ -109,7 +109,7 @@ class MessageDataNotifier extends ChangeNotifier {
         log("XXXXXXXXXXXXXXXXXXXXXXXXXXXMessageSize" + snapshot.size.toString());
 
         Map<String, dynamic> tmpData={};
-        var boxMessage = Hive.box('messages');
+        var boxMessage = Hive.lazyBox('messages');
         for(int i=0;i<snapshot.size;i++){
 
           if(snapshot.docs[i].get("deleteFlg")){
@@ -153,6 +153,7 @@ class MessageDataNotifier extends ChangeNotifier {
           if (snapshot.docs[i].get("updateTime").toDate().isAfter(messageUpdatedTime)) {
             messageUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
             await boxSetting.put("messagesUpdateCheck", messageUpdatedTime);
+
           }
 
         }
