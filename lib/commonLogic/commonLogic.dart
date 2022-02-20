@@ -1,13 +1,16 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../commonEntity/friendEntity.dart';
 import '../commonEntity/messageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
+import '../config/messagesDatabase.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
@@ -94,6 +97,15 @@ Future<void> openHiveBoxes() async {
   } catch (e) {
     await Hive.openBox("user");
   }
+
+  final dir = await getApplicationSupportDirectory();
+
+  await Isar.open(
+    schemas: [MessagesSchema],
+    directory: dir.path,
+  );
+  log("finished open");
+
 }
 
 List<String> fromTextToList(String txt) {
