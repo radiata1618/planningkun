@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/friendEntity.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
+import "package:intl/intl.dart";
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../chat.dart';
 import '../commonUI.dart';
@@ -14,9 +15,14 @@ class Talk extends ConsumerWidget {
     Key? key,
   }) : super(key: key);
 
+  double screenHeight=1;
+  double screenWidth=1;
+  double screenAdjustSizeH=1;
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     
     return Scaffold(
       appBar: whiteAppbar(text: 'Talk'),
@@ -24,8 +30,7 @@ class Talk extends ConsumerWidget {
     );
   }
 
-  Future<void> moveToChat(
-      String userDocId, String friendUserDocId, BuildContext context) async {
+  Future<void> moveToChat(String friendUserDocId, BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -37,31 +42,36 @@ class Talk extends ConsumerWidget {
 
   Widget buildTalkList(BuildContext context,WidgetRef ref,String userDocId) {
 
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenAdjustSizeH = MediaQuery.of(context).size.height * 0.0011;
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+    screenAdjustSizeH = MediaQuery.of(context).size.height * 0.0011;
 
-    //TODO firebase からではなく、メモリから読み出すように修正
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('friends')
-          .where('userDocId', isEqualTo: userDocId)
-          .orderBy('lastTime', descending: true)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: const CircularProgressIndicator(),
-          );
-        }
-        if (snapshot.hasError) {
-          return const Text('Something went wrong');
-        }
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            final data = document.data()! as Map<String, dynamic>;
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0*screenAdjustSizeH),
+    List tmpList=[];
+    Map<String,Map<String,dynamic>> tmpMap =ref.read(friendDataProvider.notifier).friendData;
+
+    //リスト化
+    tmpMap.forEach((key, value) {
+      value["friendUserDocId"]=key;
+      tmpList.add(value);
+    });
+
+    //表示順にソート
+    tmpList.sort((a,b) => b["lastMessageTime"].compareTo(a["lastMessageTime"]));
+
+        return ListView.builder(
+          itemCount:tmpList.length,
+    itemBuilder:(BuildContext context,int index){
+    return talkListUnit( context,  ref,tmpList[index]);
+          }
+      );
+
+}
+
+  Widget talkListUnit(BuildContext context,WidgetRef ref,Map<String,dynamic> friendDataMap) {
+    String todayStr=new DateFormat('MM/dd', "ja_JP").format(DateTime.now());
+
+    return  Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0*screenAdjustSizeH,horizontal:8.0*screenAdjustSizeH),
               child: Container(
                 height: 70,
                 child: GestureDetector(
@@ -73,12 +83,10 @@ class Talk extends ConsumerWidget {
                           child: CircleAvatar(radius: 35*screenAdjustSizeH,
                               backgroundImage: ref
                               .watch(friendDataProvider)
-                              .friendPhotoData[data['friendUserDocId']] ==
-                              null
+                              .friendPhotoData['friendUserDocId'] ==null
                               ? null
-                              : ref
-                                  .watch(friendDataProvider)
-                                  .friendPhotoData[data['friendUserDocId']]!
+                              : ref.watch(friendDataProvider)
+                                  .friendPhotoData['friendUserDocId'] !
                               .image),
                         ),
                         Column(children: [
@@ -86,7 +94,7 @@ class Talk extends ConsumerWidget {
                             height: 20,
                             width:screenWidth-15.0*screenAdjustSizeH*2-35*screenAdjustSizeH*2-60*screenAdjustSizeH,
                             child: Text(
-                              data['friendUserName'],
+                              friendDataMap['friendUserName'],
                               style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 16,
@@ -98,7 +106,7 @@ class Talk extends ConsumerWidget {
                             height: 45,
                             width:screenWidth-15.0*screenAdjustSizeH*2-35*screenAdjustSizeH*2-60*screenAdjustSizeH,
                             child: Text(
-                              data['lastMessageContent'],
+                              friendDataMap['lastMessageContent'],
                               style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
@@ -113,7 +121,9 @@ class Talk extends ConsumerWidget {
                               Container(
                                 height: 16,
                                 child: Text(
-                                  "10/1",
+                                    todayStr== DateFormat('MM/dd', "ja_JP").format(friendDataMap["lastMessageTime"])
+                                  ? DateFormat('hh:mm', "ja_JP").format(friendDataMap["lastMessageTime"])
+                                  : DateFormat('MM/dd', "ja_JP").format(friendDataMap["lastMessageTime"]),
                                   style: TextStyle(
                                     fontWeight: FontWeight.normal,
                                     fontSize: 15,
@@ -124,14 +134,10 @@ class Talk extends ConsumerWidget {
                             ]))
                       ]),
                   onTap: () {
-                    moveToChat(userDocId, data['friendUserDocId'], context);
+                    moveToChat(friendDataMap['friendUserDocId'], context);
                   },
                 ),
               ),
             );
-          }).toList(),
-        );
-      },
-    );
-  }
+      }
 }

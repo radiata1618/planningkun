@@ -77,11 +77,9 @@ class TopicDataNotifier extends ChangeNotifier {
 
     var boxSetting = Hive.box('setting');
     await boxSetting.put("topicsUpdateCheck",DateTime(2022, 1, 1, 0, 0));
-
     var boxTopics = Hive.box('topics');
     await boxTopics.deleteFromDisk();
     await Hive.openBox('topics');
-
     final topicsDir = Directory((await getApplicationDocumentsDirectory()).path+"/topics");
 
     List<FileSystemEntity> files;
@@ -89,8 +87,6 @@ class TopicDataNotifier extends ChangeNotifier {
     for (var file in files) {
       file.deleteSync(recursive: true);
     }
-
-    //log("finish topics data clear");
 
   }
 

@@ -5,11 +5,14 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../commonEntity/friendEntity.dart';
-import '../commonEntity/masterEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
+
+  await initializeDateFormatting('ja');
+
   await makeDir("friends");
   await makeDir("topics");
   await makeDir("categories");

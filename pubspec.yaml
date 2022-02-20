@@ -24,6 +24,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter # 追加
   # Add the dependency for the Firebase Core Flutter SDK
   firebase_core: ^1.11.0
 

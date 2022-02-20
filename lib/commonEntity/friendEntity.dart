@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:planningkun/commonEntity/userEntity.dart';
 
 final friendDataProvider = ChangeNotifierProvider(
   (ref) => FriendDataNotifier(),
@@ -89,6 +88,28 @@ class FriendDataNotifier extends ChangeNotifier {
         File("${appDocDir.path}/friends/" + friendUserDocId + profilePhotoNameSuffix);
 
     _friendPhotoData[friendUserDocId] = Image.file(localFile, width: 90);
+  }
+
+
+  void clearHiveAndMemoryAndDirectory()async {
+
+    _friendData = {};
+    _friendPhotoData = {};
+
+    var boxSetting = Hive.box('setting');
+    await boxSetting.put("friendsUpdateCheck",DateTime(2022, 1, 1, 0, 0));
+    var boxFriends = Hive.box('friends');
+    await boxFriends.deleteFromDisk();
+    await Hive.openBox('friends');
+    final topicsDir = Directory((await getApplicationDocumentsDirectory()).path+"/friends");
+
+    List<FileSystemEntity> files;
+    files = topicsDir.listSync(recursive: true,followLinks: false);
+    for (var file in files) {
+      file.deleteSync(recursive: true);
+    }
+
+    log("XXXXXXXXfinishDelete");
   }
 
   void controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(
