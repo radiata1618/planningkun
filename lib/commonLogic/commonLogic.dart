@@ -23,13 +23,13 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("user", boxSetting);
 
   await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
-  await ref.read(friendDataProvider.notifier).readNewFriendFromFirebaseToHiveAndMemory(ref);
+  await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
   ref.read(userDataProvider.notifier)
       .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("email"));//
   ref
       .read(friendDataProvider.notifier)
-      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(ref);
+      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(ref,ref.watch(userDataProvider).userData["userDocId"]);
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();

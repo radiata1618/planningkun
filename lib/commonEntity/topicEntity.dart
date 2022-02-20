@@ -31,12 +31,12 @@ class TopicDataNotifier extends ChangeNotifier {
     try {
       Reference imageRef =
           storage.ref().child("topics").child(topicDocId + photoNameSuffix);
-      log("XXXXXX before getdownloadurl");
+      //log("XXXXXX before getdownloadurl");
       String imageUrl = await imageRef.getDownloadURL();
-      log("XXXXXX before network");
+      //log("XXXXXX before network");
       _topicPhotoData[topicDocId] = Image.network(imageUrl, width: 90);
 
-      log("XXXXXX before appdocdir");
+      //log("XXXXXX before appdocdir");
       Directory appDocDir = await getApplicationDocumentsDirectory();
       File downloadToFile =
           File("${appDocDir.path}/topics/" + topicDocId + photoNameSuffix);
@@ -49,7 +49,7 @@ class TopicDataNotifier extends ChangeNotifier {
   }
   void closeStream() async {
     streamSub!.cancel();
-    log("XXXXXX before controllerClose");
+    //log("XXXXXX before controllerClose");
     // controller.close();
   }
 
@@ -66,7 +66,7 @@ class TopicDataNotifier extends ChangeNotifier {
       _topicPhotoData[key] = Image.file(File("${appDocDir.path}/topics/" + key + _topicData[key]!["photoNameSuffix"]));
 
     }
-    log("XXXXXX after cast Map data");
+    //log("XXXXXX after cast Map data");
 
   }
 
@@ -90,27 +90,27 @@ class TopicDataNotifier extends ChangeNotifier {
       file.deleteSync(recursive: true);
     }
 
-    log("finish topics data clear");
+    //log("finish topics data clear");
 
   }
 
   void controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory()async {
 
     //最初は必ず呼び出し
-    log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallする");
+    //log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallする");
     streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
-    log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
+    //log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
 
     if(controller.hasListener){
 
     }else{
-      log("XXXXXXXXXXXXXControlListener開始");
+      //log("XXXXXXXXXXXXXControlListener開始");
       //2回目以降は新しいデータを更新するたびに起動
       controller.stream.listen((value)  async{
         streamSub!.cancel();
-        log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
+        //log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
         streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
-        log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
+        //log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
       });
     }
 
@@ -120,7 +120,7 @@ class TopicDataNotifier extends ChangeNotifier {
     var boxSetting = Hive.box('setting');
     DateTime topicUpdatedTime = await boxSetting.get("topicsUpdateCheck");
 
-    log("XXXXXXXXXXXXXQueryする"+topicUpdatedTime.toString());
+    ////log("XXXXXXXXXXXXXQueryする"+topicUpdatedTime.toString());
     _callStream = FirebaseFirestore.instance
         .collection('topics')
         .where('updateTime',
@@ -132,7 +132,7 @@ class TopicDataNotifier extends ChangeNotifier {
 
     StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
       if (snapshot.size != 0) {
-        log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
+        // //log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
 
         Map<String, dynamic> tmpData={};
         var boxTopic = Hive.box('topics');
@@ -143,7 +143,7 @@ class TopicDataNotifier extends ChangeNotifier {
             if(boxTopic.get(snapshot.docs[i].id)!=null){
               deleteTopicPhotoFroDirectoryAndMemory(snapshot.docs[i].id+snapshot.docs[i].get("photoNameSuffix"));
               await boxTopic.delete(snapshot.docs[i].id);
-              log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].id);
+              // //log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].id);
 
             }
 
@@ -172,7 +172,7 @@ class TopicDataNotifier extends ChangeNotifier {
 
 
           }
-          log("XXXXXXXXXXXXXDateリセットする"+topicUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
+          //log("XXXXXXXXXXXXXDateリセットする"+topicUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
           if (snapshot.docs[i].get("updateTime").toDate().isAfter(topicUpdatedTime)) {
             topicUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
             await boxSetting.put("topicsUpdateCheck", topicUpdatedTime);
@@ -181,9 +181,9 @@ class TopicDataNotifier extends ChangeNotifier {
         }
         notifyListeners();
 
-        log("XXXXXXXXXXXXXADDする");
+        //log("XXXXXXXXXXXXXADDする");
         controller.sink.add(true);
-        log("XXXXXXXXXXXXXADDした");
+        //log("XXXXXXXXXXXXXADDした");
       }
 
     });
@@ -195,7 +195,7 @@ class TopicDataNotifier extends ChangeNotifier {
 
     final topicsPhotoFile = File((await getApplicationDocumentsDirectory()).path+"/topics/"+fileName);
     topicsPhotoFile.deleteSync(recursive: true);
-    log("filedeletefinish"+fileName);
+    //log("filedeletefinish"+fileName);
 
   }
 }
