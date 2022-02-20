@@ -10,7 +10,7 @@ import '../commonEntity/friendEntity.dart';
 import '../commonEntity/messageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
-import '../config/messagesDatabase.dart';
+import '../config/messageDatabase.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
@@ -100,11 +100,15 @@ Future<void> openHiveBoxes() async {
 
   final dir = await getApplicationSupportDirectory();
 
-  await Isar.open(
-    schemas: [MessagesSchema],
-    directory: dir.path,
-  );
-  log("finished open");
+  try {
+    Isar.getInstance();
+  } catch (e) {
+    await Isar.open(
+      schemas: [MessageSchema],
+      directory: dir.path,
+      inspector: true,
+    );
+  }
 
 }
 
