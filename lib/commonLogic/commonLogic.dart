@@ -1,16 +1,19 @@
 import 'dart:developer';
 import 'dart:io';
-
+import 'dart:async';
+import 'package:path_provider/path_provider.dart';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../commonEntity/friendEntity.dart';
-import '../commonEntity/messageEntity.dart';
+import '../commonEntity/chatMessageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
 import '../config/chatMessageDatabase.dart';
+import '../config/topicDatabase.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await makeDir("friends");
@@ -27,7 +30,6 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("user", boxSetting);
   await updateTimeCheck("chatMessages", boxSetting);
 
-  await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
   await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
   ref
@@ -40,7 +42,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
           ref, boxSetting.get("userDocId"));
   ref
       .read(topicDataProvider.notifier)
-      .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
+      .controlStreamOfReadTopicNewDataFromFirebaseToIsar();
   ref
       .read(chatMessagesDataProvider.notifier)
       .controlStreamOfReadChatMessageNewDataFromFirebaseToIsar(
@@ -77,11 +79,6 @@ Future<void> openHiveBoxes() async {
     await Hive.openBox("setting");
   }
 
-  try {
-    Hive.box("topics");
-  } catch (e) {
-    await Hive.openBox("topics");
-  }
 
   try {
     Hive.box("friends");
@@ -100,19 +97,17 @@ Future<void> openHiveBoxes() async {
   final dir = await getApplicationSupportDirectory();
   if (isarInstance == null) {
     await Isar.open(
-      schemas: [ChatMessageSchema],
+      schemas: [ChatMessageSchema,TopicSchema],
       directory: dir.path,
       inspector: true,
     );
-    log("opened");
   } else {
     if (!isarInstance.isOpen) {
       await Isar.open(
-        schemas: [ChatMessageSchema],
+        schemas: [ChatMessageSchema,TopicSchema],
         directory: dir.path,
         inspector: true,
       );
-      log("opened");
     }
   }
 }
@@ -128,4 +123,22 @@ List<String> fromTextToList(String txt) {
   outputList.add(workText);
 
   return outputList;
+}
+
+Future<File> urlToFile(String imageUrl) async {
+// generate random number.
+  var rng = new Random();
+// get temporary directory of device.
+  Directory tempDir = await getTemporaryDirectory();
+// get temporary path from temporary directory.
+  String tempPath = tempDir.path;
+// create a new file in temporary path with random file name.
+  File file = new File('$tempPath'+ (rng.nextInt(100)).toString() +'.png');
+// call http.get method and pass imageUrl into it to get response.
+  http.Response response = await http.get( Uri.parse(imageUrl));
+// write bodyBytes received in response to file.
+  await file.writeAsBytes(response.bodyBytes);
+// now return the file which is created with random name in
+// temporary directory and image bytes from response is written to // that file.
+  return file;
 }

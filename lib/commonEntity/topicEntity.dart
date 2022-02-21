@@ -7,25 +7,21 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:planningkun/config/topicDatabase.dart';
 
 final topicDataProvider = ChangeNotifierProvider(
   (ref) => TopicDataNotifier(),
 );
 
 class TopicDataNotifier extends ChangeNotifier {
-  Map<String, Map<String, dynamic>> _topicData = {};
-  get topicData => _topicData;
-  Map<String, Image?> _topicPhotoData = {};
-  get topicPhotoData => _topicPhotoData;
-
   Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
   StreamSubscription<QuerySnapshot>? streamSub;
 
-  Future<void> readTopicPhotoFromFirebaseToDirectoryAndMemory(
-      String topicDocId) async {
-    String photoNameSuffix = _topicData[topicDocId]!["photoNameSuffix"]!;
+  Future<void> readTopicPhotoFromFirebaseToDirectory(
+      String topicDocId,String photoNameSuffix) async {
 
     FirebaseStorage storage = FirebaseStorage.instance;
     try {
@@ -33,9 +29,6 @@ class TopicDataNotifier extends ChangeNotifier {
           storage.ref().child("topics").child(topicDocId + photoNameSuffix);
       //log("XXXXXX before getdownloadurl");
       String imageUrl = await imageRef.getDownloadURL();
-      //log("XXXXXX before network");
-      _topicPhotoData[topicDocId] = Image.network(imageUrl, width: 90);
-
       //log("XXXXXX before appdocdir");
       Directory appDocDir = await getApplicationDocumentsDirectory();
       File downloadToFile =
@@ -43,43 +36,22 @@ class TopicDataNotifier extends ChangeNotifier {
       log(imageUrl.toString());
       await imageRef.writeToFile(downloadToFile);
     } catch (e) {
-      //写真があるはずなのになぜかエラーだった
-      _topicPhotoData[topicDocId] = null;
+      log("写真があるはずなのになぜかエラーだった_トピック");
     }
   }
   void closeStream() async {
     streamSub!.cancel();
-    //log("XXXXXX before controllerClose");
-    // controller.close();
   }
 
-  Future<void> readTopicFromHiveToMemory() async {
-    //データリセット
-    _topicData ={};
-    _topicPhotoData = {};
+  void clearIsarAndDirectory()async {
 
-    var boxTopic = Hive.box('topics');
-    Map <dynamic,dynamic> tmpBoxTopicData= boxTopic.toMap();
-    for (var key in tmpBoxTopicData.keys) {
-    _topicData[key]=new Map<String,dynamic>.from(tmpBoxTopicData[key]);
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-      _topicPhotoData[key] = Image.file(File("${appDocDir.path}/topics/" + key + _topicData[key]!["photoNameSuffix"]));
-
-    }
-    //log("XXXXXX after cast Map data");
-
-  }
-
-  void clearHiveAndMemoryAndDirectory()async {
-
-    _topicData = {};
-    _topicPhotoData = {};
 
     var boxSetting = Hive.box('setting');
     await boxSetting.put("topicsUpdateCheck",DateTime(2022, 1, 1, 0, 0));
-    var boxTopics = Hive.box('topics');
-    await boxTopics.deleteFromDisk();
-    await Hive.openBox('topics');
+    var isarInstance = Isar.getInstance();
+    await isarInstance?.writeTxn((isar) async {
+      isar.topics.clear();
+    });
     final topicsDir = Directory((await getApplicationDocumentsDirectory()).path+"/topics");
 
     List<FileSystemEntity> files;
@@ -90,11 +62,11 @@ class TopicDataNotifier extends ChangeNotifier {
 
   }
 
-  void controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory()async {
+  void controlStreamOfReadTopicNewDataFromFirebaseToIsar()async {
 
     //最初は必ず呼び出し
     //log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallする");
-    streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
+    streamSub=await readTopicNewDataFromFirebaseToIsar();
     //log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
 
     if(controller.hasListener){
@@ -105,14 +77,14 @@ class TopicDataNotifier extends ChangeNotifier {
       controller.stream.listen((value)  async{
         streamSub!.cancel();
         //log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
-        streamSub=await readTopicNewDataFromFirebaseToHiveAndMemory();
+        streamSub=await readTopicNewDataFromFirebaseToIsar();
         //log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
       });
     }
 
   }
 
-  Future<StreamSubscription<QuerySnapshot>> readTopicNewDataFromFirebaseToHiveAndMemory() async {
+  Future<StreamSubscription<QuerySnapshot>> readTopicNewDataFromFirebaseToIsar() async {
     var boxSetting = Hive.box('setting');
     DateTime topicUpdatedTime = await boxSetting.get("topicsUpdateCheck");
 
@@ -128,45 +100,76 @@ class TopicDataNotifier extends ChangeNotifier {
 
     StreamSubscription<QuerySnapshot> streamSub=_callStream!.listen((QuerySnapshot snapshot) async {
       if (snapshot.size != 0) {
-        // //log("XXXXXXXXXXXXXXXXXXXXXXXXXXXSize" + snapshot.size.toString());
-
-        Map<String, dynamic> tmpData={};
-        var boxTopic = Hive.box('topics');
         for(int i=0;i<snapshot.size;i++){
 
           if(snapshot.docs[i].get("deleteFlg")){
 
-            if(boxTopic.get(snapshot.docs[i].id)!=null){
-              deleteTopicPhotoFroDirectoryAndMemory(snapshot.docs[i].id+snapshot.docs[i].get("photoNameSuffix"));
-              await boxTopic.delete(snapshot.docs[i].id);
-              // //log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].id);
+            var isarInstance = Isar.getInstance();
+            await isarInstance?.writeTxn((isar) async {
 
-            }
+              int result = await isar.topics.filter()
+                  .topicDocIdEqualTo(snapshot.docs[i].id)
+                  .deleteAll();
+
+              if(result>0){
+                if(snapshot.docs[i].get("fileNameSuffix")!=""){
+                  deleteTopicPhotoFromDirectory(snapshot.docs[i].id+snapshot.docs[i].get("fileNameSuffix"));
+                }
+              }
+            });
+
 
           }else{
 
-            tmpData = {
-              'categoryDocId': snapshot.docs[i].get("categoryDocId"),
-              'categoryName': snapshot.docs[i].get("categoryName"),
-              'photoNameSuffix': snapshot.docs[i].get("photoNameSuffix"),
-              'photoUpdateCnt': snapshot.docs[i].get("photoUpdateCnt"),
-              'topicName': snapshot.docs[i].get("topicName"),
-              'insertUserDocId': snapshot.docs[i].get("insertUserDocId"),
-              'insertProgramId': snapshot.docs[i].get("insertProgramId"),
-              'insertTime': snapshot.docs[i].get("insertTime").toDate(),
-              'updateUserDocId': snapshot.docs[i].get("updateUserDocId"),
-              'updateProgramId': snapshot.docs[i].get("updateProgramId"),
-              'updateTime': snapshot.docs[i].get("updateTime").toDate(),
-              'readableFlg': snapshot.docs[i].get("readableFlg"),
-              'deleteFlg': snapshot.docs[i].get("deleteFlg"),
-            };
-
-            await boxTopic.put(snapshot.docs[i].id, tmpData);
-            _topicData[snapshot.docs[i].id] = tmpData;
-
-            await readTopicPhotoFromFirebaseToDirectoryAndMemory(snapshot.docs[i].id);
+            var isarInstance = Isar.getInstance();
+            await isarInstance?.writeTxn((isar) async {
+              List<Topic> resultList = await isar.topics.filter()
+                  .topicDocIdEqualTo(snapshot.docs[i].id)
+                  .findAll();
 
 
+              if(resultList.length==0){
+
+                final newTopic = new Topic(
+                    snapshot.docs[i].id,
+                    snapshot.docs[i].get("topicName"),
+                    snapshot.docs[i].get("categoryDocId"),
+                    snapshot.docs[i].get("categoryName"),
+                    snapshot.docs[i].get("photoNameSuffix"),
+                    snapshot.docs[i].get("photoUpdateCnt"),
+                    snapshot.docs[i].get("insertUserDocId"),
+                    snapshot.docs[i].get("insertProgramId"),
+                    snapshot.docs[i].get("insertTime").toDate(),
+                    snapshot.docs[i].get("updateUserDocId"),
+                    snapshot.docs[i].get("updateProgramId"),
+                    snapshot.docs[i].get("updateTime").toDate(),
+                    snapshot.docs[i].get("readableFlg"),
+                    snapshot.docs[i].get("deleteFlg"));
+
+                newTopic.id = await isar.topics.put(newTopic);// insert
+
+              }else{
+                resultList[0].topicDocId=snapshot.docs[i].id;
+                resultList[0].topicName=snapshot.docs[i].get("topicName");
+                resultList[0].categoryDocId=snapshot.docs[i].get("categoryDocId");
+                resultList[0].categoryName=snapshot.docs[i].get("categoryName");
+                resultList[0].photoNameSuffix=snapshot.docs[i].get("photoNameSuffix");
+                resultList[0].photoUpdateCnt=snapshot.docs[i].get("photoUpdateCnt");
+                resultList[0].insertUserDocId=snapshot.docs[i].get("insertUserDocId");
+                resultList[0].insertProgramId=snapshot.docs[i].get("insertProgramId");
+                resultList[0].insertTime=snapshot.docs[i].get("insertTime").toDate();
+                resultList[0].updateUserDocId=snapshot.docs[i].get("updateUserDocId");
+                resultList[0].updateProgramId=snapshot.docs[i].get("updateProgramId");
+                resultList[0].updateTime=snapshot.docs[i].get("updateTime").toDate();
+                resultList[0].readableFlg=snapshot.docs[i].get("readableFlg");
+                resultList[0].deleteFlg=snapshot.docs[i].get("deleteFlg");
+
+                await isar.topics.put(resultList[0]);
+              }
+
+            });
+
+            await readTopicPhotoFromFirebaseToDirectory(snapshot.docs[i].id,snapshot.docs[i].get("photoNameSuffix"));
           }
           //log("XXXXXXXXXXXXXDateリセットする"+topicUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
           if (snapshot.docs[i].get("updateTime").toDate().isAfter(topicUpdatedTime)) {
@@ -187,7 +190,7 @@ class TopicDataNotifier extends ChangeNotifier {
 
   }
 
-  void deleteTopicPhotoFroDirectoryAndMemory(String fileName)async{
+  void deleteTopicPhotoFromDirectory(String fileName)async{
 
     final topicsPhotoFile = File((await getApplicationDocumentsDirectory()).path+"/topics/"+fileName);
     topicsPhotoFile.deleteSync(recursive: true);

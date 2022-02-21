@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/src/consumer.dart';
 
-Future<void> insertTestData() async {
+Future<void> insertTestUserData(WidgetRef ref) async {
   insertUnitData("wendy",37,"1","JPN");
   insertUnitData("gene",21,"1","JPN");
   insertUnitData("macky",45,"1","JPN");

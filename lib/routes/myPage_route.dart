@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/routes/setting_route.dart';
 import '../commonEntity/friendEntity.dart';
-import '../commonEntity/messageEntity.dart';
+import '../commonEntity/chatMessageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonLogic/commonLogic.dart';
-import '../insertTestData.dart';
+import '../developerLogic/insertTestTopicsData.dart';
+import '../developerLogic/insertTestUsersData.dart';
 import '../login.dart';
 import 'topicRegister.dart';
 import 'categoryRegister.dart';
@@ -127,7 +128,7 @@ class MyPage extends ConsumerWidget {
           child: OutlinedButton(
             child: Text('テストデータ登録'),
             onPressed: () {
-              insertTestData();
+              insertTestUserData(ref);
             },
           ),
         ),
@@ -157,7 +158,7 @@ class MyPage extends ConsumerWidget {
           style: ButtonStyle(),
           onPressed: () async {
             ref.read(topicDataProvider.notifier)
-                .clearHiveAndMemoryAndDirectory();
+                .clearIsarAndDirectory();
           },
           child: Text(
             "clearLocalTopicData",
@@ -206,6 +207,20 @@ class MyPage extends ConsumerWidget {
           },
           child: Text(
             "clearMessageData",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            insertTestData(ref);
+          },
+          child: Text(
+            "insertestTopicData",
             style: TextStyle(
               fontWeight: FontWeight.normal,
               fontSize: 16,
