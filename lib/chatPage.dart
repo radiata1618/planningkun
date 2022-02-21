@@ -1,11 +1,12 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isar/isar.dart';
 import 'package:planningkun/routes/friendProfile.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/userEntity.dart';
+import 'config/chatMessageDatabase.dart';
 import 'join_channel_video.dart';
 import 'chatPageLogic.dart';
 import 'confirmCall.dart';
@@ -103,7 +104,7 @@ class ChatPage extends ConsumerWidget {
     );
   }
 
-  Padding rightBalloon(String content) {
+  Padding rightBalloon(ChatMessage chatMessage) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 28.0),
       child: Align(
@@ -128,14 +129,14 @@ class ChatPage extends ConsumerWidget {
                       ])),
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text(content,
+                  child: Text(chatMessage.content,
                       style: TextStyle(
                         color: Colors.white,
                       ))))),
     );
   }
 
-  Padding leftBalloon(String content) {
+  Padding leftBalloon(ChatMessage chatMessage) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 28.0),
       child: Align(
@@ -161,7 +162,7 @@ class ChatPage extends ConsumerWidget {
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child:
-                      Text(content, style: TextStyle(color: Colors.black54))))),
+                      Text(chatMessage.content, style: TextStyle(color: Colors.black54))))),
     );
   }
 
@@ -213,31 +214,33 @@ class ChatPage extends ConsumerWidget {
     );
   }
 
-  Widget buildMessageList(String userDocId, String oppositeUserDocId) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('chatMessages')
-          .where('userDocId', isEqualTo: userDocId)
-          .where('oppositeUserDocId', isEqualTo: oppositeUserDocId)
-          .orderBy('sendTime', descending: false)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
+  Widget buildMessageList(String userDocId, String friendUserDocId) {
+
+    //TODO　ORDERで日付順にする。、時間を表示、
+    var isarInstance = Isar.getInstance();
+    Query<ChatMessage>? chatMessageDataQuery = isarInstance?.chatMessages.filter()
+        .userDocIdEqualTo(userDocId)
+        .friendUserDocIdEqualTo(friendUserDocId)
+        .build();
+
+    return StreamBuilder<List<ChatMessage>>(
+      stream: chatMessageDataQuery?.watch(initialReturn: true),
+      builder: (context, AsyncSnapshot<List<ChatMessage>> chatMessagesList) {
+        if (!chatMessagesList.hasData) {
           return const Center(
             child: const CircularProgressIndicator(),
           );
         }
-        if (snapshot.hasError) {
+        if (chatMessagesList.hasError) {
           return const Text('Something went wrong');
         }
         return ListView(
           shrinkWrap: true, //エラー対策
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            final data = document.data()! as Map<String, dynamic>;
-            if (data['receiveSend'] == "send") {
-              return rightBalloon(data['content']);
+          children: chatMessagesList.data!.map((ChatMessage chatMessge) {
+            if (chatMessge.receiveSendType == "send") {
+              return rightBalloon(chatMessge);
             } else {
-              return leftBalloon(data['content']);
+              return leftBalloon(chatMessge);
             }
           }).toList(),
         );

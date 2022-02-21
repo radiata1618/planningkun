@@ -95,10 +95,9 @@ Future<void> openHiveBoxes() async {
     await Hive.openBox("user");
   }
 
-  final dir = await getApplicationSupportDirectory();
 
   var isarInstance = Isar.getInstance();
-
+  final dir = await getApplicationSupportDirectory();
   if (isarInstance == null) {
     await Isar.open(
       schemas: [ChatMessageSchema],
