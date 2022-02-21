@@ -10,15 +10,13 @@ import '../commonEntity/friendEntity.dart';
 import '../commonEntity/messageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
-import '../config/messageDatabase.dart';
+import '../config/chatMessageDatabase.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
-
-
   await makeDir("friends");
   await makeDir("topics");
   await makeDir("categories");
-  await makeDir("messages");
+  await makeDir("chatMessages");
   await makeDir("media");
 
   await openHiveBoxes();
@@ -27,29 +25,33 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("topics", boxSetting);
   await updateTimeCheck("friends", boxSetting);
   await updateTimeCheck("user", boxSetting);
-  await updateTimeCheck("messages", boxSetting);
+  await updateTimeCheck("chatMessages", boxSetting);
 
   await ref.read(topicDataProvider.notifier).readTopicFromHiveToMemory();
   await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
-  ref.read(userDataProvider.notifier)
-      .controlStreamOfReadUserDataFirebaseToHiveAndMemory(boxSetting.get("email"));//
+  ref
+      .read(userDataProvider.notifier)
+      .controlStreamOfReadUserDataFirebaseToHiveAndMemory(
+          boxSetting.get("email")); //TODO インストール直後にログインだけするとエラー
   ref
       .read(friendDataProvider.notifier)
-      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(ref,boxSetting.get("userDocId"));
+      .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(
+          ref, boxSetting.get("userDocId"));
   ref
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToHiveAndMemory();
   ref
-      .read(messageDataProvider.notifier)
-      .controlStreamOfReadMessageNewDataFromFirebaseToIsar(ref,boxSetting.get("userDocId"));
+      .read(chatMessagesDataProvider.notifier)
+      .controlStreamOfReadChatMessageNewDataFromFirebaseToIsar(
+          ref, boxSetting.get("userDocId"));
 }
 
 Future<void> closeStreams(WidgetRef ref) async {
   ref.read(topicDataProvider.notifier).closeStream();
   ref.read(userDataProvider.notifier).closeStream();
   ref.read(friendDataProvider.notifier).closeStream();
-  ref.read(messageDataProvider.notifier).closeStream();
+  ref.read(chatMessagesDataProvider.notifier).closeStream();
 }
 
 Future<void> updateTimeCheck(String itemName, var box) async {
@@ -95,17 +97,25 @@ Future<void> openHiveBoxes() async {
 
   final dir = await getApplicationSupportDirectory();
 
-  var isarInstance=Isar.getInstance();
-  if(isarInstance?.isOpen==false){
+  var isarInstance = Isar.getInstance();
+
+  if (isarInstance == null) {
     await Isar.open(
-      schemas: [MessageSchema],
+      schemas: [ChatMessageSchema],
       directory: dir.path,
       inspector: true,
     );
     log("opened");
+  } else {
+    if (!isarInstance.isOpen) {
+      await Isar.open(
+        schemas: [ChatMessageSchema],
+        directory: dir.path,
+        inspector: true,
+      );
+      log("opened");
+    }
   }
-  log("ssssss");
-
 }
 
 List<String> fromTextToList(String txt) {

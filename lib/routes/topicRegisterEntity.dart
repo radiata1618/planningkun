@@ -112,7 +112,7 @@ Future<void> insertTopic(WidgetRef ref,String topicName) async {
         'topicName':topicName,
         'insertUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
         'insertProgramId': "topicRegister",
-        'insertTime': FieldValue.serverTimestamp().toString(),
+        'insertTime': FieldValue.serverTimestamp(),
         'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
         'updateProgramId': "topicRegister",
         'updateTime': FieldValue.serverTimestamp(),

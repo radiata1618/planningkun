@@ -1,13 +1,11 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'commonEntity/userEntity.dart';
 
 Future<void> insertChat(WidgetRef ref,
     String messageContent,String friendUserDocId) async {
 
-  FirebaseFirestore.instance.collection('messages').add({
+  FirebaseFirestore.instance.collection('chatMessages').add({
     'userDocId': ref.watch(userDataProvider).userData["userDocId"]!,
     'friendUserDocId':friendUserDocId ,
     'content': messageContent,
@@ -26,7 +24,7 @@ Future<void> insertChat(WidgetRef ref,
     'deleteFlg': false,
   });
 
-  FirebaseFirestore.instance.collection('messages').add({
+  FirebaseFirestore.instance.collection('chatMessages').add({
     'userDocId': friendUserDocId ,
     'friendUserDocId':ref.watch(userDataProvider).userData["userDocId"]!,
     'content': messageContent,

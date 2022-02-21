@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'messageDatabase.dart';
+part of 'chatMessageDatabase.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator
@@ -8,29 +8,29 @@ part of 'messageDatabase.dart';
 
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast
 
-extension GetMessageCollection on Isar {
-  IsarCollection<Message> get messages {
-    return getCollection('Message');
+extension GetChatMessageCollection on Isar {
+  IsarCollection<ChatMessage> get chatMessages {
+    return getCollection('ChatMessage');
   }
 }
 
-final MessageSchema = CollectionSchema(
-  name: 'Message',
+final ChatMessageSchema = CollectionSchema(
+  name: 'ChatMessage',
   schema:
-      '{"name":"Message","idName":"id","properties":[{"name":"callChannelId","type":"String"},{"name":"content","type":"String"},{"name":"deleteFlg","type":"Bool"},{"name":"fileNameSuffix","type":"String"},{"name":"friendUserDocId","type":"String"},{"name":"insertProgramId","type":"String"},{"name":"insertTime","type":"Long"},{"name":"insertUserDocId","type":"String"},{"name":"messageDocId","type":"String"},{"name":"messageType","type":"String"},{"name":"readableFlg","type":"Bool"},{"name":"receiveSendType","type":"String"},{"name":"sendTime","type":"Long"},{"name":"updateProgramId","type":"String"},{"name":"updateTime","type":"Long"},{"name":"updateUserDocId","type":"String"},{"name":"userDocId","type":"String"}],"indexes":[],"links":[]}',
-  nativeAdapter: const _MessageNativeAdapter(),
-  webAdapter: const _MessageWebAdapter(),
+      '{"name":"ChatMessage","idName":"id","properties":[{"name":"callChannelId","type":"String"},{"name":"chatMessageDocId","type":"String"},{"name":"content","type":"String"},{"name":"deleteFlg","type":"Bool"},{"name":"fileNameSuffix","type":"String"},{"name":"friendUserDocId","type":"String"},{"name":"insertProgramId","type":"String"},{"name":"insertTime","type":"Long"},{"name":"insertUserDocId","type":"String"},{"name":"messageType","type":"String"},{"name":"readableFlg","type":"Bool"},{"name":"receiveSendType","type":"String"},{"name":"sendTime","type":"Long"},{"name":"updateProgramId","type":"String"},{"name":"updateTime","type":"Long"},{"name":"updateUserDocId","type":"String"},{"name":"userDocId","type":"String"}],"indexes":[],"links":[]}',
+  nativeAdapter: const _ChatMessageNativeAdapter(),
+  webAdapter: const _ChatMessageWebAdapter(),
   idName: 'id',
   propertyIds: {
     'callChannelId': 0,
-    'content': 1,
-    'deleteFlg': 2,
-    'fileNameSuffix': 3,
-    'friendUserDocId': 4,
-    'insertProgramId': 5,
-    'insertTime': 6,
-    'insertUserDocId': 7,
-    'messageDocId': 8,
+    'chatMessageDocId': 1,
+    'content': 2,
+    'deleteFlg': 3,
+    'fileNameSuffix': 4,
+    'friendUserDocId': 5,
+    'insertProgramId': 6,
+    'insertTime': 7,
+    'insertUserDocId': 8,
     'messageType': 9,
     'readableFlg': 10,
     'receiveSendType': 11,
@@ -58,13 +58,14 @@ final MessageSchema = CollectionSchema(
   version: 2,
 );
 
-class _MessageWebAdapter extends IsarWebTypeAdapter<Message> {
-  const _MessageWebAdapter();
+class _ChatMessageWebAdapter extends IsarWebTypeAdapter<ChatMessage> {
+  const _ChatMessageWebAdapter();
 
   @override
-  Object serialize(IsarCollection<Message> collection, Message object) {
+  Object serialize(IsarCollection<ChatMessage> collection, ChatMessage object) {
     final jsObj = IsarNative.newJsObject();
     IsarNative.jsObjectSet(jsObj, 'callChannelId', object.callChannelId);
+    IsarNative.jsObjectSet(jsObj, 'chatMessageDocId', object.chatMessageDocId);
     IsarNative.jsObjectSet(jsObj, 'content', object.content);
     IsarNative.jsObjectSet(jsObj, 'deleteFlg', object.deleteFlg);
     IsarNative.jsObjectSet(jsObj, 'fileNameSuffix', object.fileNameSuffix);
@@ -74,7 +75,6 @@ class _MessageWebAdapter extends IsarWebTypeAdapter<Message> {
     IsarNative.jsObjectSet(
         jsObj, 'insertTime', object.insertTime.toUtc().millisecondsSinceEpoch);
     IsarNative.jsObjectSet(jsObj, 'insertUserDocId', object.insertUserDocId);
-    IsarNative.jsObjectSet(jsObj, 'messageDocId', object.messageDocId);
     IsarNative.jsObjectSet(jsObj, 'messageType', object.messageType);
     IsarNative.jsObjectSet(jsObj, 'readableFlg', object.readableFlg);
     IsarNative.jsObjectSet(jsObj, 'receiveSendType', object.receiveSendType);
@@ -89,9 +89,10 @@ class _MessageWebAdapter extends IsarWebTypeAdapter<Message> {
   }
 
   @override
-  Message deserialize(IsarCollection<Message> collection, dynamic jsObj) {
-    final object = Message(
-      IsarNative.jsObjectGet(jsObj, 'messageDocId') ?? '',
+  ChatMessage deserialize(
+      IsarCollection<ChatMessage> collection, dynamic jsObj) {
+    final object = ChatMessage(
+      IsarNative.jsObjectGet(jsObj, 'chatMessageDocId') ?? '',
       IsarNative.jsObjectGet(jsObj, 'userDocId') ?? '',
       IsarNative.jsObjectGet(jsObj, 'friendUserDocId') ?? '',
       IsarNative.jsObjectGet(jsObj, 'content') ?? '',
@@ -133,6 +134,8 @@ class _MessageWebAdapter extends IsarWebTypeAdapter<Message> {
     switch (propertyName) {
       case 'callChannelId':
         return (IsarNative.jsObjectGet(jsObj, 'callChannelId') ?? '') as P;
+      case 'chatMessageDocId':
+        return (IsarNative.jsObjectGet(jsObj, 'chatMessageDocId') ?? '') as P;
       case 'content':
         return (IsarNative.jsObjectGet(jsObj, 'content') ?? '') as P;
       case 'deleteFlg':
@@ -155,8 +158,6 @@ class _MessageWebAdapter extends IsarWebTypeAdapter<Message> {
             : DateTime.fromMillisecondsSinceEpoch(0)) as P;
       case 'insertUserDocId':
         return (IsarNative.jsObjectGet(jsObj, 'insertUserDocId') ?? '') as P;
-      case 'messageDocId':
-        return (IsarNative.jsObjectGet(jsObj, 'messageDocId') ?? '') as P;
       case 'messageType':
         return (IsarNative.jsObjectGet(jsObj, 'messageType') ?? '') as P;
       case 'readableFlg':
@@ -189,41 +190,46 @@ class _MessageWebAdapter extends IsarWebTypeAdapter<Message> {
   }
 
   @override
-  void attachLinks(Isar isar, int id, Message object) {}
+  void attachLinks(Isar isar, int id, ChatMessage object) {}
 }
 
-class _MessageNativeAdapter extends IsarNativeTypeAdapter<Message> {
-  const _MessageNativeAdapter();
+class _ChatMessageNativeAdapter extends IsarNativeTypeAdapter<ChatMessage> {
+  const _ChatMessageNativeAdapter();
 
   @override
-  void serialize(IsarCollection<Message> collection, IsarRawObject rawObj,
-      Message object, int staticSize, List<int> offsets, AdapterAlloc alloc) {
+  void serialize(
+      IsarCollection<ChatMessage> collection,
+      IsarRawObject rawObj,
+      ChatMessage object,
+      int staticSize,
+      List<int> offsets,
+      AdapterAlloc alloc) {
     var dynamicSize = 0;
     final value0 = object.callChannelId;
     final _callChannelId = IsarBinaryWriter.utf8Encoder.convert(value0);
     dynamicSize += (_callChannelId.length) as int;
-    final value1 = object.content;
-    final _content = IsarBinaryWriter.utf8Encoder.convert(value1);
+    final value1 = object.chatMessageDocId;
+    final _chatMessageDocId = IsarBinaryWriter.utf8Encoder.convert(value1);
+    dynamicSize += (_chatMessageDocId.length) as int;
+    final value2 = object.content;
+    final _content = IsarBinaryWriter.utf8Encoder.convert(value2);
     dynamicSize += (_content.length) as int;
-    final value2 = object.deleteFlg;
-    final _deleteFlg = value2;
-    final value3 = object.fileNameSuffix;
-    final _fileNameSuffix = IsarBinaryWriter.utf8Encoder.convert(value3);
+    final value3 = object.deleteFlg;
+    final _deleteFlg = value3;
+    final value4 = object.fileNameSuffix;
+    final _fileNameSuffix = IsarBinaryWriter.utf8Encoder.convert(value4);
     dynamicSize += (_fileNameSuffix.length) as int;
-    final value4 = object.friendUserDocId;
-    final _friendUserDocId = IsarBinaryWriter.utf8Encoder.convert(value4);
+    final value5 = object.friendUserDocId;
+    final _friendUserDocId = IsarBinaryWriter.utf8Encoder.convert(value5);
     dynamicSize += (_friendUserDocId.length) as int;
-    final value5 = object.insertProgramId;
-    final _insertProgramId = IsarBinaryWriter.utf8Encoder.convert(value5);
+    final value6 = object.insertProgramId;
+    final _insertProgramId = IsarBinaryWriter.utf8Encoder.convert(value6);
     dynamicSize += (_insertProgramId.length) as int;
-    final value6 = object.insertTime;
-    final _insertTime = value6;
-    final value7 = object.insertUserDocId;
-    final _insertUserDocId = IsarBinaryWriter.utf8Encoder.convert(value7);
+    final value7 = object.insertTime;
+    final _insertTime = value7;
+    final value8 = object.insertUserDocId;
+    final _insertUserDocId = IsarBinaryWriter.utf8Encoder.convert(value8);
     dynamicSize += (_insertUserDocId.length) as int;
-    final value8 = object.messageDocId;
-    final _messageDocId = IsarBinaryWriter.utf8Encoder.convert(value8);
-    dynamicSize += (_messageDocId.length) as int;
     final value9 = object.messageType;
     final _messageType = IsarBinaryWriter.utf8Encoder.convert(value9);
     dynamicSize += (_messageType.length) as int;
@@ -252,14 +258,14 @@ class _MessageNativeAdapter extends IsarNativeTypeAdapter<Message> {
     final buffer = IsarNative.bufAsBytes(rawObj.buffer, size);
     final writer = IsarBinaryWriter(buffer, staticSize);
     writer.writeBytes(offsets[0], _callChannelId);
-    writer.writeBytes(offsets[1], _content);
-    writer.writeBool(offsets[2], _deleteFlg);
-    writer.writeBytes(offsets[3], _fileNameSuffix);
-    writer.writeBytes(offsets[4], _friendUserDocId);
-    writer.writeBytes(offsets[5], _insertProgramId);
-    writer.writeDateTime(offsets[6], _insertTime);
-    writer.writeBytes(offsets[7], _insertUserDocId);
-    writer.writeBytes(offsets[8], _messageDocId);
+    writer.writeBytes(offsets[1], _chatMessageDocId);
+    writer.writeBytes(offsets[2], _content);
+    writer.writeBool(offsets[3], _deleteFlg);
+    writer.writeBytes(offsets[4], _fileNameSuffix);
+    writer.writeBytes(offsets[5], _friendUserDocId);
+    writer.writeBytes(offsets[6], _insertProgramId);
+    writer.writeDateTime(offsets[7], _insertTime);
+    writer.writeBytes(offsets[8], _insertUserDocId);
     writer.writeBytes(offsets[9], _messageType);
     writer.writeBool(offsets[10], _readableFlg);
     writer.writeBytes(offsets[11], _receiveSendType);
@@ -271,26 +277,26 @@ class _MessageNativeAdapter extends IsarNativeTypeAdapter<Message> {
   }
 
   @override
-  Message deserialize(IsarCollection<Message> collection, int id,
+  ChatMessage deserialize(IsarCollection<ChatMessage> collection, int id,
       IsarBinaryReader reader, List<int> offsets) {
-    final object = Message(
-      reader.readString(offsets[8]),
-      reader.readString(offsets[16]),
-      reader.readString(offsets[4]),
+    final object = ChatMessage(
       reader.readString(offsets[1]),
+      reader.readString(offsets[16]),
+      reader.readString(offsets[5]),
+      reader.readString(offsets[2]),
       reader.readString(offsets[11]),
       reader.readString(offsets[9]),
       reader.readDateTime(offsets[12]),
       reader.readString(offsets[0]),
-      reader.readString(offsets[3]),
-      reader.readString(offsets[7]),
-      reader.readString(offsets[5]),
-      reader.readDateTime(offsets[6]),
+      reader.readString(offsets[4]),
+      reader.readString(offsets[8]),
+      reader.readString(offsets[6]),
+      reader.readDateTime(offsets[7]),
       reader.readString(offsets[15]),
       reader.readString(offsets[13]),
       reader.readDateTime(offsets[14]),
       reader.readBool(offsets[10]),
-      reader.readBool(offsets[2]),
+      reader.readBool(offsets[3]),
     );
     object.id = id;
     return object;
@@ -307,17 +313,17 @@ class _MessageNativeAdapter extends IsarNativeTypeAdapter<Message> {
       case 1:
         return (reader.readString(offset)) as P;
       case 2:
-        return (reader.readBool(offset)) as P;
-      case 3:
         return (reader.readString(offset)) as P;
+      case 3:
+        return (reader.readBool(offset)) as P;
       case 4:
         return (reader.readString(offset)) as P;
       case 5:
         return (reader.readString(offset)) as P;
       case 6:
-        return (reader.readDateTime(offset)) as P;
-      case 7:
         return (reader.readString(offset)) as P;
+      case 7:
+        return (reader.readDateTime(offset)) as P;
       case 8:
         return (reader.readString(offset)) as P;
       case 9:
@@ -342,17 +348,19 @@ class _MessageNativeAdapter extends IsarNativeTypeAdapter<Message> {
   }
 
   @override
-  void attachLinks(Isar isar, int id, Message object) {}
+  void attachLinks(Isar isar, int id, ChatMessage object) {}
 }
 
-extension MessageQueryWhereSort on QueryBuilder<Message, Message, QWhere> {
-  QueryBuilder<Message, Message, QAfterWhere> anyId() {
+extension ChatMessageQueryWhereSort
+    on QueryBuilder<ChatMessage, ChatMessage, QWhere> {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterWhere> anyId() {
     return addWhereClauseInternal(const WhereClause(indexName: null));
   }
 }
 
-extension MessageQueryWhere on QueryBuilder<Message, Message, QWhereClause> {
-  QueryBuilder<Message, Message, QAfterWhereClause> idEqualTo(int id) {
+extension ChatMessageQueryWhere
+    on QueryBuilder<ChatMessage, ChatMessage, QWhereClause> {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterWhereClause> idEqualTo(int id) {
     return addWhereClauseInternal(WhereClause(
       indexName: null,
       lower: [id],
@@ -362,7 +370,8 @@ extension MessageQueryWhere on QueryBuilder<Message, Message, QWhereClause> {
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterWhereClause> idNotEqualTo(int id) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterWhereClause> idNotEqualTo(
+      int id) {
     if (whereSortInternal == Sort.asc) {
       return addWhereClauseInternal(WhereClause(
         indexName: null,
@@ -386,7 +395,7 @@ extension MessageQueryWhere on QueryBuilder<Message, Message, QWhereClause> {
     }
   }
 
-  QueryBuilder<Message, Message, QAfterWhereClause> idGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterWhereClause> idGreaterThan(
     int id, {
     bool include = false,
   }) {
@@ -397,7 +406,7 @@ extension MessageQueryWhere on QueryBuilder<Message, Message, QWhereClause> {
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterWhereClause> idLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterWhereClause> idLessThan(
     int id, {
     bool include = false,
   }) {
@@ -408,7 +417,7 @@ extension MessageQueryWhere on QueryBuilder<Message, Message, QWhereClause> {
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterWhereClause> idBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterWhereClause> idBetween(
     int lowerId,
     int upperId, {
     bool includeLower = true,
@@ -424,9 +433,10 @@ extension MessageQueryWhere on QueryBuilder<Message, Message, QWhereClause> {
   }
 }
 
-extension MessageQueryFilter
-    on QueryBuilder<Message, Message, QFilterCondition> {
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdEqualTo(
+extension ChatMessageQueryFilter
+    on QueryBuilder<ChatMessage, ChatMessage, QFilterCondition> {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -438,7 +448,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       callChannelIdGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -453,7 +463,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -467,7 +478,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -484,7 +496,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdStartsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -496,7 +509,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -508,9 +522,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'callChannelId',
@@ -519,9 +532,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> callChannelIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      callChannelIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'callChannelId',
@@ -530,7 +542,114 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.eq,
+      property: 'chatMessageDocId',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdGreaterThan(
+    String value, {
+    bool caseSensitive = true,
+    bool include = false,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.gt,
+      include: include,
+      property: 'chatMessageDocId',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdLessThan(
+    String value, {
+    bool caseSensitive = true,
+    bool include = false,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.lt,
+      include: include,
+      property: 'chatMessageDocId',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdBetween(
+    String lower,
+    String upper, {
+    bool caseSensitive = true,
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return addFilterConditionInternal(FilterCondition.between(
+      property: 'chatMessageDocId',
+      lower: lower,
+      includeLower: includeLower,
+      upper: upper,
+      includeUpper: includeUpper,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.startsWith,
+      property: 'chatMessageDocId',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.endsWith,
+      property: 'chatMessageDocId',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdContains(String value, {bool caseSensitive = true}) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.contains,
+      property: 'chatMessageDocId',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      chatMessageDocIdMatches(String pattern, {bool caseSensitive = true}) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.matches,
+      property: 'chatMessageDocId',
+      value: pattern,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> contentEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -542,7 +661,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      contentGreaterThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -556,7 +676,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> contentLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -570,7 +690,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> contentBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -587,7 +707,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentStartsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      contentStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -599,7 +720,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> contentEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -611,7 +732,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentContains(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> contentContains(
       String value,
       {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
@@ -622,7 +743,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> contentMatches(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> contentMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
@@ -633,8 +754,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> deleteFlgEqualTo(
-      bool value) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      deleteFlgEqualTo(bool value) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
       property: 'deleteFlg',
@@ -642,7 +763,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> fileNameSuffixEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      fileNameSuffixEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -654,7 +776,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       fileNameSuffixGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -669,7 +791,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> fileNameSuffixLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      fileNameSuffixLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -683,7 +806,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> fileNameSuffixBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      fileNameSuffixBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -700,7 +824,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       fileNameSuffixStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -713,7 +837,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> fileNameSuffixEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      fileNameSuffixEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -725,9 +850,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> fileNameSuffixContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      fileNameSuffixContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'fileNameSuffix',
@@ -736,9 +860,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> fileNameSuffixMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      fileNameSuffixMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'fileNameSuffix',
@@ -747,7 +870,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> friendUserDocIdEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      friendUserDocIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -759,7 +883,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       friendUserDocIdGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -774,7 +898,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> friendUserDocIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      friendUserDocIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -788,7 +913,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> friendUserDocIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      friendUserDocIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -805,7 +931,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       friendUserDocIdStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -818,7 +944,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> friendUserDocIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      friendUserDocIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -830,9 +957,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> friendUserDocIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      friendUserDocIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'friendUserDocId',
@@ -841,9 +967,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> friendUserDocIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      friendUserDocIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'friendUserDocId',
@@ -852,7 +977,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> idEqualTo(int value) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> idEqualTo(
+      int value) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
       property: 'id',
@@ -860,7 +986,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> idGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> idGreaterThan(
     int value, {
     bool include = false,
   }) {
@@ -872,7 +998,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> idLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> idLessThan(
     int value, {
     bool include = false,
   }) {
@@ -884,7 +1010,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> idBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> idBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -899,7 +1025,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertProgramIdEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertProgramIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -911,7 +1038,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       insertProgramIdGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -926,7 +1053,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertProgramIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertProgramIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -940,7 +1068,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertProgramIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertProgramIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -957,7 +1086,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       insertProgramIdStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -970,7 +1099,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertProgramIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertProgramIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -982,9 +1112,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertProgramIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertProgramIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'insertProgramId',
@@ -993,9 +1122,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertProgramIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertProgramIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'insertProgramId',
@@ -1004,8 +1132,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertTimeEqualTo(
-      DateTime value) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertTimeEqualTo(DateTime value) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
       property: 'insertTime',
@@ -1013,7 +1141,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertTimeGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertTimeGreaterThan(
     DateTime value, {
     bool include = false,
   }) {
@@ -1025,7 +1154,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertTimeLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertTimeLessThan(
     DateTime value, {
     bool include = false,
   }) {
@@ -1037,7 +1167,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertTimeBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertTimeBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -1052,7 +1183,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertUserDocIdEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertUserDocIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1064,7 +1196,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       insertUserDocIdGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -1079,7 +1211,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertUserDocIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertUserDocIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1093,7 +1226,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertUserDocIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertUserDocIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -1110,7 +1244,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       insertUserDocIdStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1123,7 +1257,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertUserDocIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertUserDocIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1135,9 +1270,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertUserDocIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertUserDocIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'insertUserDocId',
@@ -1146,9 +1280,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> insertUserDocIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      insertUserDocIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'insertUserDocId',
@@ -1157,110 +1290,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.eq,
-      property: 'messageDocId',
-      value: value,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdGreaterThan(
-    String value, {
-    bool caseSensitive = true,
-    bool include = false,
-  }) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.gt,
-      include: include,
-      property: 'messageDocId',
-      value: value,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdLessThan(
-    String value, {
-    bool caseSensitive = true,
-    bool include = false,
-  }) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.lt,
-      include: include,
-      property: 'messageDocId',
-      value: value,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdBetween(
-    String lower,
-    String upper, {
-    bool caseSensitive = true,
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return addFilterConditionInternal(FilterCondition.between(
-      property: 'messageDocId',
-      lower: lower,
-      includeLower: includeLower,
-      upper: upper,
-      includeUpper: includeUpper,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.startsWith,
-      property: 'messageDocId',
-      value: value,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.endsWith,
-      property: 'messageDocId',
-      value: value,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.contains,
-      property: 'messageDocId',
-      value: value,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageDocIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return addFilterConditionInternal(FilterCondition(
-      type: ConditionType.matches,
-      property: 'messageDocId',
-      value: pattern,
-      caseSensitive: caseSensitive,
-    ));
-  }
-
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1272,7 +1303,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeGreaterThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1286,7 +1318,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1300,7 +1333,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -1317,7 +1351,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeStartsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1329,7 +1364,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1341,9 +1377,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'messageType',
@@ -1352,9 +1387,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> messageTypeMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      messageTypeMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'messageType',
@@ -1363,8 +1397,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> readableFlgEqualTo(
-      bool value) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      readableFlgEqualTo(bool value) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
       property: 'readableFlg',
@@ -1372,7 +1406,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> receiveSendTypeEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      receiveSendTypeEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1384,7 +1419,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       receiveSendTypeGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -1399,7 +1434,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> receiveSendTypeLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      receiveSendTypeLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1413,7 +1449,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> receiveSendTypeBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      receiveSendTypeBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -1430,7 +1467,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       receiveSendTypeStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1443,7 +1480,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> receiveSendTypeEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      receiveSendTypeEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1455,9 +1493,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> receiveSendTypeContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      receiveSendTypeContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'receiveSendType',
@@ -1466,9 +1503,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> receiveSendTypeMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      receiveSendTypeMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'receiveSendType',
@@ -1477,7 +1513,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> sendTimeEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> sendTimeEqualTo(
       DateTime value) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
@@ -1486,7 +1522,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> sendTimeGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      sendTimeGreaterThan(
     DateTime value, {
     bool include = false,
   }) {
@@ -1498,7 +1535,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> sendTimeLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      sendTimeLessThan(
     DateTime value, {
     bool include = false,
   }) {
@@ -1510,7 +1548,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> sendTimeBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition> sendTimeBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -1525,7 +1563,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateProgramIdEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateProgramIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1537,7 +1576,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       updateProgramIdGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -1552,7 +1591,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateProgramIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateProgramIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1566,7 +1606,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateProgramIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateProgramIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -1583,7 +1624,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       updateProgramIdStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1596,7 +1637,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateProgramIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateProgramIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1608,9 +1650,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateProgramIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateProgramIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'updateProgramId',
@@ -1619,9 +1660,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateProgramIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateProgramIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'updateProgramId',
@@ -1630,8 +1670,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateTimeEqualTo(
-      DateTime value) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateTimeEqualTo(DateTime value) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
       property: 'updateTime',
@@ -1639,7 +1679,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateTimeGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateTimeGreaterThan(
     DateTime value, {
     bool include = false,
   }) {
@@ -1651,7 +1692,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateTimeLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateTimeLessThan(
     DateTime value, {
     bool include = false,
   }) {
@@ -1663,7 +1705,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateTimeBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateTimeBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -1678,7 +1721,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateUserDocIdEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateUserDocIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1690,7 +1734,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       updateUserDocIdGreaterThan(
     String value, {
     bool caseSensitive = true,
@@ -1705,7 +1749,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateUserDocIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateUserDocIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1719,7 +1764,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateUserDocIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateUserDocIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -1736,7 +1782,7 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition>
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
       updateUserDocIdStartsWith(
     String value, {
     bool caseSensitive = true,
@@ -1749,7 +1795,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateUserDocIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateUserDocIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1761,9 +1808,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateUserDocIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateUserDocIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'updateUserDocId',
@@ -1772,9 +1818,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> updateUserDocIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      updateUserDocIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'updateUserDocId',
@@ -1783,7 +1828,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdEqualTo(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1795,7 +1841,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdGreaterThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdGreaterThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1809,7 +1856,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdLessThan(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdLessThan(
     String value, {
     bool caseSensitive = true,
     bool include = false,
@@ -1823,7 +1871,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdBetween(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdBetween(
     String lower,
     String upper, {
     bool caseSensitive = true,
@@ -1840,7 +1889,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdStartsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1852,7 +1902,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdEndsWith(
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -1864,9 +1915,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdContains(String value, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.contains,
       property: 'userDocId',
@@ -1875,9 +1925,8 @@ extension MessageQueryFilter
     ));
   }
 
-  QueryBuilder<Message, Message, QAfterFilterCondition> userDocIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterFilterCondition>
+      userDocIdMatches(String pattern, {bool caseSensitive = true}) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.matches,
       property: 'userDocId',
@@ -1887,467 +1936,496 @@ extension MessageQueryFilter
   }
 }
 
-extension MessageQueryLinks
-    on QueryBuilder<Message, Message, QFilterCondition> {}
+extension ChatMessageQueryLinks
+    on QueryBuilder<ChatMessage, ChatMessage, QFilterCondition> {}
 
-extension MessageQueryWhereSortBy on QueryBuilder<Message, Message, QSortBy> {
-  QueryBuilder<Message, Message, QAfterSortBy> sortByCallChannelId() {
+extension ChatMessageQueryWhereSortBy
+    on QueryBuilder<ChatMessage, ChatMessage, QSortBy> {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByCallChannelId() {
     return addSortByInternal('callChannelId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByCallChannelIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByCallChannelIdDesc() {
     return addSortByInternal('callChannelId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByContent() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByChatMessageDocId() {
+    return addSortByInternal('chatMessageDocId', Sort.asc);
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByChatMessageDocIdDesc() {
+    return addSortByInternal('chatMessageDocId', Sort.desc);
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByContent() {
     return addSortByInternal('content', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByContentDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByContentDesc() {
     return addSortByInternal('content', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByDeleteFlg() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByDeleteFlg() {
     return addSortByInternal('deleteFlg', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByDeleteFlgDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByDeleteFlgDesc() {
     return addSortByInternal('deleteFlg', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByFileNameSuffix() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByFileNameSuffix() {
     return addSortByInternal('fileNameSuffix', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByFileNameSuffixDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByFileNameSuffixDesc() {
     return addSortByInternal('fileNameSuffix', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByFriendUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByFriendUserDocId() {
     return addSortByInternal('friendUserDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByFriendUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByFriendUserDocIdDesc() {
     return addSortByInternal('friendUserDocId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortById() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortById() {
     return addSortByInternal('id', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByIdDesc() {
     return addSortByInternal('id', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByInsertProgramId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByInsertProgramId() {
     return addSortByInternal('insertProgramId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByInsertProgramIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByInsertProgramIdDesc() {
     return addSortByInternal('insertProgramId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByInsertTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByInsertTime() {
     return addSortByInternal('insertTime', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByInsertTimeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByInsertTimeDesc() {
     return addSortByInternal('insertTime', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByInsertUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByInsertUserDocId() {
     return addSortByInternal('insertUserDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByInsertUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByInsertUserDocIdDesc() {
     return addSortByInternal('insertUserDocId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByMessageDocId() {
-    return addSortByInternal('messageDocId', Sort.asc);
-  }
-
-  QueryBuilder<Message, Message, QAfterSortBy> sortByMessageDocIdDesc() {
-    return addSortByInternal('messageDocId', Sort.desc);
-  }
-
-  QueryBuilder<Message, Message, QAfterSortBy> sortByMessageType() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByMessageType() {
     return addSortByInternal('messageType', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByMessageTypeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByMessageTypeDesc() {
     return addSortByInternal('messageType', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByReadableFlg() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByReadableFlg() {
     return addSortByInternal('readableFlg', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByReadableFlgDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByReadableFlgDesc() {
     return addSortByInternal('readableFlg', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByReceiveSendType() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByReceiveSendType() {
     return addSortByInternal('receiveSendType', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByReceiveSendTypeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByReceiveSendTypeDesc() {
     return addSortByInternal('receiveSendType', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortBySendTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortBySendTime() {
     return addSortByInternal('sendTime', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortBySendTimeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortBySendTimeDesc() {
     return addSortByInternal('sendTime', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUpdateProgramId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByUpdateProgramId() {
     return addSortByInternal('updateProgramId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUpdateProgramIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByUpdateProgramIdDesc() {
     return addSortByInternal('updateProgramId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUpdateTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByUpdateTime() {
     return addSortByInternal('updateTime', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUpdateTimeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByUpdateTimeDesc() {
     return addSortByInternal('updateTime', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUpdateUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByUpdateUserDocId() {
     return addSortByInternal('updateUserDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUpdateUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      sortByUpdateUserDocIdDesc() {
     return addSortByInternal('updateUserDocId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByUserDocId() {
     return addSortByInternal('userDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> sortByUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> sortByUserDocIdDesc() {
     return addSortByInternal('userDocId', Sort.desc);
   }
 }
 
-extension MessageQueryWhereSortThenBy
-    on QueryBuilder<Message, Message, QSortThenBy> {
-  QueryBuilder<Message, Message, QAfterSortBy> thenByCallChannelId() {
+extension ChatMessageQueryWhereSortThenBy
+    on QueryBuilder<ChatMessage, ChatMessage, QSortThenBy> {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByCallChannelId() {
     return addSortByInternal('callChannelId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByCallChannelIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByCallChannelIdDesc() {
     return addSortByInternal('callChannelId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByContent() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByChatMessageDocId() {
+    return addSortByInternal('chatMessageDocId', Sort.asc);
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByChatMessageDocIdDesc() {
+    return addSortByInternal('chatMessageDocId', Sort.desc);
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByContent() {
     return addSortByInternal('content', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByContentDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByContentDesc() {
     return addSortByInternal('content', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByDeleteFlg() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByDeleteFlg() {
     return addSortByInternal('deleteFlg', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByDeleteFlgDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByDeleteFlgDesc() {
     return addSortByInternal('deleteFlg', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByFileNameSuffix() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByFileNameSuffix() {
     return addSortByInternal('fileNameSuffix', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByFileNameSuffixDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByFileNameSuffixDesc() {
     return addSortByInternal('fileNameSuffix', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByFriendUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByFriendUserDocId() {
     return addSortByInternal('friendUserDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByFriendUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByFriendUserDocIdDesc() {
     return addSortByInternal('friendUserDocId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenById() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenById() {
     return addSortByInternal('id', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByIdDesc() {
     return addSortByInternal('id', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByInsertProgramId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByInsertProgramId() {
     return addSortByInternal('insertProgramId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByInsertProgramIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByInsertProgramIdDesc() {
     return addSortByInternal('insertProgramId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByInsertTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByInsertTime() {
     return addSortByInternal('insertTime', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByInsertTimeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByInsertTimeDesc() {
     return addSortByInternal('insertTime', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByInsertUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByInsertUserDocId() {
     return addSortByInternal('insertUserDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByInsertUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByInsertUserDocIdDesc() {
     return addSortByInternal('insertUserDocId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByMessageDocId() {
-    return addSortByInternal('messageDocId', Sort.asc);
-  }
-
-  QueryBuilder<Message, Message, QAfterSortBy> thenByMessageDocIdDesc() {
-    return addSortByInternal('messageDocId', Sort.desc);
-  }
-
-  QueryBuilder<Message, Message, QAfterSortBy> thenByMessageType() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByMessageType() {
     return addSortByInternal('messageType', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByMessageTypeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByMessageTypeDesc() {
     return addSortByInternal('messageType', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByReadableFlg() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByReadableFlg() {
     return addSortByInternal('readableFlg', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByReadableFlgDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByReadableFlgDesc() {
     return addSortByInternal('readableFlg', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByReceiveSendType() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByReceiveSendType() {
     return addSortByInternal('receiveSendType', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByReceiveSendTypeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByReceiveSendTypeDesc() {
     return addSortByInternal('receiveSendType', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenBySendTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenBySendTime() {
     return addSortByInternal('sendTime', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenBySendTimeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenBySendTimeDesc() {
     return addSortByInternal('sendTime', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUpdateProgramId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByUpdateProgramId() {
     return addSortByInternal('updateProgramId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUpdateProgramIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByUpdateProgramIdDesc() {
     return addSortByInternal('updateProgramId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUpdateTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByUpdateTime() {
     return addSortByInternal('updateTime', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUpdateTimeDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByUpdateTimeDesc() {
     return addSortByInternal('updateTime', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUpdateUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByUpdateUserDocId() {
     return addSortByInternal('updateUserDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUpdateUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy>
+      thenByUpdateUserDocIdDesc() {
     return addSortByInternal('updateUserDocId', Sort.desc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUserDocId() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByUserDocId() {
     return addSortByInternal('userDocId', Sort.asc);
   }
 
-  QueryBuilder<Message, Message, QAfterSortBy> thenByUserDocIdDesc() {
+  QueryBuilder<ChatMessage, ChatMessage, QAfterSortBy> thenByUserDocIdDesc() {
     return addSortByInternal('userDocId', Sort.desc);
   }
 }
 
-extension MessageQueryWhereDistinct
-    on QueryBuilder<Message, Message, QDistinct> {
-  QueryBuilder<Message, Message, QDistinct> distinctByCallChannelId(
+extension ChatMessageQueryWhereDistinct
+    on QueryBuilder<ChatMessage, ChatMessage, QDistinct> {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByCallChannelId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('callChannelId', caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByContent(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByChatMessageDocId(
+      {bool caseSensitive = true}) {
+    return addDistinctByInternal('chatMessageDocId',
+        caseSensitive: caseSensitive);
+  }
+
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByContent(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('content', caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByDeleteFlg() {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByDeleteFlg() {
     return addDistinctByInternal('deleteFlg');
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByFileNameSuffix(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByFileNameSuffix(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('fileNameSuffix',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByFriendUserDocId(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByFriendUserDocId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('friendUserDocId',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctById() {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctById() {
     return addDistinctByInternal('id');
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByInsertProgramId(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByInsertProgramId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('insertProgramId',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByInsertTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByInsertTime() {
     return addDistinctByInternal('insertTime');
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByInsertUserDocId(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByInsertUserDocId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('insertUserDocId',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByMessageDocId(
-      {bool caseSensitive = true}) {
-    return addDistinctByInternal('messageDocId', caseSensitive: caseSensitive);
-  }
-
-  QueryBuilder<Message, Message, QDistinct> distinctByMessageType(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByMessageType(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('messageType', caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByReadableFlg() {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByReadableFlg() {
     return addDistinctByInternal('readableFlg');
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByReceiveSendType(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByReceiveSendType(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('receiveSendType',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctBySendTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctBySendTime() {
     return addDistinctByInternal('sendTime');
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByUpdateProgramId(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByUpdateProgramId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('updateProgramId',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByUpdateTime() {
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByUpdateTime() {
     return addDistinctByInternal('updateTime');
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByUpdateUserDocId(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByUpdateUserDocId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('updateUserDocId',
         caseSensitive: caseSensitive);
   }
 
-  QueryBuilder<Message, Message, QDistinct> distinctByUserDocId(
+  QueryBuilder<ChatMessage, ChatMessage, QDistinct> distinctByUserDocId(
       {bool caseSensitive = true}) {
     return addDistinctByInternal('userDocId', caseSensitive: caseSensitive);
   }
 }
 
-extension MessageQueryProperty
-    on QueryBuilder<Message, Message, QQueryProperty> {
-  QueryBuilder<Message, String, QQueryOperations> callChannelIdProperty() {
+extension ChatMessageQueryProperty
+    on QueryBuilder<ChatMessage, ChatMessage, QQueryProperty> {
+  QueryBuilder<ChatMessage, String, QQueryOperations> callChannelIdProperty() {
     return addPropertyNameInternal('callChannelId');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> contentProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      chatMessageDocIdProperty() {
+    return addPropertyNameInternal('chatMessageDocId');
+  }
+
+  QueryBuilder<ChatMessage, String, QQueryOperations> contentProperty() {
     return addPropertyNameInternal('content');
   }
 
-  QueryBuilder<Message, bool, QQueryOperations> deleteFlgProperty() {
+  QueryBuilder<ChatMessage, bool, QQueryOperations> deleteFlgProperty() {
     return addPropertyNameInternal('deleteFlg');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> fileNameSuffixProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations> fileNameSuffixProperty() {
     return addPropertyNameInternal('fileNameSuffix');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> friendUserDocIdProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      friendUserDocIdProperty() {
     return addPropertyNameInternal('friendUserDocId');
   }
 
-  QueryBuilder<Message, int, QQueryOperations> idProperty() {
+  QueryBuilder<ChatMessage, int, QQueryOperations> idProperty() {
     return addPropertyNameInternal('id');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> insertProgramIdProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      insertProgramIdProperty() {
     return addPropertyNameInternal('insertProgramId');
   }
 
-  QueryBuilder<Message, DateTime, QQueryOperations> insertTimeProperty() {
+  QueryBuilder<ChatMessage, DateTime, QQueryOperations> insertTimeProperty() {
     return addPropertyNameInternal('insertTime');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> insertUserDocIdProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      insertUserDocIdProperty() {
     return addPropertyNameInternal('insertUserDocId');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> messageDocIdProperty() {
-    return addPropertyNameInternal('messageDocId');
-  }
-
-  QueryBuilder<Message, String, QQueryOperations> messageTypeProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations> messageTypeProperty() {
     return addPropertyNameInternal('messageType');
   }
 
-  QueryBuilder<Message, bool, QQueryOperations> readableFlgProperty() {
+  QueryBuilder<ChatMessage, bool, QQueryOperations> readableFlgProperty() {
     return addPropertyNameInternal('readableFlg');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> receiveSendTypeProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      receiveSendTypeProperty() {
     return addPropertyNameInternal('receiveSendType');
   }
 
-  QueryBuilder<Message, DateTime, QQueryOperations> sendTimeProperty() {
+  QueryBuilder<ChatMessage, DateTime, QQueryOperations> sendTimeProperty() {
     return addPropertyNameInternal('sendTime');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> updateProgramIdProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      updateProgramIdProperty() {
     return addPropertyNameInternal('updateProgramId');
   }
 
-  QueryBuilder<Message, DateTime, QQueryOperations> updateTimeProperty() {
+  QueryBuilder<ChatMessage, DateTime, QQueryOperations> updateTimeProperty() {
     return addPropertyNameInternal('updateTime');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> updateUserDocIdProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations>
+      updateUserDocIdProperty() {
     return addPropertyNameInternal('updateUserDocId');
   }
 
-  QueryBuilder<Message, String, QQueryOperations> userDocIdProperty() {
+  QueryBuilder<ChatMessage, String, QQueryOperations> userDocIdProperty() {
     return addPropertyNameInternal('userDocId');
   }
 }

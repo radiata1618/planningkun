@@ -10,26 +10,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
+import 'package:planningkun/config/chatMessageDatabase.dart';
 
-import '../config/messageDatabase.dart';
 
-final messageDataProvider = ChangeNotifierProvider(
-      (ref) => MessageDataNotifier(),
+final chatMessagesDataProvider = ChangeNotifierProvider(
+      (ref) => ChatMessageDataNotifier(),
 );
 
-class MessageDataNotifier extends ChangeNotifier {
+class ChatMessageDataNotifier extends ChangeNotifier {
   Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
   StreamSubscription<QuerySnapshot>? streamSub;
 
-  Future<void> readMessagePhotoFromFirebaseToDirectory(String messageDocId,String senderUserDocId,String fileNameSuffix) async {
+  Future<void> readChatMessagePhotoFromFirebaseToDirectory(String chatMessageDocId,String senderUserDocId,String fileNameSuffix) async {
 
     if (fileNameSuffix != "" ) {
       FirebaseStorage storage = FirebaseStorage.instance;
       try {
         Reference fileRef =
-        storage.ref().child("messages").child(senderUserDocId).child(
-            messageDocId + fileNameSuffix);
+        storage.ref().child("chatMessages").child(senderUserDocId).child(
+            chatMessageDocId + fileNameSuffix);
         //log("XXXXXX before getdownloadurl");
         var data = await fileRef.getData();
         File downLoadFile = new File.fromRawPath(data!);
@@ -37,8 +37,8 @@ class MessageDataNotifier extends ChangeNotifier {
         //log("XXXXXX before appdocdir");
         Directory appDocDir = await getApplicationDocumentsDirectory();
         await downLoadFile.copy(
-            "${appDocDir.path}/messages/" + senderUserDocId + "/" +
-                messageDocId + fileNameSuffix);
+            "${appDocDir.path}/chatMessages/" + senderUserDocId + "/" +
+                chatMessageDocId + fileNameSuffix);
       } catch (e) {
         //写真があるはずなのになぜかエラーだった
         log("XXXXXXXXXXXXXXXファイル保存ERROR");
@@ -57,25 +57,28 @@ class MessageDataNotifier extends ChangeNotifier {
 
     //TODO　削除の処理を登録
     var boxSetting = Hive.box('setting');
-    await boxSetting.put("messagesUpdateCheck",DateTime(2022, 1, 1, 0, 0));
+    await boxSetting.put("chatMessagesUpdateCheck",DateTime(2022, 1, 1, 0, 0));
     var isarInstance = Isar.getInstance();
-    isarInstance?.messages.clear();
+    // isarInstance?.messages.clear();
+    await isarInstance?.writeTxn((isar) async {
+      isar.chatMessages.clear();
+    });
 
-    final messagesDir = Directory((await getApplicationDocumentsDirectory()).path+"/messages");
+    final chatMessagesDir = Directory((await getApplicationDocumentsDirectory()).path+"/chatMessages");
 
     List<FileSystemEntity> files;
-    files = messagesDir.listSync(recursive: true,followLinks: false);
+    files = chatMessagesDir.listSync(recursive: true,followLinks: false);
     for (var file in files) {
       file.deleteSync(recursive: true);
     }
 
   }
 
-  void controlStreamOfReadMessageNewDataFromFirebaseToIsar(WidgetRef ref,String userDocId)async {
+  void controlStreamOfReadChatMessageNewDataFromFirebaseToIsar(WidgetRef ref,String userDocId)async {
 
     //最初は必ず呼び出し
     //log("XXXXXXXXXXXXX初回readMessageNewDataFromFirebaseToHiveAndMemorycallする");
-    streamSub=await readMessageNewDataFromFirebaseToIsar(ref,userDocId);
+    streamSub=await readChatMessageNewDataFromFirebaseToIsar(ref,userDocId);
     //log("XXXXXXXXXXXXX初回readMessageNewDataFromFirebaseToHiveAndMemorycallした");
 
     if(controller.hasListener){
@@ -86,23 +89,23 @@ class MessageDataNotifier extends ChangeNotifier {
       controller.stream.listen((value)  async{
         streamSub!.cancel();
         //log("XXXXXXXXXXXXXreadMessageNewDataFromFirebaseToHiveAndMemorycallする");
-        streamSub=await readMessageNewDataFromFirebaseToIsar(ref,userDocId);
+        streamSub=await readChatMessageNewDataFromFirebaseToIsar(ref,userDocId);
         //log("XXXXXXXXXXXXXreadMessageNewDataFromFirebaseToHiveAndMemorycallした");
       });
     }
 
   }
 
-  Future<StreamSubscription<QuerySnapshot>> readMessageNewDataFromFirebaseToIsar(WidgetRef ref,String userDocId) async {
+  Future<StreamSubscription<QuerySnapshot>> readChatMessageNewDataFromFirebaseToIsar(WidgetRef ref,String userDocId) async {
     var boxSetting = Hive.box('setting');
-    DateTime messageUpdatedTime = await boxSetting.get("messagesUpdateCheck");
+    DateTime chatMessageUpdatedTime = await boxSetting.get("chatMessagesUpdateCheck");
 
     ////log("XXXXXXXXXXXXXQueryする"+messageUpdatedTime.toString());
     _callStream = FirebaseFirestore.instance
-        .collection('messages')
+        .collection('chatMessages')
         .where('userDocId', isEqualTo: userDocId)
         .where('updateTime',
-        isGreaterThan: Timestamp.fromDate(messageUpdatedTime))
+        isGreaterThan: Timestamp.fromDate(chatMessageUpdatedTime))
         .where('readableFlg', isEqualTo: true)
         .orderBy('updateTime', descending: false)
         .snapshots();
@@ -120,13 +123,13 @@ class MessageDataNotifier extends ChangeNotifier {
             var isarInstance = Isar.getInstance();
             await isarInstance?.writeTxn((isar) async {
 
-              int result = await isar.messages.filter()
-                .messageDocIdEqualTo(snapshot.docs[i].id)
+              int result = await isar.chatMessages.filter()
+                .chatMessageDocIdEqualTo(snapshot.docs[i].id)
                 .deleteAll();
 
               if(result>0){
                 if(snapshot.docs[i].get("fileNameSuffix")!=""){
-                  deleteMessageFileFromDirectory(snapshot.docs[i].id+snapshot.docs[i].get("fileNameSuffix"));
+                  deleteChatMessageFileFromDirectory(snapshot.docs[i].id+snapshot.docs[i].get("fileNameSuffix"));
                 }
               }
             });
@@ -134,52 +137,69 @@ class MessageDataNotifier extends ChangeNotifier {
 
           }else{
 
-            final newMessage = new Message(
-                snapshot.docs[i].id,
-                snapshot.docs[i].get("userDocId"),
-                snapshot.docs[i].get("friendUserDocId"),
-                snapshot.docs[i].get("content"),
-                snapshot.docs[i].get("receiveSendType"),
-                snapshot.docs[i].get("messageType"),
-                snapshot.docs[i].get("sendTime").toDate(),
-                snapshot.docs[i].get("callChannelId"),
-                snapshot.docs[i].get("fileNameSuffix"),
-                snapshot.docs[i].get("insertUserDocId"),
-                snapshot.docs[i].get("insertProgramId"),
-                snapshot.docs[i].get("insertTime").toDate(),
-                snapshot.docs[i].get("updateUserDocId"),
-                snapshot.docs[i].get("updateProgramId"),
-                snapshot.docs[i].get("updateTime").toDate(),
-                snapshot.docs[i].get("readableFlg"),
-                snapshot.docs[i].get("deleteFlg"));
 
             var isarInstance = Isar.getInstance();
             await isarInstance?.writeTxn((isar) async {
-              List result = await isar.messages.filter()
-                  .messageDocIdEqualTo(snapshot.docs[i].id)
+              List<ChatMessage> resultList = await isar.chatMessages.filter()
+                  .chatMessageDocIdEqualTo(snapshot.docs[i].id)
                   .findAll();
 
-              if(result.length==0){
+              if(resultList.length==0){
                 //新規登録
 
-                newMessage.id = await isar.messages.put(newMessage);// insert
+                final newChatMessage = new ChatMessage(
+                    snapshot.docs[i].id,
+                    snapshot.docs[i].get("userDocId"),
+                    snapshot.docs[i].get("friendUserDocId"),
+                    snapshot.docs[i].get("content"),
+                    snapshot.docs[i].get("receiveSendType"),
+                    snapshot.docs[i].get("messageType"),
+                    snapshot.docs[i].get("sendTime").toDate(),
+                    snapshot.docs[i].get("callChannelId"),
+                    snapshot.docs[i].get("fileNameSuffix"),
+                    snapshot.docs[i].get("insertUserDocId"),
+                    snapshot.docs[i].get("insertProgramId"),
+                    snapshot.docs[i].get("insertTime").toDate(),
+                    snapshot.docs[i].get("updateUserDocId"),
+                    snapshot.docs[i].get("updateProgramId"),
+                    snapshot.docs[i].get("updateTime").toDate(),
+                    snapshot.docs[i].get("readableFlg"),
+                    snapshot.docs[i].get("deleteFlg"));
+                newChatMessage.id = await isar.chatMessages.put(newChatMessage);// insert
 
               }else{
-
+                resultList[0].chatMessageDocId=snapshot.docs[i].id;
+                resultList[0].userDocId=snapshot.docs[i].get("userDocId");
+                resultList[0].friendUserDocId=snapshot.docs[i].get("friendUserDocId");
+                resultList[0].content=snapshot.docs[i].get("content");
+                resultList[0].receiveSendType=snapshot.docs[i].get("receiveSendType");
+                resultList[0].messageType=snapshot.docs[i].get("messageType");
+                resultList[0].sendTime=snapshot.docs[i].get("sendTime").toDate();
+                resultList[0].callChannelId=snapshot.docs[i].get("callChannelId");
+                resultList[0].fileNameSuffix=snapshot.docs[i].get("fileNameSuffix");
+                resultList[0].insertUserDocId=snapshot.docs[i].get("insertUserDocId");
+                resultList[0].insertProgramId=snapshot.docs[i].get("insertProgramId");
+                resultList[0].insertTime=snapshot.docs[i].get("insertTime").toDate();
+                resultList[0].updateUserDocId=snapshot.docs[i].get("updateUserDocId");
+                resultList[0].updateProgramId=snapshot.docs[i].get("updateProgramId");
+                resultList[0].updateTime=snapshot.docs[i].get("updateTime").toDate();
+                resultList[0].readableFlg=snapshot.docs[i].get("readableFlg");
+                resultList[0].deleteFlg=snapshot.docs[i].get("deleteFlg");
+                await isar.chatMessages.put(resultList[0]);// insert
               }
 
             });
 
-            await readMessagePhotoFromFirebaseToDirectory(snapshot.docs[i].id
+            await readChatMessagePhotoFromFirebaseToDirectory(snapshot.docs[i].id
                 ,snapshot.docs[i].get("receiveSendType")=="send"?snapshot.docs[i].get("userDocId"):snapshot.docs[i].get("friendUserDocId")
                 ,snapshot.docs[i].get("fileNameSuffix"));
 
 
           }
-          log("XXXXXXXXXXXXXDateリセットするMessage"+messageUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
-          if (snapshot.docs[i].get("updateTime").toDate().isAfter(messageUpdatedTime)) {
-            messageUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
-            await boxSetting.put("messagesUpdateCheck", messageUpdatedTime);
+          log("XXXXXXXXXXXXXDateリセットするMessage"+chatMessageUpdatedTime.toString()+">>>>"+snapshot.docs[i].get("updateTime").toDate().toString());
+          if (snapshot.docs[i].get("updateTime").toDate().isAfter(chatMessageUpdatedTime)) {
+            chatMessageUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
+            await boxSetting.put("chatMessagesUpdateCheck", chatMessageUpdatedTime);
 
           }
 
@@ -192,14 +212,16 @@ class MessageDataNotifier extends ChangeNotifier {
       }
 
     });
+    var isarInstance = Isar.getInstance();
+    final chatMessages = await isarInstance?.chatMessages.where().findAll();
+    log("XXXXXXXXXXXXXXXXXXXXXXX");
     return streamSub;
-
   }
 
-  void deleteMessageFileFromDirectory(String fileName)async{
+  void deleteChatMessageFileFromDirectory(String fileName)async{
 
-    final messagesPhotoFile = File((await getApplicationDocumentsDirectory()).path+"/messages/"+fileName);
-    messagesPhotoFile.deleteSync(recursive: true);
+    final chatMessagesPhotoFile = File((await getApplicationDocumentsDirectory()).path+"/chatMessages/"+fileName);
+    chatMessagesPhotoFile.deleteSync(recursive: true);
     //log("filedeletefinish"+fileName);
 
   }

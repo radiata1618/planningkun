@@ -216,7 +216,7 @@ class ChatPage extends ConsumerWidget {
   Widget buildMessageList(String userDocId, String oppositeUserDocId) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('messages')
+          .collection('chatMessages')
           .where('userDocId', isEqualTo: userDocId)
           .where('oppositeUserDocId', isEqualTo: oppositeUserDocId)
           .orderBy('sendTime', descending: false)

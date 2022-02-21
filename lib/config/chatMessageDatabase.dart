@@ -1,12 +1,12 @@
 import 'package:isar/isar.dart';
 
-part 'messageDatabase.g.dart';
+part 'chatMessageDatabase.g.dart';
 
 //flutter pub run build_runner build
 @Collection()
-class Message {
+class ChatMessage {
 
-  Message(this.messageDocId,
+  ChatMessage(this.chatMessageDocId,
   this.userDocId,
   this.friendUserDocId,
   this.content,
@@ -28,7 +28,7 @@ class Message {
 
   @Id()
   int id = Isar.autoIncrement;
-  late String messageDocId;
+  late String chatMessageDocId;
   late String userDocId;
   late String friendUserDocId;
   late String content;

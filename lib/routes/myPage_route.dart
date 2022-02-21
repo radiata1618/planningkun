@@ -201,7 +201,7 @@ class MyPage extends ConsumerWidget {
         ElevatedButton(
           style: ButtonStyle(),
           onPressed: () async {
-            ref.read(messageDataProvider.notifier)
+            ref.read(chatMessagesDataProvider.notifier)
                 .clearIsarAndDirectory();
           },
           child: Text(
