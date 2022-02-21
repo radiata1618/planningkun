@@ -12,14 +12,33 @@ import '../commonLogic/commonLogic.dart';
 Future<void> insertTestData(WidgetRef ref) async {
 
   insertTopicTestData(ref
-      ,"insertTestTopicsData"
       ,"Vermeer"
       ,"art"
-      ,"https://upload.wikimedia.org/wikipedia/commons/4/46/Cropped_version_of_Jan_Vermeer_van_Delft_002.jpg");
+      ,"https://news.artnet.com/app/news-upload/2020/04/Onderzoek-Meisje-met-de-parel-Johannes-Vermeer_01-256x256.jpg");
+
+  insertTopicTestData(ref
+      ,"hokusai"
+      ,"art"
+      ,"https://data.ukiyo-e.org/artelino/scaled/21257g1.jpg");
+
+  insertTopicTestData(ref
+      ,"ohi"
+      ,"art"
+      ,"https://stat.ameba.jp/user_images/20200315/18/sasala-mama/82/fa/j/o0660035014728473900.jpg");
+
+  insertTopicTestData(ref
+      ,"monet"
+      ,"art"
+      ,"https://dearsam.com/img/600/744/resize/w/o/woman-with-a-parasol-by-monet-50x70_2.jpg");
+
+
+  insertTopicTestData(ref
+      ,"futsal"
+      ,"sports"
+      ,"https://s.cafebazaar.ir/images/icons/com.prosoccercaptain.futsalballheropro-f098e385-3d34-40de-9265-0b2319ba161a_128x128.png");
 }
 
 Future<void> insertTopicTestData(WidgetRef ref
-    ,String programId
     ,String topicName
     ,String categoryName
     ,String photoURL)async {
@@ -38,12 +57,12 @@ Future<void> insertTopicTestData(WidgetRef ref
         'photoNameSuffix':photoURL.substring(photoURL.lastIndexOf('.')),
         'photoUpdateCnt': 0,
         'insertUserDocId':ref.watch(userDataProvider).userData["userDocId"],
-        'insertProgramId': programId,
+        'insertProgramId': "insertTestTopicsData",
         'insertTime': FieldValue.serverTimestamp(),
         'updateUserDocId':ref.watch(userDataProvider).userData["userDocId"],
-        'updateProgramId': programId,
+        'updateProgramId': "insertTestTopicsData",
         'updateTime': FieldValue.serverTimestamp(),
-        'readableFlg': true,
+        'readableFlg': false,
         'deleteFlg': false,
       }).then((value){
     insertedDocId=value.id;
@@ -57,5 +76,17 @@ Future<void> insertTopicTestData(WidgetRef ref
   }catch(e){
     log("画像保存でエラー");
   }
+
+
+  await FirebaseFirestore.instance
+      .collection('topics')
+      .doc(insertedDocId)
+      .update({
+    'readableFlg': true,
+    'photoUpdateCnt':1,
+    'updateUserDocId':ref.watch(userDataProvider.notifier).userData["userDocId"],
+    'updateProgramId': "insertTestTopicsData",
+    'updateTime': FieldValue.serverTimestamp(),
+  });
 
 }
