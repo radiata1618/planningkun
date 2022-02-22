@@ -9,7 +9,7 @@ import 'commonEntity/userEntity.dart';
 import 'routes/myPage_route.dart';
 import 'routes/talk_route.dart';
 import 'routes/search_route.dart';
-import 'routes/topic_route.dart';
+import 'routes/topicRoot_route.dart';
 import 'routes/now_route.dart';
 import 'commonEntity/commonEntity.dart';
 import 'rootWidgetEntity.dart';
@@ -58,7 +58,7 @@ class RootWidget extends ConsumerWidget {
       case 2:
         return Search();
       case 3:
-        return Topic(
+        return TopicPage(
         );
       default:
         return MyPage();

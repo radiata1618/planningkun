@@ -25,33 +25,33 @@ class Topic extends ConsumerWidget {
         body: SafeArea(
             child: Container(
                 child: Column(children: [
-      Container(color: Colors.black54, height: 40),
-      Expanded(
-        child: topicsEntire(),
-      )
-    ]))));
+                  Container(color: Colors.black54, height: 40),
+                  Expanded(
+                    child: topicsEntire(),
+                  )
+                ]))));
   }
 
   Widget topicsEntire() {
     return SingleChildScrollView(
         child: Column(
-          children:[
-          Container(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Topic&Text",
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16,
-                        color: Colors.black45,
-                      ),
-                    )),
-              )),
-            Container(child:Column(children:horizonalDetailList(),))
+            children:[
+              Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Topic&Text",
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            color: Colors.black45,
+                          ),
+                        )),
+                  )),
+              Container(child:Column(children:horizonalDetailList(),))
             ]
-    ));
+        ));
   }
 
   List<Widget> horizonalDetailList() {
@@ -84,7 +84,7 @@ class Topic extends ConsumerWidget {
 
       for (int i = 0; i < snapshot.docs.length; i++) {
         Reference imageRef =
-            await storage.ref(snapshot.docs[i].get("photoPath"));
+        await storage.ref(snapshot.docs[i].get("photoPath"));
         String imageUrl = await imageRef.getDownloadURL();
         Image img = await Image.network(imageUrl, height: 40, width: 70);
 
