@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:isar/isar.dart';
@@ -12,6 +13,7 @@ class Topic {
       this.topicName,
       this.categoryDocId,
       this.categoryName,
+      this.photoFile,
       this.photoNameSuffix,
       this.photoUpdateCnt,
       this.insertUserDocId,
@@ -28,6 +30,7 @@ class Topic {
   int id = Isar.autoIncrement;
   late String topicDocId;
   late String topicName;
+  late Uint8List photoFile;
   late String categoryDocId;
   late String categoryName;
   late String photoNameSuffix;

@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
-import 'package:path_provider/path_provider.dart';
 import '../config/topicDatabase.dart';
+import 'dart:io';
 
 class TopicPage extends ConsumerWidget {
   TopicPage({
@@ -87,18 +85,13 @@ Widget topicsBody(String CategoryDocId){
       );
     },
   );
-
 }
 
-Future<Widget> topicItemUnit(Topic topic)async{
-  Directory appDocDir = await getApplicationDocumentsDirectory();
-  File localFile =
-  File("${appDocDir.path}/topics/"+topic.topicDocId + topic.photoNameSuffix);
-  _mainPhotoData = Image.file(localFile, width: 90);
+Widget topicItemUnit(Topic topic){
 
   return Column(
     children:[
-      Image.file(file),
+      Image.file(File.fromRawPath(topic.photoFile)),
       Text(topic.topicName)
     ]
   );

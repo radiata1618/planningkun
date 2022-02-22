@@ -158,7 +158,7 @@ class MyPage extends ConsumerWidget {
           style: ButtonStyle(),
           onPressed: () async {
             ref.read(topicDataProvider.notifier)
-                .clearIsarAndDirectory();
+                .clearIsar();
           },
           child: Text(
             "clearLocalTopicData",

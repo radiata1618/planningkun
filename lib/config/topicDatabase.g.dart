@@ -17,7 +17,7 @@ extension GetTopicCollection on Isar {
 final TopicSchema = CollectionSchema(
   name: 'Topic',
   schema:
-      '{"name":"Topic","idName":"id","properties":[{"name":"categoryDocId","type":"String"},{"name":"categoryName","type":"String"},{"name":"deleteFlg","type":"Bool"},{"name":"insertProgramId","type":"String"},{"name":"insertTime","type":"Long"},{"name":"insertUserDocId","type":"String"},{"name":"photoNameSuffix","type":"String"},{"name":"photoUpdateCnt","type":"Long"},{"name":"readableFlg","type":"Bool"},{"name":"topicDocId","type":"String"},{"name":"topicName","type":"String"},{"name":"updateProgramId","type":"String"},{"name":"updateTime","type":"Long"},{"name":"updateUserDocId","type":"String"}],"indexes":[],"links":[]}',
+      '{"name":"Topic","idName":"id","properties":[{"name":"categoryDocId","type":"String"},{"name":"categoryName","type":"String"},{"name":"deleteFlg","type":"Bool"},{"name":"insertProgramId","type":"String"},{"name":"insertTime","type":"Long"},{"name":"insertUserDocId","type":"String"},{"name":"photoFile","type":"ByteList"},{"name":"photoNameSuffix","type":"String"},{"name":"photoUpdateCnt","type":"Long"},{"name":"readableFlg","type":"Bool"},{"name":"topicDocId","type":"String"},{"name":"topicName","type":"String"},{"name":"updateProgramId","type":"String"},{"name":"updateTime","type":"Long"},{"name":"updateUserDocId","type":"String"}],"indexes":[],"links":[]}',
   nativeAdapter: const _TopicNativeAdapter(),
   webAdapter: const _TopicWebAdapter(),
   idName: 'id',
@@ -28,16 +28,17 @@ final TopicSchema = CollectionSchema(
     'insertProgramId': 3,
     'insertTime': 4,
     'insertUserDocId': 5,
-    'photoNameSuffix': 6,
-    'photoUpdateCnt': 7,
-    'readableFlg': 8,
-    'topicDocId': 9,
-    'topicName': 10,
-    'updateProgramId': 11,
-    'updateTime': 12,
-    'updateUserDocId': 13
+    'photoFile': 6,
+    'photoNameSuffix': 7,
+    'photoUpdateCnt': 8,
+    'readableFlg': 9,
+    'topicDocId': 10,
+    'topicName': 11,
+    'updateProgramId': 12,
+    'updateTime': 13,
+    'updateUserDocId': 14
   },
-  listProperties: {},
+  listProperties: {'photoFile'},
   indexIds: {},
   indexTypes: {},
   linkIds: {},
@@ -69,6 +70,7 @@ class _TopicWebAdapter extends IsarWebTypeAdapter<Topic> {
     IsarNative.jsObjectSet(
         jsObj, 'insertTime', object.insertTime.toUtc().millisecondsSinceEpoch);
     IsarNative.jsObjectSet(jsObj, 'insertUserDocId', object.insertUserDocId);
+    IsarNative.jsObjectSet(jsObj, 'photoFile', object.photoFile);
     IsarNative.jsObjectSet(jsObj, 'photoNameSuffix', object.photoNameSuffix);
     IsarNative.jsObjectSet(jsObj, 'photoUpdateCnt', object.photoUpdateCnt);
     IsarNative.jsObjectSet(jsObj, 'readableFlg', object.readableFlg);
@@ -88,6 +90,7 @@ class _TopicWebAdapter extends IsarWebTypeAdapter<Topic> {
       IsarNative.jsObjectGet(jsObj, 'topicName') ?? '',
       IsarNative.jsObjectGet(jsObj, 'categoryDocId') ?? '',
       IsarNative.jsObjectGet(jsObj, 'categoryName') ?? '',
+      IsarNative.jsObjectGet(jsObj, 'photoFile') ?? Uint8List(0),
       IsarNative.jsObjectGet(jsObj, 'photoNameSuffix') ?? '',
       IsarNative.jsObjectGet(jsObj, 'photoUpdateCnt') ??
           double.negativeInfinity,
@@ -137,6 +140,9 @@ class _TopicWebAdapter extends IsarWebTypeAdapter<Topic> {
             : DateTime.fromMillisecondsSinceEpoch(0)) as P;
       case 'insertUserDocId':
         return (IsarNative.jsObjectGet(jsObj, 'insertUserDocId') ?? '') as P;
+      case 'photoFile':
+        return (IsarNative.jsObjectGet(jsObj, 'photoFile') ?? Uint8List(0))
+            as P;
       case 'photoNameSuffix':
         return (IsarNative.jsObjectGet(jsObj, 'photoNameSuffix') ?? '') as P;
       case 'photoUpdateCnt':
@@ -191,26 +197,29 @@ class _TopicNativeAdapter extends IsarNativeTypeAdapter<Topic> {
     final value5 = object.insertUserDocId;
     final _insertUserDocId = IsarBinaryWriter.utf8Encoder.convert(value5);
     dynamicSize += (_insertUserDocId.length) as int;
-    final value6 = object.photoNameSuffix;
-    final _photoNameSuffix = IsarBinaryWriter.utf8Encoder.convert(value6);
+    final value6 = object.photoFile;
+    dynamicSize += (value6.length) * 1;
+    final _photoFile = value6;
+    final value7 = object.photoNameSuffix;
+    final _photoNameSuffix = IsarBinaryWriter.utf8Encoder.convert(value7);
     dynamicSize += (_photoNameSuffix.length) as int;
-    final value7 = object.photoUpdateCnt;
-    final _photoUpdateCnt = value7;
-    final value8 = object.readableFlg;
-    final _readableFlg = value8;
-    final value9 = object.topicDocId;
-    final _topicDocId = IsarBinaryWriter.utf8Encoder.convert(value9);
+    final value8 = object.photoUpdateCnt;
+    final _photoUpdateCnt = value8;
+    final value9 = object.readableFlg;
+    final _readableFlg = value9;
+    final value10 = object.topicDocId;
+    final _topicDocId = IsarBinaryWriter.utf8Encoder.convert(value10);
     dynamicSize += (_topicDocId.length) as int;
-    final value10 = object.topicName;
-    final _topicName = IsarBinaryWriter.utf8Encoder.convert(value10);
+    final value11 = object.topicName;
+    final _topicName = IsarBinaryWriter.utf8Encoder.convert(value11);
     dynamicSize += (_topicName.length) as int;
-    final value11 = object.updateProgramId;
-    final _updateProgramId = IsarBinaryWriter.utf8Encoder.convert(value11);
+    final value12 = object.updateProgramId;
+    final _updateProgramId = IsarBinaryWriter.utf8Encoder.convert(value12);
     dynamicSize += (_updateProgramId.length) as int;
-    final value12 = object.updateTime;
-    final _updateTime = value12;
-    final value13 = object.updateUserDocId;
-    final _updateUserDocId = IsarBinaryWriter.utf8Encoder.convert(value13);
+    final value13 = object.updateTime;
+    final _updateTime = value13;
+    final value14 = object.updateUserDocId;
+    final _updateUserDocId = IsarBinaryWriter.utf8Encoder.convert(value14);
     dynamicSize += (_updateUserDocId.length) as int;
     final size = staticSize + dynamicSize;
 
@@ -224,33 +233,35 @@ class _TopicNativeAdapter extends IsarNativeTypeAdapter<Topic> {
     writer.writeBytes(offsets[3], _insertProgramId);
     writer.writeDateTime(offsets[4], _insertTime);
     writer.writeBytes(offsets[5], _insertUserDocId);
-    writer.writeBytes(offsets[6], _photoNameSuffix);
-    writer.writeLong(offsets[7], _photoUpdateCnt);
-    writer.writeBool(offsets[8], _readableFlg);
-    writer.writeBytes(offsets[9], _topicDocId);
-    writer.writeBytes(offsets[10], _topicName);
-    writer.writeBytes(offsets[11], _updateProgramId);
-    writer.writeDateTime(offsets[12], _updateTime);
-    writer.writeBytes(offsets[13], _updateUserDocId);
+    writer.writeBytes(offsets[6], _photoFile);
+    writer.writeBytes(offsets[7], _photoNameSuffix);
+    writer.writeLong(offsets[8], _photoUpdateCnt);
+    writer.writeBool(offsets[9], _readableFlg);
+    writer.writeBytes(offsets[10], _topicDocId);
+    writer.writeBytes(offsets[11], _topicName);
+    writer.writeBytes(offsets[12], _updateProgramId);
+    writer.writeDateTime(offsets[13], _updateTime);
+    writer.writeBytes(offsets[14], _updateUserDocId);
   }
 
   @override
   Topic deserialize(IsarCollection<Topic> collection, int id,
       IsarBinaryReader reader, List<int> offsets) {
     final object = Topic(
-      reader.readString(offsets[9]),
       reader.readString(offsets[10]),
+      reader.readString(offsets[11]),
       reader.readString(offsets[0]),
       reader.readString(offsets[1]),
-      reader.readString(offsets[6]),
-      reader.readLong(offsets[7]),
+      reader.readBytes(offsets[6]),
+      reader.readString(offsets[7]),
+      reader.readLong(offsets[8]),
       reader.readString(offsets[5]),
       reader.readString(offsets[3]),
       reader.readDateTime(offsets[4]),
-      reader.readString(offsets[13]),
-      reader.readString(offsets[11]),
-      reader.readDateTime(offsets[12]),
-      reader.readBool(offsets[8]),
+      reader.readString(offsets[14]),
+      reader.readString(offsets[12]),
+      reader.readDateTime(offsets[13]),
+      reader.readBool(offsets[9]),
       reader.readBool(offsets[2]),
     );
     object.id = id;
@@ -276,20 +287,22 @@ class _TopicNativeAdapter extends IsarNativeTypeAdapter<Topic> {
       case 5:
         return (reader.readString(offset)) as P;
       case 6:
-        return (reader.readString(offset)) as P;
+        return (reader.readBytes(offset)) as P;
       case 7:
-        return (reader.readLong(offset)) as P;
-      case 8:
-        return (reader.readBool(offset)) as P;
-      case 9:
         return (reader.readString(offset)) as P;
+      case 8:
+        return (reader.readLong(offset)) as P;
+      case 9:
+        return (reader.readBool(offset)) as P;
       case 10:
         return (reader.readString(offset)) as P;
       case 11:
         return (reader.readString(offset)) as P;
       case 12:
-        return (reader.readDateTime(offset)) as P;
+        return (reader.readString(offset)) as P;
       case 13:
+        return (reader.readDateTime(offset)) as P;
+      case 14:
         return (reader.readString(offset)) as P;
       default:
         throw 'Illegal propertyIndex';
@@ -1866,6 +1879,10 @@ extension TopicQueryProperty on QueryBuilder<Topic, Topic, QQueryProperty> {
 
   QueryBuilder<Topic, String, QQueryOperations> insertUserDocIdProperty() {
     return addPropertyNameInternal('insertUserDocId');
+  }
+
+  QueryBuilder<Topic, Uint8List, QQueryOperations> photoFileProperty() {
+    return addPropertyNameInternal('photoFile');
   }
 
   QueryBuilder<Topic, String, QQueryOperations> photoNameSuffixProperty() {
