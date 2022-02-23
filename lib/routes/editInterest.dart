@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import '../config/categoryDatabase.dart';
-import 'now_routeEntity.dart';
 
 
 class EditInterest extends ConsumerWidget {

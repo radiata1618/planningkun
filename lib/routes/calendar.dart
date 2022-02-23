@@ -1,6 +1,3 @@
-//import 'dart:html';
-
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 class Calendar extends StatefulWidget {
@@ -9,10 +6,6 @@ class Calendar extends StatefulWidget {
 }
 
 class _Calendar extends State<Calendar> {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
-
 
   DateTime? startDateTime;
   DateTime? endDateTime;
