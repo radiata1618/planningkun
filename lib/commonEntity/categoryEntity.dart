@@ -5,19 +5,20 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
-import 'package:planningkun/config/topicDatabase.dart';
+import 'package:planningkun/config/categoryDatabase.dart' as category;
 
 import '../commonLogic/commonLogic.dart';
 
-final topicDataProvider = ChangeNotifierProvider(
-  (ref) => TopicDataNotifier(),
+final categoryDataProvider = ChangeNotifierProvider(
+      (ref) => CategoryDataNotifier(),
 );
 
-class TopicDataNotifier extends ChangeNotifier {
+class CategoryDataNotifier extends ChangeNotifier {
   Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
   StreamSubscription<QuerySnapshot>? streamSub;
@@ -30,19 +31,19 @@ class TopicDataNotifier extends ChangeNotifier {
 
 
     var boxSetting = Hive.box('setting');
-    await boxSetting.put("topicsUpdateCheck",DateTime(2022, 1, 1, 0, 0));
+    await boxSetting.put("categoriesUpdateCheck",DateTime(2022, 1, 1, 0, 0));
     var isarInstance = Isar.getInstance();
     await isarInstance?.writeTxn((isar) async {
-      isar.topics.clear();
+      isar.categorys.clear();
     });
   }
 
-  void controlStreamOfReadTopicNewDataFromFirebaseToIsar()async {
+  void controlStreamOfReadCategoryNewDataFromFirebaseToIsar()async {
 
     //最初は必ず呼び出し
-    //log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallする");
-    streamSub=await readTopicNewDataFromFirebaseToIsar();
-    //log("XXXXXXXXXXXXX初回readTopicNewDataFromFirebaseToHiveAndMemorycallした");
+    //log("XXXXXXXXXXXXX初回readCategoryNewDataFromFirebaseToHiveAndMemorycallする");
+    streamSub=await readCategoryNewDataFromFirebaseToIsar();
+    //log("XXXXXXXXXXXXX初回readCategoryNewDataFromFirebaseToHiveAndMemorycallした");
 
     if(controller.hasListener){
 
@@ -51,23 +52,23 @@ class TopicDataNotifier extends ChangeNotifier {
       //2回目以降は新しいデータを更新するたびに起動
       controller.stream.listen((value)  async{
         streamSub!.cancel();
-        //log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallする");
-        streamSub=await readTopicNewDataFromFirebaseToIsar();
-        //log("XXXXXXXXXXXXXreadTopicNewDataFromFirebaseToHiveAndMemorycallした");
+        //log("XXXXXXXXXXXXXreadCategoryNewDataFromFirebaseToHiveAndMemorycallする");
+        streamSub=await readCategoryNewDataFromFirebaseToIsar();
+        //log("XXXXXXXXXXXXXreadCategoryNewDataFromFirebaseToHiveAndMemorycallした");
       });
     }
 
   }
 
-  Future<StreamSubscription<QuerySnapshot>> readTopicNewDataFromFirebaseToIsar() async {
+  Future<StreamSubscription<QuerySnapshot>> readCategoryNewDataFromFirebaseToIsar() async {
     var boxSetting = Hive.box('setting');
-    DateTime topicUpdatedTime = await boxSetting.get("topicsUpdateCheck");
+    DateTime categoryUpdatedTime = await boxSetting.get("categoriesUpdateCheck");
 
-    ////log("XXXXXXXXXXXXXQueryする"+topicUpdatedTime.toString());
+    ////log("XXXXXXXXXXXXXQueryする"+categoryUpdatedTime.toString());
     _callStream = FirebaseFirestore.instance
-        .collection('topics')
+        .collection('categories')
         .where('updateTime',
-            isGreaterThan: Timestamp.fromDate(topicUpdatedTime))
+        isGreaterThan: Timestamp.fromDate(categoryUpdatedTime))
         .where('readableFlg', isEqualTo: true)
         .orderBy('updateTime', descending: false)
         .snapshots();
@@ -81,8 +82,8 @@ class TopicDataNotifier extends ChangeNotifier {
 
             var isarInstance = Isar.getInstance();
             await isarInstance?.writeTxn((isar) async {
-              await isar.topics.filter()
-                  .topicDocIdEqualTo(snapshot.docs[i].id)
+              await isar.categorys.filter()
+                  .categoryDocIdEqualTo(snapshot.docs[i].id)
                   .deleteAll();
             });
 
@@ -90,31 +91,29 @@ class TopicDataNotifier extends ChangeNotifier {
 
             var isarInstance = Isar.getInstance();
             await isarInstance?.writeTxn((isar) async {
-              List<Topic> resultList = await isar.topics.filter()
-                  .topicDocIdEqualTo(snapshot.docs[i].id)
+              List<category.Category> resultList = await isar.categorys.filter()
+                  .categoryDocIdEqualTo(snapshot.docs[i].id)
                   .findAll();
 
               //画像ファイルの取得
               FirebaseStorage storage = FirebaseStorage.instance;
-                Reference imageRef = storage.ref().child("topics").child(snapshot.docs[i].id + snapshot.docs[i].get("photoNameSuffix"));
-                String imageUrl = await imageRef.getDownloadURL();
-                File imgFile=await urlToFile(imageUrl);
-                Uint8List? bytes;
+              Reference imageRef = storage.ref().child("categories").child(snapshot.docs[i].id + snapshot.docs[i].get("photoNameSuffix"));
+              String imageUrl = await imageRef.getDownloadURL();
+              File imgFile=await urlToFile(imageUrl);
+              Uint8List? bytes;
 
-                await imgFile.readAsBytes().then((value) {
-                  bytes = Uint8List.fromList(value);
-                  log('reading of bytes is completed');
-                }).catchError((onError) {
-                  log('Exception Error while reading audio from path:' +
-                      onError.toString());
+              await imgFile.readAsBytes().then((value) {
+                bytes = Uint8List.fromList(value);
+                log('reading of bytes is completed');
+              }).catchError((onError) {
+                log('Exception Error while reading audio from path:' +
+                    onError.toString());
               });
 
               if(resultList.length==0){
 
-                final newTopic = new Topic(
+                final newCategory = new category.Category(
                     snapshot.docs[i].id,
-                    snapshot.docs[i].get("topicName"),
-                    snapshot.docs[i].get("categoryDocId"),
                     snapshot.docs[i].get("categoryName"),
                     bytes!,
                     snapshot.docs[i].get("photoNameSuffix"),
@@ -128,12 +127,10 @@ class TopicDataNotifier extends ChangeNotifier {
                     snapshot.docs[i].get("readableFlg"),
                     snapshot.docs[i].get("deleteFlg"));
 
-                newTopic.id = await isar.topics.put(newTopic);// insert
+                newCategory.id = await isar.categorys.put(newCategory);// insert
 
               }else{
-                resultList[0].topicDocId=snapshot.docs[i].id;
-                resultList[0].topicName=snapshot.docs[i].get("topicName");
-                resultList[0].categoryDocId=snapshot.docs[i].get("categoryDocId");
+                resultList[0].categoryDocId=snapshot.docs[i].id;
                 resultList[0].categoryName=snapshot.docs[i].get("categoryName");
                 resultList[0].photoFile=bytes!;
                 resultList[0].photoNameSuffix=snapshot.docs[i].get("photoNameSuffix");
@@ -147,14 +144,13 @@ class TopicDataNotifier extends ChangeNotifier {
                 resultList[0].readableFlg=snapshot.docs[i].get("readableFlg");
                 resultList[0].deleteFlg=snapshot.docs[i].get("deleteFlg");
 
-                await isar.topics.put(resultList[0]);
-                log("donload topics "+resultList[0].topicName+snapshot.docs[i].get("topicName"));
+                await isar.categorys.put(resultList[0]);
               }
             });
           }
-          if (snapshot.docs[i].get("updateTime").toDate().isAfter(topicUpdatedTime)) {
-            topicUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
-            await boxSetting.put("topicsUpdateCheck", topicUpdatedTime);
+          if (snapshot.docs[i].get("updateTime").toDate().isAfter(categoryUpdatedTime)) {
+            categoryUpdatedTime = snapshot.docs[i].get("updateTime").toDate();
+            await boxSetting.put("categoriesUpdateCheck", categoryUpdatedTime);
           }
 
         }

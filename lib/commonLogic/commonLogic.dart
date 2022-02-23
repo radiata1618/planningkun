@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
+import 'package:planningkun/config/categoryDatabase.dart';
 
+import '../commonEntity/categoryEntity.dart';
 import '../commonEntity/friendEntity.dart';
 import '../commonEntity/chatMessageEntity.dart';
 import '../commonEntity/topicEntity.dart';
@@ -29,6 +31,7 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("friends", boxSetting);
   await updateTimeCheck("user", boxSetting);
   await updateTimeCheck("chatMessages", boxSetting);
+  await updateTimeCheck("categories", boxSetting);
 
   await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
@@ -44,12 +47,16 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
       .read(topicDataProvider.notifier)
       .controlStreamOfReadTopicNewDataFromFirebaseToIsar();
   ref
+      .read(categoryDataProvider.notifier)
+      .controlStreamOfReadCategoryNewDataFromFirebaseToIsar();
+  ref
       .read(chatMessagesDataProvider.notifier)
       .controlStreamOfReadChatMessageNewDataFromFirebaseToIsar(
           ref, boxSetting.get("userDocId"));
 }
 
 Future<void> closeStreams(WidgetRef ref) async {
+  ref.read(categoryDataProvider.notifier).closeStream();
   ref.read(topicDataProvider.notifier).closeStream();
   ref.read(userDataProvider.notifier).closeStream();
   ref.read(friendDataProvider.notifier).closeStream();
@@ -97,14 +104,14 @@ Future<void> openHiveBoxes() async {
   final dir = await getApplicationSupportDirectory();
   if (isarInstance == null) {
     await Isar.open(
-      schemas: [ChatMessageSchema,TopicSchema],
+      schemas: [ChatMessageSchema,TopicSchema,CategorySchema],
       directory: dir.path,
       inspector: true,
     );
   } else {
     if (!isarInstance.isOpen) {
       await Isar.open(
-        schemas: [ChatMessageSchema,TopicSchema],
+        schemas: [ChatMessageSchema,TopicSchema,CategorySchema],
         directory: dir.path,
         inspector: true,
       );

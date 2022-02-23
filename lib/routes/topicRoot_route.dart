@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:planningkun/routes/topicRoot_routeEntity.dart';
+import 'package:planningkun/routes/topicUnitPage.dart';
 import '../config/topicDatabase.dart';
 import 'dart:io';
 
@@ -27,10 +28,12 @@ class TopicPage extends ConsumerWidget {
 
     return Scaffold(
         body: SafeArea(
-            child: Column(children: [
-      upperButtonsSlide(ref),
-              topicsBody(ref.watch(topicPageDataProvider).categoryId)
-    ])));
+            child:
+            Column(children: [
+              upperButtonsSlide(ref),
+              Flexible(child: topicsBody(context,ref.watch(topicPageDataProvider).categoryId))
+    ])
+       ));
   }
 
   Widget upperButtonsSlide(WidgetRef ref) {
@@ -46,12 +49,12 @@ class TopicPage extends ConsumerWidget {
 
 
 
-  Widget topicsBody(String CategoryDocId) {
+  Widget topicsBody(BuildContext context,String categoryDocId) {
     // return Text(CategoryDocId);
 
     var isarInstance = Isar.getInstance();
     Query<Topic>? topicsDataQuery =
-    isarInstance?.topics.filter().categoryDocIdEqualTo(CategoryDocId).build();
+    isarInstance?.topics.filter().categoryDocIdEqualTo(categoryDocId).build();
 
     return StreamBuilder<List<Topic>>(
       stream: topicsDataQuery?.watch(initialReturn: true),
@@ -64,51 +67,62 @@ class TopicPage extends ConsumerWidget {
         if (topicList.hasError) {
           return const Text('Something went wrong');
         }
-        return GridView(
-          shrinkWrap: true, //エラー対策
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, //カラム数
-          ),
-          children: topicList.data!.map((Topic topic) {
-            return topicItemUnit(topic);
+        return GridView.count(
+          shrinkWrap: true,
+          crossAxisCount: 3,
+          scrollDirection: Axis.vertical,
+            physics: ScrollPhysics(),
+            children: topicList.data!.map((Topic topic) {
+            return topicItemUnit( context,topic);
           }).toList(),
         );
       },
     );
   }
 
-  Widget topicItemUnit(Topic topic) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical:0),
-      child: Column(children: [
-      //   ClipRRect(
-      // clipper:new CustomClipper()
-      //       borderRadius: BorderRadius.circular(8.0),
-      //       child:Image.memory(topic.photoFile)
-      //   ),
-      //   ClipRRect(child:Container(
-      //     width: 110.0,
-      //     height: 110.0,
-      //     decoration: BoxDecoration(
-      //         shape: BoxShape.rectangle,
-      //         image: DecorationImage(
-      //             fit: BoxFit.fill,
-      //             image: Image.memory(topic.photoFile).image
-      //         )
-      //     ),
-      //   ),),
-        // ClipRect(
-        //   child: Align(
-        //     alignment: Alignment.center,
-        //     heightFactor: 0.8,
-        //     widthFactor: 0.8,
-        //     child: Image.memory(topic.photoFile)
+  Widget topicItemUnit(BuildContext context,Topic topic) {
+    return GestureDetector(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical:0),
+        child: Column(children: [
+          //TODO　丸写真でなく、矩形丸角写真にする
+        //   ClipRRect(
+        // clipper:new CustomClipper()
+        //       borderRadius: BorderRadius.circular(8.0),
+        //       child:Image.memory(topic.photoFile)
         //   ),
-        // ),
-        CircleAvatar(radius: 55*screenAdjustSizeH,
-            backgroundImage: Image.memory(topic.photoFile).image),
-        Text(topic.topicName)
-      ]),
+        //   ClipRRect(child:Container(
+        //     width: 110.0,
+        //     height: 110.0,
+        //     decoration: BoxDecoration(
+        //         shape: BoxShape.rectangle,
+        //         image: DecorationImage(
+        //             fit: BoxFit.fill,
+        //             image: Image.memory(topic.photoFile).image
+        //         )
+        //     ),
+        //   ),),
+          // ClipRect(
+          //   child: Align(
+          //     alignment: Alignment.center,
+          //     heightFactor: 0.8,
+          //     widthFactor: 0.8,
+          //     child: Image.memory(topic.photoFile)
+          //   ),
+          // ),
+          CircleAvatar(radius: 55*screenAdjustSizeH,
+              backgroundImage: Image.memory(topic.photoFile).image),
+          Text(topic.topicName)
+        ]),
+      ),
+      onTap:() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TopicUnitPage(argumentTopic:topic),
+          ),
+        );
+      },
     );
   }
 

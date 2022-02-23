@@ -1,7 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
+
+import '../config/categoryDatabase.dart';
 
 final topicPageDataProvider = ChangeNotifierProvider(
       (ref) => TopicPageDataNotifier(),
@@ -17,14 +19,16 @@ class TopicPageDataNotifier extends ChangeNotifier {
   ,'drink'
   ,'travel'
   ,'art'
-  ,'food'];
+    ,'food'
+    ,'nature'];
 
   List<IconData> iconList=[Icons.vpn_lock
     ,Icons.accessibility_new_rounded
     ,Icons.wine_bar_sharp
     ,Icons.airplanemode_active
     ,Icons.add_photo_alternate_outlined
-    ,Icons.wine_bar_sharp];
+    ,Icons.wine_bar_sharp
+  ,Icons.filter_hdr];
 
   Future<void> initialize(WidgetRef ref)async{
 
@@ -54,12 +58,12 @@ class TopicPageDataNotifier extends ChangeNotifier {
 
   Future<void> setCategoryId(String categoryName) async {
 
-    QuerySnapshot<Map<String, dynamic>> categoryData=await FirebaseFirestore.instance
-        .collection('categories')
-        .where('categoryName', isEqualTo: categoryName)
-        .get();
+    var isarInstance = Isar.getInstance();
+    Query<Category>? categoriesDataQuery =
+    isarInstance?.categorys.filter()
+        .categoryNameEqualTo(categoryName).build();
 
-    categoryId=categoryData.docs[0].id;
+    categoryId=categoriesDataQuery!.findAllSync()[0].categoryDocId;
   }
 
   Widget upperButtonUnit({ required int index,required bool activeBool}) {
