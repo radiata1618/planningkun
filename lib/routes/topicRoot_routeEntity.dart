@@ -19,32 +19,37 @@ class TopicPageDataNotifier extends ChangeNotifier {
   ,'art'
   ,'food'];
 
+  List<IconData> iconList=[Icons.vpn_lock
+    ,Icons.accessibility_new_rounded
+    ,Icons.wine_bar_sharp
+    ,Icons.airplanemode_active
+    ,Icons.add_photo_alternate_outlined
+    ,Icons.wine_bar_sharp];
+
   Future<void> initialize(WidgetRef ref)async{
-    upperButtonsList=[
-      upperButtonUnit( icon: Icons.vpn_lock,ref:ref,index:0),
-      upperButtonUnit(
-          icon: Icons.accessibility_new_rounded,ref:ref,index:1),
-      upperButtonUnit( icon: Icons.wine_bar_sharp,ref:ref,index:2),
-      upperButtonUnit( icon: Icons.airplanemode_active,ref:ref,index:3),
-      upperButtonUnit(
-          icon: Icons.add_photo_alternate_outlined,ref:ref,index:4),
-      upperButtonUnit( icon: Icons.wine_bar_sharp,ref:ref,index:5),
-    ];
+
+    for(int i =0;i<categoryList.length;i++){
+      upperButtonsList.add(upperButtonUnit(index:i,activeBool:false));
+    }
 
     await tapButton(0);
   }
 
   Future<void> tapButton(int tappedIndex) async{
-    // deactiveButton(selectedIndex);
-    // activeButton(tappedIndex);
+    deactiveButton(selectedIndex);
+    activeButton(tappedIndex);
     await setCategoryId(categoryList[tappedIndex]);
     selectedIndex=tappedIndex;
 
     notifyListeners();
   }
 
-  activeButton(int index){
+  deactiveButton(int index){
+    upperButtonsList[index]=upperButtonUnit(index:index,activeBool:false);
+  }
 
+  activeButton(int index){
+    upperButtonsList[index]=upperButtonUnit(index:index,activeBool:true);
   }
 
   Future<void> setCategoryId(String categoryName) async {
@@ -57,7 +62,7 @@ class TopicPageDataNotifier extends ChangeNotifier {
     categoryId=categoryData.docs[0].id;
   }
 
-  Widget upperButtonUnit({ required IconData icon, required WidgetRef ref,required int index}) {
+  Widget upperButtonUnit({ required int index,required bool activeBool}) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: GestureDetector(
@@ -65,7 +70,12 @@ class TopicPageDataNotifier extends ChangeNotifier {
               height: 40,
               width: 50,
               child: Column(
-                children: [Icon(icon), Text(categoryList[index])],
+                children: [Icon(iconList[index]
+                ,color:activeBool
+                        ?Colors.orangeAccent
+                        :Colors.black54
+                ),
+                  Text(categoryList[index])],
               )),
           onTap: () {
             tapButton(index);

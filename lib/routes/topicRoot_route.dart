@@ -78,11 +78,38 @@ class TopicPage extends ConsumerWidget {
   }
 
   Widget topicItemUnit(Topic topic) {
-    return Column(children: [
-      CircleAvatar(radius: 35*screenAdjustSizeH,
-          backgroundImage: Image.memory(topic.photoFile).image),
-      Text(topic.topicName)
-    ]);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical:0),
+      child: Column(children: [
+      //   ClipRRect(
+      // clipper:new CustomClipper()
+      //       borderRadius: BorderRadius.circular(8.0),
+      //       child:Image.memory(topic.photoFile)
+      //   ),
+      //   ClipRRect(child:Container(
+      //     width: 110.0,
+      //     height: 110.0,
+      //     decoration: BoxDecoration(
+      //         shape: BoxShape.rectangle,
+      //         image: DecorationImage(
+      //             fit: BoxFit.fill,
+      //             image: Image.memory(topic.photoFile).image
+      //         )
+      //     ),
+      //   ),),
+        // ClipRect(
+        //   child: Align(
+        //     alignment: Alignment.center,
+        //     heightFactor: 0.8,
+        //     widthFactor: 0.8,
+        //     child: Image.memory(topic.photoFile)
+        //   ),
+        // ),
+        CircleAvatar(radius: 55*screenAdjustSizeH,
+            backgroundImage: Image.memory(topic.photoFile).image),
+        Text(topic.topicName)
+      ]),
+    );
   }
 
 }
