@@ -12,6 +12,7 @@ import '../developerLogic/insertTestCategoriesData.dart';
 import '../developerLogic/insertTestTopicsData.dart';
 import '../developerLogic/insertTestUsersData.dart';
 import '../login.dart';
+import 'daily.dart';
 import 'editInterest.dart';
 import 'topicRegister.dart';
 import 'categoryRegister.dart';
@@ -111,9 +112,27 @@ class MyPage extends ConsumerWidget {
         ElevatedButton(
           style: ButtonStyle(),
           onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return EditInterest();
+              }),
+            );
+          },
+          child: Text(
+            "Write daily",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
-                  return TopicRegister();
+                  return Daily();
                 }),
               );
           },
