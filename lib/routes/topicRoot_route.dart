@@ -11,12 +11,11 @@ class TopicPage extends ConsumerWidget {
     //コンストラクタ
   }
 
-  double screenHeight=1;
-  double screenWidth=1;
-  double screenAdjustSizeH=1;
+  double screenHeight = 1;
+  double screenWidth = 1;
+  double screenAdjustSizeH = 1;
 
   Widget build(BuildContext context, WidgetRef ref) {
-
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     screenAdjustSizeH = MediaQuery.of(context).size.height * 0.0011;
@@ -37,10 +36,16 @@ Widget upperButtonsSlide() {
           child: Row(
             children: [
               upperButtonUnit(categoryName: 'Top', icon: Icons.vpn_lock),
-              upperButtonUnit(categoryName: 'sports', icon: Icons.accessibility_new_rounded),
-              upperButtonUnit(categoryName: 'drink', icon: Icons.wine_bar_sharp),
-              upperButtonUnit(categoryName: 'travel', icon: Icons.airplanemode_active),
-              upperButtonUnit(categoryName: 'art', icon: Icons.add_photo_alternate_outlined),
+              upperButtonUnit(
+                  categoryName: 'sports',
+                  icon: Icons.accessibility_new_rounded),
+              upperButtonUnit(
+                  categoryName: 'drink', icon: Icons.wine_bar_sharp),
+              upperButtonUnit(
+                  categoryName: 'travel', icon: Icons.airplanemode_active),
+              upperButtonUnit(
+                  categoryName: 'art',
+                  icon: Icons.add_photo_alternate_outlined),
               upperButtonUnit(categoryName: 'food', icon: Icons.wine_bar_sharp),
             ],
           )));
@@ -57,12 +62,10 @@ Widget upperButtonUnit({required String categoryName, required IconData icon}) {
           )));
 }
 
-Widget topicsBody(String CategoryDocId){
-
+Widget topicsBody(String CategoryDocId) {
   var isarInstance = Isar.getInstance();
-  Query<Topic>? topicsDataQuery = isarInstance?.topics.filter()
-      .categoryDocIdEqualTo(CategoryDocId)
-      .build();
+  Query<Topic>? topicsDataQuery =
+      isarInstance?.topics.filter().categoryDocIdEqualTo(CategoryDocId).build();
   return StreamBuilder<List<Topic>>(
     stream: topicsDataQuery?.watch(initialReturn: true),
     builder: (context, AsyncSnapshot<List<Topic>> topicList) {
@@ -87,12 +90,9 @@ Widget topicsBody(String CategoryDocId){
   );
 }
 
-Widget topicItemUnit(Topic topic){
-
-  return Column(
-    children:[
-      Image.file(File.fromRawPath(topic.photoFile)),
-      Text(topic.topicName)
-    ]
-  );
+Widget topicItemUnit(Topic topic) {
+  return Column(children: [
+    Image.file(File.fromRawPath(topic.photoFile)),
+    Text(topic.topicName)
+  ]);
 }
