@@ -250,6 +250,7 @@ class JoinChannelVideo extends ConsumerWidget {
                           width: 120,
                           height: 120,
                           child: RtcRemoteView.SurfaceView(
+                            channelId:channelId,
                             uid: e,
                           ),
                         ),

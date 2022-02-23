@@ -1,14 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 
-import '../commonEntity/commonEntity.dart';
 
 class SearchConditionValueEdit extends StatefulWidget {
   Map<String, String>  argumentUserData;
@@ -30,9 +26,7 @@ class SearchConditionValueEdit extends StatefulWidget {
 }
 
 class _SettingTextEdit extends State<SearchConditionValueEdit> {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
+
 
   @override
   Widget build(BuildContext context) {
