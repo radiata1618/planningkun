@@ -70,6 +70,7 @@ dependencies:
 #  permission_handler: ^8.3.0
 
   google_maps_flutter: ^2.1.1
+  flutter_speech: ^2.0.0
 
 dev_dependencies:
   isar_generator: ^2.2.1

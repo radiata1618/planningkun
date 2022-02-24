@@ -5,6 +5,14 @@
             <action android:name="android.speech.RecognitionService" />
         </intent>
     </queries>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!--    ADD BELLOW-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!--    <uses-permission android:name="android.permission.INTERNET"/>-->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
    <application
        android:name="${applicationName}"
        android:label="planningkun"

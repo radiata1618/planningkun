@@ -9,6 +9,7 @@ import '../commonEntity/chatMessageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonLogic/commonLogic.dart';
 import '../developerLogic/insertTestCategoriesData.dart';
+import '../developerLogic/insertTestCountriesData.dart';
 import '../developerLogic/insertTestTopicsData.dart';
 import '../developerLogic/insertTestUsersData.dart';
 import '../login.dart';
@@ -114,7 +115,7 @@ class MyPage extends ConsumerWidget {
           onPressed: () async {
             await Navigator.of(context).push(
               MaterialPageRoute(builder: (context) {
-                return EditInterest();
+                return Daily();
               }),
             );
           },
@@ -132,7 +133,7 @@ class MyPage extends ConsumerWidget {
           onPressed: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
-                  return Daily();
+                  return TopicRegister();
                 }),
               );
           },
@@ -296,6 +297,20 @@ class MyPage extends ConsumerWidget {
                 fontSize: 16,
                 color: Colors.white,
               ),
+          ),
+        ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            insertTestCountryData(ref);
+          },
+          child: Text(
+            "insertTestCountryData",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
           ),
         ),
         Text("カレンダ"),

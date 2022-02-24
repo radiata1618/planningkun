@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:algolia/algolia.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -89,6 +91,7 @@ class SearchResultNotifier extends ChangeNotifier {
           });
         } catch (e) {
           //写真があるはずなのになぜかエラーだった
+          log("写真あるはずなのになぜかエラーだった");
           _friendImage[_searchResultList[i].data["objectID"]!] = null;
         }
       } else {

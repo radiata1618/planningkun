@@ -35,10 +35,14 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
 
   await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
+
+  if(boxSetting.get("email")==null){
+    boxSetting.put("email",email);
+  }
   ref
       .read(userDataProvider.notifier)
       .controlStreamOfReadUserDataFirebaseToHiveAndMemory(
-          boxSetting.get("email")); //TODO インストール直後にログインだけするとエラー
+          boxSetting.get("email"));
   ref
       .read(friendDataProvider.notifier)
       .controlStreamOfReadFriendNewDataFromFirebaseToHiveAndMemory(
