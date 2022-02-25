@@ -10,17 +10,20 @@ import 'package:isar/isar.dart';
 import 'package:planningkun/config/categoryDatabase.dart';
 
 import '../commonEntity/categoryEntity.dart';
+import '../commonEntity/countryEntity.dart';
 import '../commonEntity/friendEntity.dart';
 import '../commonEntity/chatMessageEntity.dart';
 import '../commonEntity/topicEntity.dart';
 import '../commonEntity/userEntity.dart';
 import '../config/chatMessageDatabase.dart';
+import '../config/countryDatabase.dart';
 import '../config/topicDatabase.dart';
 
 Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await makeDir("friends");
   await makeDir("topics");
   await makeDir("categories");
+  await makeDir("countries");
   await makeDir("chatMessages");
   await makeDir("media");
 
@@ -32,9 +35,11 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
   await updateTimeCheck("user", boxSetting);
   await updateTimeCheck("chatMessages", boxSetting);
   await updateTimeCheck("categories", boxSetting);
+  await updateTimeCheck("countries", boxSetting);
 
   await ref.read(friendDataProvider.notifier).readFriendDataFromHiveToMemory();
   await ref.read(userDataProvider.notifier).readUserDataFromHiveToMemory();
+  await ref.read(countryDataProvider.notifier).readCountryDataFromIsarToMemory();
 
   if(boxSetting.get("email")==null){
     boxSetting.put("email",email);
@@ -57,6 +62,9 @@ Future<void> initialProcessLogic(WidgetRef ref, String email) async {
       .read(chatMessagesDataProvider.notifier)
       .controlStreamOfReadChatMessageNewDataFromFirebaseToIsar(
           ref, boxSetting.get("userDocId"));
+
+  ref.read(countryDataProvider.notifier).controlStreamOfReadCountryNewDataFromFirebaseToIsarAndMemory();
+  //TODO Master、Topic、Category、Countryは常にWatchする必要ないよね
 }
 
 Future<void> closeStreams(WidgetRef ref) async {
@@ -108,14 +116,14 @@ Future<void> openHiveBoxes() async {
   final dir = await getApplicationSupportDirectory();
   if (isarInstance == null) {
     await Isar.open(
-      schemas: [ChatMessageSchema,TopicSchema,CategorySchema],
+      schemas: [ChatMessageSchema,TopicSchema,CategorySchema,CountrySchema],
       directory: dir.path,
       inspector: true,
     );
   } else {
     if (!isarInstance.isOpen) {
       await Isar.open(
-        schemas: [ChatMessageSchema,TopicSchema,CategorySchema],
+        schemas: [ChatMessageSchema,TopicSchema,CategorySchema,CountrySchema],
         directory: dir.path,
         inspector: true,
       );
@@ -151,5 +159,6 @@ Future<File> urlToFile(String imageUrl) async {
   await file.writeAsBytes(response.bodyBytes);
 // now return the file which is created with random name in
 // temporary directory and image bytes from response is written to // that file.
+  //TODO　キャッシュはちゃんと削除するような処理方式に変更？→このメソッドから返った後もファイル使っている？ログイン時などに一括処理？
   return file;
 }

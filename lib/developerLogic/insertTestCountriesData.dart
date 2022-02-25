@@ -8,7 +8,7 @@ import '../commonEntity/userEntity.dart';
 import '../commonLogic/commonLogic.dart';
 
 Future<void> insertTestCountryData(WidgetRef ref) async {
-  insertCountryUnitData(ref,"JPN","Japan","https://https://fifaranking.net/img/fifa/nations/jpn.png");
+  insertCountryUnitData(ref,"JPN","Japan","https://fifaranking.net/img/fifa/nations/jpn.png");
   insertCountryUnitData(ref,"USA","United States of America","https://d4a8qxd2udge6.cloudfront.net/6586/thumb_cover_256_322-1.jpg");
   insertCountryUnitData(ref,"IRN","Iran","https://fifaranking.net/img/fifa/nations/irn.png");
 
@@ -30,7 +30,7 @@ Future<void> insertCountryUnitData(WidgetRef ref, String countryCode, String cou
         'updateUserDocId':"system",
         'updateProgramId': "insertTestCountriesData",
         'updateTime': FieldValue.serverTimestamp(),
-        'readableFlg': true,
+        'readableFlg': false,
         'deleteFlg': false,
       }).then((value){
     insertedDocId=value.id;
@@ -41,7 +41,7 @@ Future<void> insertCountryUnitData(WidgetRef ref, String countryCode, String cou
         .ref("countries/" +insertedDocId+ photoURL.substring(photoURL.lastIndexOf('.')))
         .putFile(await urlToFile(photoURL));
   }catch(e){
-    log("画像保存でエラー");
+    log("画像保存でエラー"+countryName);
   }
 
   await FirebaseFirestore.instance

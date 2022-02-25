@@ -24,8 +24,6 @@ class Search extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-
-
     return Scaffold(
         appBar: whiteAppbar(text:(ref.watch(SearchResultProvider).searchResultList==null)?"Search":"Search"),//
         body: SafeArea(
@@ -120,7 +118,6 @@ class Search extends ConsumerWidget {
       )
       );
     }else {
-
       return Expanded(
           child:ListView.builder(
               itemCount:ref.watch(SearchResultProvider).searchResultList.length,
@@ -222,7 +219,6 @@ class Search extends ConsumerWidget {
             )
           ]
         )
-
       ),
     );
   }

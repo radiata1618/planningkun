@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/commonEntity/userEntity.dart';
 import 'package:planningkun/routes/setting_route.dart';
 import '../commonEntity/categoryEntity.dart';
+import '../commonEntity/countryEntity.dart';
 import '../commonEntity/friendEntity.dart';
 import '../commonEntity/chatMessageEntity.dart';
 import '../commonEntity/topicEntity.dart';
@@ -269,6 +270,21 @@ class MyPage extends ConsumerWidget {
                 fontSize: 16,
                 color: Colors.white,
               ),
+          ),
+        ),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            ref.read(countryDataProvider.notifier)
+                .clearIsar();
+          },
+          child: Text(
+            "clearLocalCountryData",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
           ),
         ),
         ElevatedButton(
