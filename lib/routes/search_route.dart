@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:algolia/algolia.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:planningkun/routes/search_routeEntity.dart';
-
-import '../commonEntity/commonEntity.dart';
-import '../commonUI.dart';
+import '../commonEntity/countryEntity.dart';
+import '../commonLogic/commonUI.dart';
 import 'friendProfile.dart';
 import 'SearchConditionPage.dart';
 
@@ -130,95 +127,71 @@ class Search extends ConsumerWidget {
 
   Widget userResultList(BuildContext context, WidgetRef ref,AlgoliaObjectSnapshot userData){
 
-    return GestureDetector(
-      onTap:()async{
-        await Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) {
-            return FriendProfile(
-                argumentFriendUserDocId:userData.data["objectID"],
-            );
-          }),
-        );
-      },
-      child: Container(
-        color: Colors.white10,
-        height:80,
-        child:Row(
-          children:[
-            Container(
-              child:CircleAvatar(radius:32,
-            backgroundImage:ref.watch(SearchResultProvider).friendImage[userData.data["objectID"]] ==null
-            ? null
-            : ref.watch(SearchResultProvider).friendImage[userData.data["objectID"]]!.image,),
-                  width:80
-            ),
-            Expanded(
-              child:Column(
-                children:[
-                  Padding(
-                    padding: const EdgeInsets.only(top:8.0),
-                    child: Align(
-                        alignment: Alignment.topLeft,
-                        child:Text(userData.data["name"],
-                            style:TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                        )
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top:4.0),
-                    child: Align(
-                        alignment: Alignment.topLeft,
-                        child:Text(userData.data["country"],
-                          style:TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: Colors.black54,
-                          ),
-                        )
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top:4.0),
-                    child: Align(
-                        alignment: Alignment.topLeft,
-                        child:Text(userData.data["greeting"],
-                          style:TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: Colors.black54,
-                          ),
-                        )
-                    ),
-                  ),
-                ],
+    String lastLoginStr="";
+    //最終ログイン日付の計算
+    int differentDays =DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(userData.data["lastLoginTime"])).inDays;
+    if(differentDays==0){
+      lastLoginStr="today";
+    }else if(differentDays == 1){
+      lastLoginStr="yesterday";
+    }else{
+      lastLoginStr=differentDays.toString()+" days ago";
+    }
+
+    List<Widget> featureList=[];
+    featureList.add(orangeBorderContainer( text:"intermediate"));
+    featureList.add(orangeBorderContainer( text:"cate1"));
+    featureList.add(orangeBorderContainer( text:"cate2"));
+    featureList.add(orangeBorderContainer( text:"cate3"));
+    featureList.add(orangeBorderContainer( text:"cate4"));
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical:5),
+      child: GestureDetector(
+        onTap:()async{
+          await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) {
+              return FriendProfile(
+                  argumentFriendUserDocId:userData.data["objectID"],
+              );
+            }),
+          );
+        },
+        child: Container(
+          color: Colors.white10,
+          height:130,
+          child:Row(
+            children:[
+              Container(
+                child:CircleAvatar(radius:32,
+              backgroundImage:ref.watch(SearchResultProvider).friendImage[userData.data["objectID"]] ==null
+              ? null
+              : ref.watch(SearchResultProvider).friendImage[userData.data["objectID"]]!.image,),
+                    width:80
+              ),
+              Expanded(
+                child:Column(
+                  children:[
+                    Row(children:[
+                      blackBiggerTextLeft(text: userData.data["name"]),
+                CircleAvatar(radius:10,
+                    backgroundImage:ref.watch(countryDataProvider).countryData[userData.data["country"]]["imageFile"].image)
+                    ]),
+                    grayTextLeft(text: userData.data["greeting"]),
+                    Wrap(children: featureList)
+                  ],
+                )
+              ),
+              Container(
+                  width:70,
+                child:Column(
+                  children:[
+                    grayTextRight(text:lastLoginStr ),
+                  ]
+                )
               )
-            ),
-            Container(
-                width:70,
-              child:Column(
-                children:[
-                  Padding(
-                    padding: const EdgeInsets.only(top:8.0),
-                    child: Align(
-                        alignment: Alignment.topLeft,
-                        child:Text(userData.data["ageNumber"].toString(),
-                          style:TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: Colors.black54,
-                          ),
-                        )
-                    ),
-                  ),
-                ]
-              )
-            )
-          ]
-        )
+            ]
+          )
+        ),
       ),
     );
   }

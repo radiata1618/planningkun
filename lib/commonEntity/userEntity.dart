@@ -41,6 +41,7 @@ class UserDataProviderNotifier extends ChangeNotifier {
     "searchConditionGender",
     "profilePhotoNameSuffix",
     "profilePhotoUpdateCnt",
+    "lastLoginTime",
     "insertUserDocId",
     "insertProgramId",
     "insertTime",
@@ -54,6 +55,12 @@ class UserDataProviderNotifier extends ChangeNotifier {
   Stream<QuerySnapshot>? _callStream;
   final controller = StreamController<bool>();
   StreamSubscription<QuerySnapshot>? streamSub;
+
+
+  Future<void> updatelastLoginTime() async {
+    FirebaseFirestore.instance.collection('users').doc(_userData["userDocId"]).update({'lastLoginTime': FieldValue.serverTimestamp()});
+  }
+
 
   Future<void> readMainPhotoDataFromDirectoryToMemory() async {
     if ((_userData["profilePhotoNameSuffix"] == null?"":_userData["profilePhotoNameSuffix"]) == "") {
@@ -162,9 +169,13 @@ class UserDataProviderNotifier extends ChangeNotifier {
         await boxUser.put("userDocId", snapshot.docs[0].id);
         _userData["userDocId"] = snapshot.docs[0].id;
 
+        boxSetting.put("email",snapshot.docs[0].get("email"));
+        boxSetting.put("userDocId",snapshot.docs[0].id);
+
         for (int i = 0; i < itemNameList.length; i++) {
           if (itemNameList[i] == "updateTime" ||
-              itemNameList[i] == "insertTime") {
+              itemNameList[i] == "insertTime" ||
+              itemNameList[i] == "lastLoginTime") {
             _userData[itemNameList[i]] =
                 snapshot.docs[0].get(itemNameList[i]).toDate();
             await boxUser.put(itemNameList[i],

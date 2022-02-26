@@ -15,6 +15,7 @@ Widget borderedTextBox({required String text, Function(String)? onChanged,requir
       ]));
 }
 
+
 const Color themeColorDeep = Colors.orangeAccent;
 
 Text GrayText(String txt) {
@@ -99,3 +100,71 @@ AppBar whiteAppbar({required String text}) {
   );
 }
 
+Padding grayTextRight({required String text}){
+  return Padding(
+    padding: const EdgeInsets.only(top:4.0),
+    child: Align(
+        alignment: Alignment.topRight,
+        child:Text(text,
+          style:TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 13,
+            color: Colors.black54,
+          ),
+        )
+    ),
+  );
+}
+Padding grayTextLeft({required String text}){
+  return Padding(
+    padding: const EdgeInsets.only(top:4.0),
+    child: Align(
+        alignment: Alignment.topLeft,
+        child:Text(text,
+          style:TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 13,
+            color: Colors.black54,
+          ),
+        )
+    ),
+  );
+}
+
+
+Padding blackBiggerTextLeft({required String text}){
+  return Padding(
+    padding: const EdgeInsets.only(top:8.0),
+    child: Align(
+        alignment: Alignment.topLeft,
+        child:Text(text,
+          style:TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        )
+    ),
+  );
+}
+
+Padding orangeBorderContainer({required String text}){
+  return Padding(
+    padding: const EdgeInsets.all(3.0),
+    child: Container(
+      child:Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Text(text,
+          style:TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 13,
+            color: Colors.orange,
+          ),
+        ),
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.deepOrange),
+        borderRadius: BorderRadius.circular(20),
+      ),),
+  );
+}

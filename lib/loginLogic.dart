@@ -36,6 +36,7 @@ Future<void> insertUserToFirebase(String email) async {
         'searchConditionGender': '1,2,3',
         'profilePhotoNameSuffix':"",
         'profilePhotoUpdateCnt': 0,
+        'lastLoginTime': FieldValue.serverTimestamp(),
         'insertUserDocId':"myself",
         'insertProgramId': "login",
         'insertTime': FieldValue.serverTimestamp(),
@@ -51,6 +52,7 @@ Future<void> insertUserToFirebase(String email) async {
     var box= await Hive.openBox("setting");
     box.put("email",email);
     box.put("userDocId",insertedDocId);
+
 
   }
 }

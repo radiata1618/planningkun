@@ -4,7 +4,7 @@ import 'package:planningkun/commonEntity/friendEntity.dart';
 import 'package:planningkun/commonEntity/masterEntity.dart';
 import '../chatPage.dart';
 import '../commonEntity/commonEntity.dart';
-import '../commonUI.dart';
+import '../commonLogic/commonUI.dart';
 import 'friendProfileEntity.dart';
 import 'friendProfileLogic.dart';
 

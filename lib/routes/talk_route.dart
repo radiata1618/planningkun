@@ -8,7 +8,7 @@ import "package:intl/intl.dart";
 import 'package:intl/date_symbol_data_local.dart';
 
 import '../chatPage.dart';
-import '../commonUI.dart';
+import '../commonLogic/commonUI.dart';
 
 class Talk extends ConsumerWidget {
   Talk({

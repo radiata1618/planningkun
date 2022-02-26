@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'commonLogic/commonLogic.dart';
-import 'commonUI.dart';
+import 'commonLogic/commonUI.dart';
 import 'rootWidget.dart';
 import 'loginLogic.dart';
 import 'commonEntity/commonEntity.dart';

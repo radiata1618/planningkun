@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:isar/isar.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:planningkun/config/countryDatabase.dart';
 import '../commonLogic/commonLogic.dart';
 
@@ -150,8 +149,6 @@ class CountryDataNotifier extends ChangeNotifier {
               List<Country> resultList = await isar.countrys.filter()
                   .countryDocIdEqualTo(snapshot.docs[i].id)
                   .findAll();
-
-
 
               if(resultList.length==0){
 

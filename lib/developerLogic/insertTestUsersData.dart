@@ -58,6 +58,7 @@ Future<void> insertUnitData(WidgetRef ref, String name,int age,String gender,Str
         'searchConditionGender': '1,2,3',
         'profilePhotoNameSuffix':photoURL.substring(photoURL.lastIndexOf('.')),
         'profilePhotoUpdateCnt': 0,
+        'lastLoginTime': FieldValue.serverTimestamp(),
         'insertUserDocId':"myself",
         'insertProgramId': "login",
         'insertTime': FieldValue.serverTimestamp(),
