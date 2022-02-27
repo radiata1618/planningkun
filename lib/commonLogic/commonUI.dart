@@ -168,3 +168,16 @@ Padding orangeBorderContainer({required String text}){
       ),),
   );
 }
+
+
+IconButton graySmallIconButton({required IconData icon,required Function()? onPressed }){
+
+  return
+    IconButton(
+      icon: Icon(icon),
+      iconSize: 28,
+      color: Colors.black54,
+      onPressed: onPressed,
+    );
+
+}

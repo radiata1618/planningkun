@@ -6,6 +6,7 @@ import 'package:isar/isar.dart';
 import 'package:planningkun/routes/friendProfile.dart';
 import 'commonEntity/friendEntity.dart';
 import 'commonEntity/userEntity.dart';
+import 'commonLogic/commonUI.dart';
 import 'config/chatMessageDatabase.dart';
 import 'join_channel_video.dart';
 import 'chatPageLogic.dart';
@@ -167,21 +168,13 @@ class ChatPage extends ConsumerWidget {
   }
 
   Container textInputWidget(WidgetRef ref) {
+    var _controller = TextEditingController();
+
     return Container(
       height: 68,
       child: Row(children: [
-        IconButton(
-          icon: Icon(Icons.camera_alt_outlined),
-          iconSize: 28,
-          color: Colors.black54,
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: Icon(Icons.photo_outlined),
-          iconSize: 28,
-          color: Colors.black54,
-          onPressed: () {},
-        ),
+        graySmallIconButton(icon: Icons.camera_alt_outlined, onPressed: () {  }),
+        graySmallIconButton(icon: Icons.photo_outlined, onPressed: () {  }),
         Expanded(
             child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -190,26 +183,20 @@ class ChatPage extends ConsumerWidget {
               borderRadius: BorderRadius.circular(40)),
           child: TextField(
             autofocus: true,
+            controller: _controller,
             decoration: InputDecoration(border: InputBorder.none),
             onChanged: (String value) {
                 content = value;
             },
           ),
         )),
-        IconButton(
-          icon: Icon(Icons.arrow_forward_ios_rounded),
-          iconSize: 28,
-          color: Colors.black54,
-          onPressed: () {
-            insertChat(ref,content,friendUserDocId);
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.mic),
-          iconSize: 28,
-          color: Colors.black54,
-          onPressed: () {},
-        ),
+        graySmallIconButton(
+            icon: Icons.arrow_forward_ios_rounded,
+            onPressed: () async {
+              await insertChat(ref,content,friendUserDocId);
+              _controller.clear();
+            }),
+        graySmallIconButton(icon: Icons.mic, onPressed: () {  }),
       ]),
     );
   }

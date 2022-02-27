@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,11 +12,20 @@ import 'autoLoginPage.dart';
 import 'login.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("バックグラウンドでメッセージを受け取りました");
+}
+
 Future<void> main() async {
   await initializeDateFormatting('ja');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
   await Hive.initFlutter();
+
+  //バックグラウンド用
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(
     ProviderScope(
       child: MyApp(),
