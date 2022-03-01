@@ -2,6 +2,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
+import '../commonEntity/userEntity.dart';
+import '../commonLogic/commonUI.dart';
+import '../config/realtime_database_service.dart';
 import 'now_routeEntity.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -60,10 +63,22 @@ class Now extends ConsumerWidget {
     }
     return Scaffold(
         body: SafeArea(
-            child: Container(
-                child:ref.watch(nowImageDataProvider).bytes==null
-                ?null
-                :Image.memory(ref.watch(nowImageDataProvider).bytes!)
+            child: Column(
+              children: [
+                Container(
+                    child:ref.watch(nowImageDataProvider).bytes==null
+                    ?null
+                    :Image.memory(ref.watch(nowImageDataProvider).bytes!)
+                ),
+                whiteBorderRoundButton(
+                    text:"presence management",
+                    onPressed: () async{
+                      //プレゼンス管理
+                      final RealtimeDatabaseService _realtimeDatabaseService=ref.watch(realtimeDatabaseServiceProvider);
+                      await _realtimeDatabaseService
+                          .updateUserPresence(ref.watch(userDataProvider).userData["userDocId"] );
+                    })
+              ],
             )
         )
     );
