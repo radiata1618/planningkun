@@ -14,6 +14,7 @@ import '../developerLogic/insertTestCountriesData.dart';
 import '../developerLogic/insertTestTopicsData.dart';
 import '../developerLogic/insertTestUsersData.dart';
 import '../login.dart';
+import 'calendar.dart';
 import 'daily.dart';
 import 'editInterest.dart';
 import 'topicRegister.dart';
@@ -329,7 +330,24 @@ class MyPage extends ConsumerWidget {
             ),
           ),
         ),
-        Text("カレンダ"),
+        ElevatedButton(
+          style: ButtonStyle(),
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return Calendar();
+              }),
+            );
+          },
+          child: Text(
+            "Calendar",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
         Text("本人認証")
       ])
     ])),

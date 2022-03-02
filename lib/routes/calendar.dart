@@ -1,84 +1,113 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-class Calendar extends StatefulWidget {
+
+import '../commonLogic/commonLogic.dart';
+import '../commonLogic/commonUI.dart';
+import 'calendarEntity.dart';
+import 'calendarLogic.dart';
+
+class Calendar extends ConsumerWidget {
+  Calendar({
+    Key? key,
+  }) : super(key: key);
+
   @override
-  _Calendar createState() => _Calendar();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(calendarDataProvider).initialProcessFlg) {
+      ref.read(calendarDataProvider.notifier).initialize();
+    }
 
-class _Calendar extends State<Calendar> {
-
-  DateTime? startDateTime;
-  DateTime? endDateTime;
-
-  int status = 1; //1:スタート時間を選択中、2:エンド時間を選択中
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(child:Container(
-            child: SfCalendar(
-              view: CalendarView.month,
-      //        dataSource: EventDataSource(_getDataSource()),
-              monthViewSettings: MonthViewSettings(showAgenda: true),
-            ))));
+        body: SafeArea(
+            child: Container(
+                child: SfCalendar(
+                    view: CalendarView.week,
+                    monthViewSettings: MonthViewSettings(showAgenda: true),
+                    dataSource: MeetingDataSource(
+                        ref.watch(calendarDataProvider).meetingListData),
+                    onTap: (calendarDetails) {
+                      _fabPressed(context, calendarDetails,ref);
+                    }))));
+  }
+
+  void _fabPressed(BuildContext context, CalendarTapDetails calendarDetails,WidgetRef ref) {
+    String title = "";
+    ref.read(calendarDataProvider.notifier).setSelectedDateTimeFrom(calendarDetails.date!);
+    ref.read(calendarDataProvider.notifier).setSelectedDateTimeTo(calendarDetails.date!.add(Duration(hours: 1)));
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        height: 200,
+        child: Column(
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              graySmallIconButton(
+                  icon: Icons.clear,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+              smallOrangeRoundButton(text: "save", onPressed: () {}),
+            ]),
+            borderedTextBox(
+              text: "title",
+              onChanged: (String value) {
+                title = value;
+              },
+              passwordSecure: false,
+            ),
+            dateTimeRow(ref,context,"from"),
+            dateTimeRow(ref,context,"to"),
+          ],
+        ),
+      ),
+    );
   }
 }
 
 
+Widget dateTimeRow(WidgetRef ref,BuildContext context,String fromTo){
 
-//
-//
-//   List<Event> _getDataSource() {
-//
-// //データをまとめるリスト
-// //    final List<Event> event = <Event>[];
-//
-// //データの用意
-//     final DateTime today = DateTime.now();
-//     final DateTime startTime =
-//     DateTime(today.year, today.month, today.day, 9, 0, 0);
-//     final DateTime endTime = startTime.add(const Duration(hours: 2));
-//
-// //データをリストに追加
-//     //event.add(Event('イベント', startTime, endTime, const Color(0xFF0F8644), false));
-//
-//     return event;
-//   }
-//
-// }
-//
-// class EventDataSource extends CalendarDataSource {
-//
-//   EventDataSource(List<Event> event) {
-//     appointments = event;
-//   }
-//
-// //イベントのカラー
-//   @override
-//   Color getColor(int index) {
-//     return appointments![index].background;
-//   }
-//
-// //イベントの終了時間
-//   @override
-//   DateTime getEndTime(int index) {
-//     return appointments![index].to;
-//   }
-//
-// //イベントの開始時間
-//   @override
-//   DateTime getStartTime(int index) {
-//     return appointments![index].from;
-//   }
-//
-// //イベントの名前
-//   @override
-//   String getSubject(int index) {
-//     return appointments![index].eventName;
-//   }
-//
-//   @override
-//   bool isAllDay(int index) {
-//     return appointments![index].isAllDay;
-//   }
-// }
+  DateTime dateTime =(fromTo=="from"?ref.watch(calendarDataProvider).selectedDateTimeFrom:ref.watch(calendarDataProvider).selectedDateTimeTo);
+  return    Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical:8),
+    child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      GestureDetector(
+          child: grayBiggerTextRight(
+            text: fromDateToYearMonthDayText(dateTime),
+          ),
+          onTap: () async{
+            final DateTime? d = await showDatePicker(
+              context: context,
+                initialDate: dateTime,
+                firstDate: DateTime(dateTime.add(Duration(days:-30)).year,dateTime.add(Duration(days:-30)).month,dateTime.add(Duration(days:-30)).day),
+                lastDate: DateTime(dateTime.add(Duration(days:30)).year,dateTime.add(Duration(days:30)).month,dateTime.add(Duration(days:30)).day),
+            );
+            if (d != null) {
+              if(fromTo=="from"){
+                ref.read(calendarDataProvider.notifier).setSelectedDateTimeFrom(new DateTime(d.year,d.month,d.day,dateTime.hour,dateTime.minute));
+              }else{
+                ref.read(calendarDataProvider.notifier).setSelectedDateTimeTo(new DateTime(d.year,d.month,d.day,dateTime.hour,dateTime.minute));
+              }
+            }
+
+          }
+          ),
+      GestureDetector(
+          child: grayBiggerTextRight(
+            text: fromDateToHourMinuteText(dateTime),
+          ),
+          onTap: () async{
+            final TimeOfDay? t = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute ),
+            );
+            if (t != null) {
+              dateTime=new DateTime(dateTime.year,dateTime.month,dateTime.day,t.hour,t.minute);
+            }
+
+          }),
+    ]),
+  );
+}

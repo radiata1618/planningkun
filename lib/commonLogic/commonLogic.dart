@@ -163,3 +163,24 @@ Future<File> urlToFile(String imageUrl) async {
   //TODO　キャッシュはちゃんと削除するような処理方式に変更？→このメソッドから返った後もファイル使っている？ログイン時などに一括処理？
   return file;
 }
+
+String fromDateToYearMonthDayText(DateTime datetime){
+
+  return
+    datetime.year.toString() +
+        "/" +
+        ("00"+datetime.month.toString()).substring(datetime.month.toString().length) +
+        "/" +
+        ("00"+datetime.day.toString()).substring(datetime.day.toString().length);
+
+}
+
+
+String fromDateToHourMinuteText(DateTime datetime){
+
+  return
+        ("00"+datetime.hour.toString()).substring(datetime.hour.toString().length) +
+        ":" +
+        ("00"+datetime.minute.toString()).substring(datetime.minute.toString().length);
+
+}

@@ -57,6 +57,33 @@ Widget orangeRoundButton(
   );
 }
 
+Widget smallOrangeRoundButton(
+    {required String text, required Function()? onPressed}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+    child: Container(
+      height: 30,
+      child: OutlinedButton(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          primary: Colors.white10,
+          backgroundColor: Colors.orange,
+          shape: const StadiumBorder(),
+          side: const BorderSide(color: Colors.white, width: 0),
+        ),
+        onPressed: onPressed,
+      ),
+    ),
+  );
+}
+
 Widget whiteBorderRoundButton(
     {required String text, required Function()? onPressed}) {
   return Padding(
@@ -124,6 +151,22 @@ Padding grayTextLeft({required String text}){
           style:TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 13,
+            color: Colors.black54,
+          ),
+        )
+    ),
+  );
+}
+
+Padding grayBiggerTextRight({required String text}){
+  return Padding(
+    padding: const EdgeInsets.only(top:8.0),
+    child: Align(
+        alignment: Alignment.topRight,
+        child:Text(text,
+          style:TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
             color: Colors.black54,
           ),
         )
