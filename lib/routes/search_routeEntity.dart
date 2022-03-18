@@ -49,9 +49,9 @@ class SearchResultNotifier extends ChangeNotifier {
         ref, filterConditions, "searchConditionCountry", "country");
     //filterConditions=addConditionList(filterConditions,"searchConditionGender","gender");TODO なぜか追加すると検索できない
 
-    //query=query.filters("country:USA");文字検索の成功例
     //query=query.filters("ageNumber:30 TO 40");
     //query=query.facetFilter(["ageNumber:"+ageConditionList[0]+" TO "+ageConditionList[1]]);
+    //query=query.filters("country:USA");文字検索の成功例
     //query=query.filters("country:"+widget.argumentUserData["searchConditionCountry"]!);
     //query=query.filters("country:JPN");
     query = query.filters(filterConditions);

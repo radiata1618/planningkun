@@ -169,6 +169,7 @@ class FriendDataNotifier extends ChangeNotifier {
                   snapshot.docs[i].get("profilePhotoNameSuffix"));
               await boxFriend.delete(snapshot.docs[i].get('friendUserDocId'));
               log("XXXXXXXXXXXXXXXXXXXXXXXXXXXDelete完了" + snapshot.docs[i].get('friendUserDocId'));
+              //TODO メモリからの削除処理が必要
             }
           } else {
 

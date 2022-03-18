@@ -148,7 +148,7 @@ class TopicDataNotifier extends ChangeNotifier {
                 resultList[0].deleteFlg=snapshot.docs[i].get("deleteFlg");
 
                 await isar.topics.put(resultList[0]);
-                log("donload topics "+resultList[0].topicName+snapshot.docs[i].get("topicName"));
+                log("download topics "+resultList[0].topicName+snapshot.docs[i].get("topicName"));
               }
             });
           }
